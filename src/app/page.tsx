@@ -144,6 +144,19 @@ export default function Home() {
     return activeCategories;
   }, [searchQuery, activeCategories, filteredCategories]);
 
+  const sortedCategories = useMemo(() => {
+    if (!searchQuery) {
+      return appCategories;
+    }
+    const matchingCategories = appCategories.filter(cat =>
+      filteredCategories.includes(cat.id)
+    );
+    const otherCategories = appCategories.filter(
+      cat => !filteredCategories.includes(cat.id)
+    );
+    return [...matchingCategories, ...otherCategories];
+  }, [searchQuery, filteredCategories]);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -172,7 +185,7 @@ export default function Home() {
                       onValueChange={setActiveCategories}
                       className="w-full"
                     >
-                      {appCategories.map(cat => (
+                      {sortedCategories.map(cat => (
                         <CategorySelector
                           key={cat.id}
                           category={cat}
