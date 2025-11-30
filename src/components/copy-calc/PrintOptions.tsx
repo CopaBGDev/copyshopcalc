@@ -49,10 +49,6 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       if (selectedPaper.format === 'SRA3') {
         const copiesPerSheet = format === 'A4' ? 2 : 1;
         paperPricePerCopy = selectedPaper.price / copiesPerSheet;
-        if (side === 'twoSided') {
-             // For two-sided printing, the paper cost is applied once per sheet, but the print price is per side.
-             // The price tier already gives price per printed side. We add paper price.
-        }
       } else {
         paperPricePerCopy = selectedPaper.price;
       }
@@ -71,7 +67,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     const opis = `${format}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
     
     onAddToBasket({
-      serviceId: `stampa-${format}-${color}-${paperId}`,
+      serviceId: `stampa-${format}-${color}-${side}-${paperId}`,
       naziv: `Štampa: ${activePrintOption.name}`,
       opis,
       kolicina: quantity,
