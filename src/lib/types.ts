@@ -170,6 +170,63 @@ export type BusinessCardData = {
 }
 // --- END: Business Card Service Specific Types ---
 
+// --- START: Large Format Service Specific Types ---
+
+export type PlottingService = {
+  rollWidth: string;
+  cb: number;
+  lineColor: number;
+  fullColor: number;
+}
+
+export type PlottingData = {
+  paper80g: PlottingService[];
+  finishing: { name: string; price: number; }[];
+}
+
+export type PosterService = {
+  paper: string;
+  price: number;
+}
+
+export type PosterData = {
+  fixedFormat: {
+    '50x70': PosterService[];
+    '70x100': PosterService[];
+  };
+  byMeter: {
+    rollWidth: string;
+    paper: string;
+    priceM2: number;
+  }[];
+}
+
+export type BannerService = {
+  name: string;
+  tiers: { '1-5': number; '5-10': number; '10+': string; }
+}
+
+export type RollupService = {
+  dimensions: string;
+  price: number;
+}
+
+export type LargeFormatData = {
+  plotting: PlottingData;
+  posters: PosterData;
+  banners: {
+    services: BannerService[];
+    addons: { name: string; price: number; unit: 'kom' | 'm' }[]
+  };
+  rollups: {
+    setups: RollupService[],
+    refill: { name: string, tiers: { '1-5': number; '5-10': number; '10+': string; } },
+    changeService: { name: string, price: number, unit: string }
+  }
+}
+
+// --- END: Large Format Service Specific Types ---
+
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {

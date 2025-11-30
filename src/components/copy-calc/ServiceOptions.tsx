@@ -8,6 +8,7 @@ import { ScanOptions } from "./ScanOptions";
 import { TextileOptions } from "./TextileOptions";
 import { KeyOptions } from "./KeyOptions";
 import { BusinessCardOptions } from "./BusinessCardOptions";
+import { LargeFormatOptions } from "./LargeFormatOptions";
 
 type ServiceOptionsProps = {
   category: AppCategory;
@@ -31,10 +32,11 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
         return <KeyOptions onAddToBasket={onAddToBasket} />;
       case 'vizitke_flajeri':
         return <BusinessCardOptions onAddToBasket={onAddToBasket} />;
+      case 'veliki_formati':
+        return <LargeFormatOptions onAddToBasket={onAddToBasket} />;
       // Add cases for other categories here
       case 'promo':
       case 'kanvas':
-      case 'veliki_formati':
       case 'dizajn':
       default:
         return (

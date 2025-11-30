@@ -1,4 +1,4 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData } from './types';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
@@ -273,5 +273,66 @@ export const businessCardServices: BusinessCardData = {
             { kolicina: 500, cena: 3070.00, sifra: 680 },
             { kolicina: 1000, cena: 5430.00, sifra: 681 }
         ]
+    }
+};
+
+export const largeFormatServices: LargeFormatData = {
+    plotting: {
+        paper80g: [
+            { rollWidth: "1060 mm", cb: 285.00, lineColor: 299.00, fullColor: 705.00 },
+            { rollWidth: "914 mm", cb: 265.00, lineColor: 280.00, fullColor: 605.00 },
+            { rollWidth: "750 mm", cb: 225.00, lineColor: 250.00, fullColor: 555.00 },
+            { rollWidth: "620 mm", cb: 215.00, lineColor: 230.00, fullColor: 505.00 },
+            { rollWidth: "420 mm", cb: 175.00, lineColor: 199.00, fullColor: 455.00 },
+            { rollWidth: "320 mm", cb: 155.00, lineColor: 180.00, fullColor: 405.00 },
+        ],
+        finishing: [
+            { name: "Sečenje po m1 dužnom", price: 30.00 },
+            { name: "Savijanje po m1 na A4", price: 30.00 },
+            { name: "Savijanje po m1 na A3", price: 85.00 },
+        ]
+    },
+    posters: {
+        fixedFormat: {
+            '50x70': [
+                { paper: "120gr Foto mat", price: 590.00 },
+                { paper: "180gr Foto mat", price: 735.00 },
+                { paper: "180gr Foto GLOSSY", price: 945.00 },
+            ],
+            '70x100': [
+                { paper: "120gr Foto mat", price: 945.00 },
+                { paper: "180gr Foto mat", price: 1253.00 },
+                { paper: "180gr Foto Glossy", price: 1323.00 },
+            ]
+        },
+        byMeter: [
+            { rollWidth: "610mm", paper: "120gr Foto mat (crno belo/linijski kolor)", priceM2: 630.00 },
+            { rollWidth: "610mm", paper: "120gr Foto mat (do 50% popunjenosti)", priceM2: 840.00 },
+            { rollWidth: "610mm", paper: "120gr Foto mat (preko 50% popunjenosti)", priceM2: 840.00 },
+            { rollWidth: "1060mm", paper: "120gr Foto mat (crno belo/linijski kolor)", priceM2: 890.00 },
+            { rollWidth: "1060mm", paper: "120gr Foto mat (do 50% popunjenosti)", priceM2: 1350.00 },
+            { rollWidth: "1060mm", paper: "120gr Foto mat (preko 50% popunjenosti)", priceM2: 1350.00 },
+            { rollWidth: "610mm", paper: "180gr Foto mat", priceM2: 1050.00 },
+            { rollWidth: "610mm", paper: "180gr Foto glossy /satin", priceM2: 1370.00 },
+            { rollWidth: "1060mm", paper: "180gr Foto mat", priceM2: 1790.00 },
+            { rollWidth: "1060mm", paper: "180gr Foto glossy /satin", priceM2: 1890.00 },
+        ]
+    },
+    banners: {
+        services: [
+            { name: "Cirada Baner", tiers: { '1-5': 2150.00, '5-10': 1815.00, '10+': "na upit" } },
+        ],
+        addons: [
+            { name: "Ringlice za baner ciradu", price: 55.00, unit: 'kom' },
+            { name: "Porubljivanje baner cirade", price: 220.00, unit: 'm' },
+        ]
+    },
+    rollups: {
+        setups: [
+            { dimensions: "85x200cm", price: 8800.00 },
+            { dimensions: "100x200cm", price: 9990.00 },
+        ],
+        refill: { name: "PP baner za roll up", tiers: { '1-5': 2530.00, '5-10': 2310.00, '10+': "na upit" } },
+        changeService: { name: "Usluga zamena medija za roll up", price: 700.00, unit: "po m2" },
     }
 }
