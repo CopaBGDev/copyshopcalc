@@ -25,7 +25,7 @@ export type PriceTier = {
   sifra?: number;
 };
 
-export type PrintFormat = 'A4' | 'A3' | 'A5' | 'A6' | 'SRA3_330x482';
+export type PrintFormat = 'A4' | 'A3' | 'SRA3_330x482';
 
 export type PrintOption = {
   format: 'A4' | 'A3'; // Base format for pricing

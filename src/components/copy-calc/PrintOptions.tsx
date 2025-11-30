@@ -137,13 +137,6 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
         
         let currentUnitPrice = tier.cena;
-
-        // Adjust price for smaller formats based on A4
-        if (format === 'A5') {
-            currentUnitPrice /= 2;
-        } else if (format === 'A6') {
-            currentUnitPrice /= 4;
-        }
         
         let paperPricePerCopy = 0;
         if (selectedPaper.price > 0) {
@@ -152,8 +145,6 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                 if (format === 'SRA3_330x482') copiesPerSheet = 1;
                 else if (format === 'A3') copiesPerSheet = 1; // approx
                 else if (format === 'A4') copiesPerSheet = 2;
-                else if (format === 'A5') copiesPerSheet = 4;
-                else if (format === 'A6') copiesPerSheet = 8;
                 paperPricePerCopy = selectedPaper.price / copiesPerSheet;
             } else { // Assuming price is per A4 if format is not SRA3
                  paperPricePerCopy = selectedPaper.price;
@@ -226,14 +217,6 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     <div className="flex items-center space-x-2">
                         <RadioGroupItem value="A3" id="format-a3" />
                         <Label htmlFor="format-a3">A3</Label>
-                    </div>
-                     <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="A5" id="format-a5" />
-                        <Label htmlFor="format-a5">A5</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="A6" id="format-a6" />
-                        <Label htmlFor="format-a6">A6</Label>
                     </div>
                      <div className="flex items-center space-x-2">
                         <RadioGroupItem value="SRA3_330x482" id="format-sra3" />
