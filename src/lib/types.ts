@@ -1,40 +1,3 @@
-export type PriceTier = {
-  kolicina: string;
-  cena: number;
-};
-
-export type PrintService = {
-  id: string;
-  naziv: string;
-  kategorija: 'Štampa';
-  podkategorija: 'Crno-belo' | 'Kolor';
-  format: 'A4' | 'A3';
-  cene_jednostrano: PriceTier[];
-  cene_obostrano: PriceTier[];
-};
-
-export type FinishingService = {
-  id: string;
-  naziv: string;
-  kategorija: 'Dorada';
-  podkategorija: string;
-  specifikacije: Record<string, any>;
-  cena: number;
-  jedinica_mere: 'komad' | 'm' | 'rez' | 'big';
-};
-
-export type OtherService = {
-    id: string;
-    naziv: string;
-    kategorija: string;
-    podkategorija?: string;
-    cena: number;
-    specifikacije?: Record<string, any>;
-    jedinica_mere: string;
-}
-
-export type Service = PrintService | FinishingService | OtherService;
-
 export type OrderItem = {
   id: string; // Unique ID for the basket item instance
   serviceId: string;
@@ -51,3 +14,41 @@ export type AppCategory = {
   icon: any; // Lucide icon component
   opis: string;
 };
+
+// --- START: Print Service Specific Types ---
+
+export type PriceTier = {
+  kolicina: { min: number; max: number };
+  cena: number;
+  sifra: number;
+};
+
+export type PrintOption = {
+  format: 'A4' | 'A3';
+  color: 'cb' | 'kolor';
+  name: string;
+  oneSided: PriceTier[];
+  twoSided: PriceTier[];
+};
+
+export type PaperType = {
+  id: string;
+  name: string;
+  price: number;
+  format?: 'SRA3'
+};
+
+export type PrintServiceData = {
+  papers: PaperType[];
+  options: PrintOption[];
+};
+
+// --- END: Print Service Specific Types ---
+
+// Generic service types can be defined below if needed for other categories
+export type OtherService = {
+    id: string;
+    naziv: string;
+    kategorija: string;
+    cena: number;
+}
