@@ -11,6 +11,7 @@ import { BusinessCardOptions } from "./BusinessCardOptions";
 import { LargeFormatOptions } from "./LargeFormatOptions";
 import { CanvasOptions } from "./CanvasOptions";
 import { FlyerOptions } from "./FlyerOptions";
+import { GiftOptions } from "./GiftOptions";
 
 type ServiceOptionsProps = {
   category: AppCategory;
@@ -40,6 +41,8 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
         return <CanvasOptions onAddToBasket={onAddToBasket} />;
       case 'flajeri':
          return <FlyerOptions onAddToBasket={onAddToBasket} />;
+      case 'pokloni':
+        return <GiftOptions onAddToBasket={onAddToBasket} />;
       case 'promo':
         return (
             <div className="text-center text-muted-foreground py-8">

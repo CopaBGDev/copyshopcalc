@@ -304,6 +304,19 @@ export type CanvasServiceData = {
 }
 // --- END: Canvas Service Specific Types ---
 
+// --- START: Gift Service Specific Types ---
+export type GiftService = {
+  id: string;
+  name: string;
+  price: number;
+  sifra?: number;
+}
+
+export type GiftServiceData = {
+  items: GiftService[];
+}
+// --- END: Gift Service Specific Types ---
+
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {
@@ -312,5 +325,3 @@ export type OtherService = {
     kategorija: string;
     cena: number;
 }
-
-    

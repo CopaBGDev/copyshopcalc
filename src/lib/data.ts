@@ -1,5 +1,5 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData, FlyerData, CanvasServiceData } from './types';
-import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon, Newspaper } from 'lucide-react';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData, FlyerData, CanvasServiceData, GiftServiceData } from './types';
+import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon, Newspaper, Gift } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
   {
@@ -37,6 +37,12 @@ export const appCategories: AppCategory[] = [
     naziv: 'Štampa na Tekstilu',
     icon: Shirt,
     opis: 'Majice, duksevi, cegeri.'
+  },
+  {
+    id: 'pokloni',
+    naziv: 'Foto Pokloni',
+    icon: Gift,
+    opis: 'Šolje, puzzle, satovi, privesci...'
   },
   {
     id: 'promo',
@@ -419,4 +425,14 @@ export const canvasServices: CanvasServiceData = {
     ]
 }
 
-    
+export const giftServices: GiftServiceData = {
+  items: [
+    { id: "solja-bela", name: "Foto šolja klasična bela", price: 850.00 },
+    { id: "puzzle-a4", name: "Foto puzzle A4", price: 1200.00 },
+    { id: "puzzle-srce", name: "Foto puzzle srce", price: 1100.00 },
+    { id: "sat", name: "Personalizovani sat (razni oblici)", price: 2900.00 },
+    { id: "foto-kugla", name: "Foto kugla ili srce", price: 1150.00 },
+    { id: "foto-ram", name: "Foto ram ili duplo srce", price: 1350.00 },
+    { id: "maska-telefon", name: "Maska za telefon sa štampom", price: 1500.00, sifra: 335 }
+  ]
+}
