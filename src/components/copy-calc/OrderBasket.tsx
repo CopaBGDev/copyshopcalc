@@ -14,7 +14,7 @@ type OrderBasketProps = {
 };
 
 export function OrderBasket({ items, onUpdateQuantity, onFinalizeOrder, isFinalizing }: OrderBasketProps) {
-  const total = items.reduce((acc, item) => acc + item.cena_jedinice * item.kolicina, 0);
+  const total = items.reduce((acc, item) => acc + item.cena_ukupno, 0);
 
   return (
     <Card className="shadow-lg">
@@ -25,7 +25,7 @@ export function OrderBasket({ items, onUpdateQuantity, onFinalizeOrder, isFinali
         </CardTitle>
         <CardDescription>Pregled i izmena stavki pre zaključenja.</CardDescription>
       </CardHeader>
-      <CardContent className="max-h-[40vh] overflow-y-auto pr-3">
+      <CardContent className="max-h-[45vh] overflow-y-auto pr-3">
         {items.length === 0 ? (
           <div className="text-center text-muted-foreground py-10">
             <p>Korpa je trenutno prazna.</p>
@@ -35,8 +35,9 @@ export function OrderBasket({ items, onUpdateQuantity, onFinalizeOrder, isFinali
             {items.map((item) => (
               <div key={item.id} className="flex justify-between items-start animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div className="flex-grow">
-                  <p className="font-medium">{item.naziv}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium leading-tight">{item.naziv}</p>
+                  <p className="text-xs text-muted-foreground">{item.opis}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {item.kolicina} x {item.cena_jedinice.toFixed(2)} RSD
                   </p>
                 </div>

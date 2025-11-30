@@ -14,7 +14,7 @@ export async function createOrder(items: OrderItem[], total: number) {
     console.log("--- KREIRANJE NOVE PORUDŽBINE ---");
     console.log("Vreme:", new Date().toISOString());
     console.log("Ukupno:", total.toFixed(2), "RSD");
-    console.log("Stavke:", JSON.stringify(items, null, 2));
+    console.log("Stavke:", JSON.stringify(items.map(it => ({ naziv: it.naziv, opis: it.opis, kolicina: it.kolicina, cena_ukupno: it.cena_ukupno })), null, 2));
 
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));

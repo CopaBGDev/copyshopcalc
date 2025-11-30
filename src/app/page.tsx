@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo, useTransition } from "react";
-import type { OrderItem, Service } from "@/lib/types";
-import { mockServices } from "@/lib/data";
+import type { OrderItem, AppCategory } from "@/lib/types";
+import { appCategories } from "@/lib/data";
 import { createOrder } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,51 +11,35 @@ import { CategorySelector } from "@/components/copy-calc/CategorySelector";
 import { ServiceOptions } from "@/components/copy-calc/ServiceOptions";
 import { OrderBasket } from "@/components/copy-calc/OrderBasket";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Accordion } from "@/components/ui/accordion";
+
 
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [activeCategories, setActiveCategories] = useState<string[]>(['stampa']);
   const [basket, setBasket] = useState<OrderItem[]>([]);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
-  const servicesForCategory = useMemo(() => {
-    if (!selectedCategory) return [];
-    return mockServices.filter((s) => s.kategorija === selectedCategory);
-  }, [selectedCategory]);
-
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(prev => prev === category ? null : category);
+  const handleCategoryToggle = (categoryId: string) => {
+    setActiveCategories(prev =>
+      prev.includes(categoryId)
+        ? prev.filter(c => c !== categoryId)
+        : [...prev, categoryId]
+    );
   };
 
-  const handleAddToBasket = (service: Service, quantity: number) => {
-    if (quantity <= 0) return;
+  const handleAddToBasket = (item: Omit<OrderItem, 'id'>) => {
+    const newItem: OrderItem = {
+      ...item,
+      id: `${item.serviceId}-${Date.now()}`,
+    };
 
-    setBasket((prevBasket) => {
-      const existingItemIndex = prevBasket.findIndex(
-        (item) => item.serviceId === service.id
-      );
-
-      if (existingItemIndex > -1) {
-        const updatedBasket = [...prevBasket];
-        updatedBasket[existingItemIndex].kolicina += quantity;
-        return updatedBasket;
-      } else {
-        const newItem: OrderItem = {
-          id: `${service.id}-${Date.now()}`,
-          serviceId: service.id,
-          naziv: service.naziv,
-          kolicina: quantity,
-          cena_jedinice: service.cena_jedinice,
-        };
-        return [...prevBasket, newItem];
-      }
-    });
+    setBasket(prev => [...prev, newItem]);
     
     toast({
-        title: "Stavka dodata",
-        description: `${service.naziv} (x${quantity}) je dodat u korpu.`,
-    })
+      title: "Stavka dodata",
+      description: `${item.naziv} (x${item.kolicina}) je dodat u korpu.`,
+    });
   };
 
   const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
@@ -63,14 +47,21 @@ export default function Home() {
       if (newQuantity <= 0) {
         return prevBasket.filter((item) => item.id !== itemId);
       }
-      return prevBasket.map((item) =>
-        item.id === itemId ? { ...item, kolicina: newQuantity } : item
-      );
+      return prevBasket.map((item) => {
+        if (item.id === itemId) {
+          return { 
+            ...item, 
+            kolicina: newQuantity,
+            cena_ukupno: item.cena_jedinice * newQuantity,
+           };
+        }
+        return item;
+      });
     });
   };
 
   const handleFinalizeOrder = () => {
-    const total = basket.reduce((acc, item) => acc + item.cena_jedinice * item.kolicina, 0);
+    const total = basket.reduce((acc, item) => acc + item.cena_ukupno, 0);
 
     if (basket.length === 0) {
         toast({
@@ -89,7 +80,6 @@ export default function Home() {
           description: result.message,
         });
         setBasket([]);
-        setSelectedCategory(null);
       } else {
         toast({
           variant: "destructive",
@@ -106,20 +96,31 @@ export default function Home() {
       <main className="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8">
           <div className="lg:col-span-2">
-             <Card className="shadow-lg animate-in fade-in duration-500">
+             <Card className="shadow-lg">
                 <CardContent className="p-6">
-                    <CategorySelector onSelectCategory={handleCategorySelect} selectedCategory={selectedCategory} />
-                    {selectedCategory && (
-                      <>
-                        <Separator className="my-6" />
-                        <ServiceOptions
-                            key={selectedCategory} // Reset component state on category change
-                            category={selectedCategory}
-                            services={servicesForCategory}
-                            onAddToBasket={handleAddToBasket}
-                        />
-                      </>
-                    )}
+                    <h2 className="text-2xl font-bold tracking-tight mb-1">Započnite novu porudžbinu</h2>
+                    <p className="text-muted-foreground mb-6">Izaberite kategoriju usluge za unos stavki.</p>
+                    <Accordion 
+                      type="multiple" 
+                      value={activeCategories}
+                      onValueChange={setActiveCategories}
+                      className="w-full"
+                    >
+                      {appCategories.map(cat => (
+                        <CategorySelector
+                          key={cat.id}
+                          category={cat}
+                          isOpen={activeCategories.includes(cat.id)}
+                          onToggle={() => handleCategoryToggle(cat.id)}
+                        >
+                          <ServiceOptions
+                              key={cat.id}
+                              category={cat}
+                              onAddToBasket={handleAddToBasket}
+                          />
+                        </CategorySelector>
+                      ))}
+                    </Accordion>
                 </CardContent>
             </Card>
           </div>
