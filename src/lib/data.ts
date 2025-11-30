@@ -1,4 +1,4 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData, FlyerData, CanvasServiceData, GiftServiceData, OfficeSuppliesData } from './types';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData, FlyerData, CanvasServiceData, GiftServiceData, OfficeSuppliesData, DesignServiceData } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon, Newspaper, Gift, Briefcase } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
@@ -463,14 +463,22 @@ export const officeSuppliesData: OfficeSuppliesData = {
         { type: 'c4', kolicina: 500, cena: 7900.00 },
     ],
     brochures: [
-        { id: 'buklet-a4', name: 'Brošura - buklet A4 (kolor)', pricePerPage: 60.00, unit: 'po strani' },
-        { id: 'katalog-a5', name: 'Katalog - buklet A5 (kolor)', pricePerPage: 32.00, unit: 'po strani' },
+        { id: 'buklet-a4', name: 'Brošura - buklet A4 (kolor)', price: 0, pricePerPage: 60.00, unit: 'po strani' },
+        { id: 'katalog-a5', name: 'Katalog - buklet A5 (kolor)', price: 0, pricePerPage: 32.00, unit: 'po strani' },
         { id: 'liflet-a4-50', name: 'Liflet A4 (2 savijanja, 50 kom)', price: 4150.00, unit: 'paket' },
         { id: 'liflet-a4-100', name: 'Liflet A4 (2 savijanja, 100 kom)', price: 5950.00, unit: 'paket' },
         { id: 'liflet-a3-50', name: 'Liflet A3 (1 savijanje, 50 kom)', price: 5750.00, unit: 'paket' },
     ]
 }
 
+export const designServices: DesignServiceData = [
+    { id: "kreativni-dizajn", name: "Kreativni dizajn", price: 3600.00, unit: "sat" },
+    { id: "priprema-stampa", name: "Priprema za štampu", price: 2400.00, unit: "sat" },
+    { id: "montaze-korekcije", name: "Montaže i korekcije", price: 60.00, unit: "minut" },
+    { id: "izrada-logoa", name: "Izrada logoa", price: 5000.00, unit: "komad", notes: "Cena od 5000 do 18000" },
+    { id: "obrada-fotografija", name: "Obrada fotografija", price: 2400.00, unit: "sat" },
+    { id: "kucanje-teksta", name: "Kucanje teksta", price: 1200.00, unit: "strana" }
+];
 
 
   

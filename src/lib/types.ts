@@ -345,6 +345,19 @@ export type OfficeSuppliesData = {
 
 // --- END: Office Supplies Types ---
 
+// --- START: Design Service Types ---
+export type DesignService = {
+    id: string;
+    name: string;
+    price: number;
+    unit: 'sat' | 'minut' | 'strana' | 'komad';
+    notes?: string;
+}
+
+export type DesignServiceData = DesignService[];
+// --- END: Design Service Types ---
+
+
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {
     id: string;

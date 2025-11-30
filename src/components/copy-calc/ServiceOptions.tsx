@@ -13,6 +13,7 @@ import { CanvasOptions } from "./CanvasOptions";
 import { FlyerOptions } from "./FlyerOptions";
 import { GiftOptions } from "./GiftOptions";
 import { OfficeOptions } from "./OfficeOptions";
+import { DesignOptions } from "./DesignOptions";
 
 type ServiceOptionsProps = {
   category: AppCategory;
@@ -54,12 +55,7 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
             </div>
         )
       case 'dizajn':
-          return (
-            <div className="text-center text-muted-foreground py-8">
-                <p className="font-semibold">Usluge grafičkog dizajna i pripreme.</p>
-                <p className="text-sm mt-2">Za sve potrebe dizajna, preloma teksta i pripreme za štampu, obratite se našem dizajnerskom timu radi konsultacija i formiranja cene.</p>
-            </div>
-        )
+          return <DesignOptions onAddToBasket={onAddToBasket} />;
       default:
         return (
             <div className="text-center text-muted-foreground py-8">
