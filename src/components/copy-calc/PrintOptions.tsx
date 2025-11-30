@@ -17,17 +17,21 @@ type PrintOptionsProps = {
   onAddToBasket: (item: Omit<OrderItem, 'id'>) => void;
 };
 
-const SRA3_W = 450;
-const SRA3_H = 320;
+const SRA3_W = 482;
+const SRA3_H = 330;
+const MARGIN = 5;
 
 function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sheetH: number): number {
     if (itemW <= 0 || itemH <= 0) return 0;
+    
+    const usableSheetW = sheetW - (MARGIN * 2);
+    const usableSheetH = sheetH - (MARGIN * 2);
 
     // First orientation
-    const itemsNormal = Math.floor(sheetW / itemW) * Math.floor(sheetH / itemH);
+    const itemsNormal = Math.floor(usableSheetW / itemW) * Math.floor(usableSheetH / itemH);
 
     // Rotated orientation
-    const itemsRotated = Math.floor(sheetW / itemH) * Math.floor(sheetH / itemW);
+    const itemsRotated = Math.floor(usableSheetW / itemH) * Math.floor(usableSheetH / itemW);
 
     return Math.max(itemsNormal, itemsRotated);
 }
@@ -277,7 +281,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     <Calculator className="h-4 w-4" />
                     <AlertTitle>Obračun</AlertTitle>
                     <AlertDescription>
-                        Cena se računa na osnovu broja komada koji staju na SRA3 tabak (450x320mm). 
+                        Cena se računa na osnovu broja komada koji staju na SRA3 tabak ({SRA3_W}x{SRA3_H}mm, sa marginama od {MARGIN}mm). 
                         Na jedan tabak staje: <span className="font-bold">{itemsPerSRA3}</span> kom.
                     </AlertDescription>
                 </Alert>
@@ -324,3 +328,5 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     </div>
   );
 }
+
+    
