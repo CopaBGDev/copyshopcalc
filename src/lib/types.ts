@@ -91,6 +91,15 @@ export type LaminationServiceData = {
   roll: LaminationRollService[];
 }
 
+export type OtherFinishingService = {
+    id: string;
+    name: string;
+    price: number;
+    price_over_50?: number;
+    unit: string;
+    sifra?: number;
+}
+
 
 export type FinishingServiceData = {
   binding: {
@@ -99,6 +108,7 @@ export type FinishingServiceData = {
   };
   hardcover: HardcoverBindingType;
   lamination: LaminationServiceData;
+  other: OtherFinishingService[];
 }
 
 // --- END: Finishing Service Specific Types ---

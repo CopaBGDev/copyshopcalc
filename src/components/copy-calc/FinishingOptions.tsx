@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { PlusCircle, BookCopy, ShieldCheck, Layers } from 'lucide-react';
+import { PlusCircle, BookCopy, ShieldCheck, Layers, Settings2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -345,13 +345,116 @@ const LaminationCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Or
 };
 
 
+const OtherFinishingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
+    const services = finishingServices.other;
+    const [selectedServiceId, setSelectedServiceId] = useState<string>(services[0].id);
+    const [quantity, setQuantity] = useState<number>(1);
+
+    const { unitPrice, description, serviceName } = useMemo(() => {
+        const service = services.find(s => s.id === selectedServiceId);
+        if (!service) return { unitPrice: 0, description: '', serviceName: '' };
+        
+        let price = service.price;
+        // Special price logic for bigovanje
+        if (service.id === 'bigovanje' && quantity > 50) {
+            price = service.price_over_50 || price;
+        }
+
+        return { 
+            unitPrice: price, 
+            description: service.name,
+            serviceName: service.name
+        };
+    }, [selectedServiceId, quantity, services]);
+    
+    const totalPrice = unitPrice * quantity;
+
+    const handleAddToBasket = () => {
+        if (totalPrice <= 0) return;
+
+        let finalDescription = description;
+        if (selectedServiceId === 'bigovanje') {
+            finalDescription += ` (${quantity} kom)`;
+        }
+
+
+        onAddToBasket({
+            serviceId: `dorada-ostalo-${selectedServiceId}`,
+            naziv: serviceName,
+            opis: finalDescription,
+            kolicina: quantity,
+            cena_jedinice: unitPrice,
+            cena_ukupno: totalPrice,
+        });
+    };
+
+    const selectedService = services.find(s => s.id === selectedServiceId);
+
+    return (
+        <Card className="border-none shadow-none">
+            <CardContent className="p-4 space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="other-finishing-type">Vrsta usluge</Label>
+                    <Select onValueChange={setSelectedServiceId} defaultValue={selectedServiceId}>
+                        <SelectTrigger id="other-finishing-type">
+                            <SelectValue placeholder="Izaberite vrstu usluge" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {services.map(s => (
+                                <SelectItem key={s.id} value={s.id}>
+                                    {s.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                    <div className="space-y-2">
+                        <Label htmlFor="other-finishing-quantity">Količina</Label>
+                        <Input
+                            id="other-finishing-quantity"
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                            min="1"
+                            className="max-w-xs"
+                        />
+                        { selectedService?.id === 'bigovanje' &&
+                            <p className="text-xs text-muted-foreground">Podešavanje + 50 bigova je {selectedService.price} RSD. <br/> Preko 50 kom, cena po komadu je {selectedService.price_over_50} RSD.</p>
+                         }
+                    </div>
+                     <div className="flex flex-col items-start md:items-end bg-primary/5 p-4 rounded-lg">
+                        <Label className="text-sm text-muted-foreground">Ukupna cena</Label>
+                        <p className="text-3xl font-bold font-mono tracking-tight text-primary">
+                            {totalPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground h-4">
+                           {quantity > 0 && `(${unitPrice.toFixed(2)} RSD / ${selectedService?.unit || 'kom'})`}
+                        </p>
+                    </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-end">
+                    <Button size="lg" onClick={handleAddToBasket} disabled={totalPrice <= 0}>
+                        <PlusCircle className="mr-2" />
+                        Dodaj u korpu
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
 
 export function FinishingOptions({ onAddToBasket }: FinishingOptionsProps) {
     return (
         <div className="space-y-6">
             <h3 className="text-lg font-semibold">Opcije dorade</h3>
             <Tabs defaultValue="binding" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="binding">
                         <BookCopy className="mr-2 h-4 w-4"/>
                         Koričenje
@@ -364,6 +467,10 @@ export function FinishingOptions({ onAddToBasket }: FinishingOptionsProps) {
                         <Layers className="mr-2 h-4 w-4" />
                         Plastifikacija
                     </TabsTrigger>
+                     <TabsTrigger value="other">
+                        <Settings2 className="mr-2 h-4 w-4" />
+                        Ostalo
+                    </TabsTrigger>
                 </TabsList>
                 <TabsContent value="binding">
                     <BindingCalculator onAddToBasket={onAddToBasket} />
@@ -373,6 +480,9 @@ export function FinishingOptions({ onAddToBasket }: FinishingOptionsProps) {
                 </TabsContent>
                  <TabsContent value="lamination">
                    <LaminationCalculator onAddToBasket={onAddToBasket} />
+                </TabsContent>
+                <TabsContent value="other">
+                   <OtherFinishingCalculator onAddToBasket={onAddToBasket} />
                 </TabsContent>
             </Tabs>
         </div>
