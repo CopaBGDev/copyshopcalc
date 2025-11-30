@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useTransition } from "react";
@@ -49,13 +50,44 @@ export default function Home() {
       }
       return prevBasket.map((item) => {
         if (item.id === itemId) {
+          // Handle custom print items that are calculated per sheet
+          if (item.itemsPerSheet && item.itemsPerSheet > 0) {
+            const itemsPerSheet = item.itemsPerSheet;
+            const isIncreasing = newQuantity > item.kolicina;
+            
+            let currentSheets = Math.ceil(item.kolicina / itemsPerSheet);
+            let newSheets: number;
+
+            if (isIncreasing) {
+                 newSheets = currentSheets + 1;
+            } else { // decreasing
+                 newSheets = currentSheets - 1;
+            }
+
+            if (newSheets <= 0) {
+              return { ...item, kolicina: 0, cena_ukupno: 0 }; // Will be filtered out
+            }
+            
+            const newTotalItems = newSheets * itemsPerSheet;
+            const pricePerSheet = (item.cena_jedinice * itemsPerSheet);
+            const newTotalPrice = pricePerSheet * newSheets;
+
+            return {
+              ...item,
+              kolicina: newTotalItems,
+              cena_ukupno: newTotalPrice,
+              opis: item.opis.replace(/\(x\d+\)/, `(x${newTotalItems})`).replace(/\d+ tabak/, `${newSheets} tabak`),
+            };
+          }
+          
+          // Handle regular items
           const newTotal = item.cena_jedinice * newQuantity;
-          return { 
-            ...item, 
+          return {
+            ...item,
             kolicina: newQuantity,
             cena_ukupno: newTotal,
             opis: item.opis.includes("x") ? item.opis.substring(0, item.opis.lastIndexOf(" (x")) + ` (x${newQuantity})` : `${item.opis} (x${newQuantity})`,
-           };
+          };
         }
         return item;
       });

@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { OrderItem } from "@/lib/types";
@@ -5,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Minus, Trash2, ShoppingCart, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 
 type OrderBasketProps = {
   items: OrderItem[];
@@ -42,12 +45,12 @@ export function OrderBasket({ items, onUpdateQuantity, onFinalizeOrder, isFinali
                   </p>
                 </div>
                 <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                   <div className="flex items-center">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onUpdateQuantity(item.id, item.kolicina - 1)}>
+                   <div className={cn("flex items-center", item.itemsPerSheet && "pointer-events-none")}>
+                        <Button variant="ghost" size="icon" className={cn("h-7 w-7", !item.itemsPerSheet && "pointer-events-auto")} onClick={() => !item.itemsPerSheet && onUpdateQuantity(item.id, item.kolicina - 1)}>
                             <Minus className="h-4 w-4" />
                         </Button>
                         <span className="w-8 text-center font-mono">{item.kolicina}</span>
-                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onUpdateQuantity(item.id, item.kolicina + 1)}>
+                         <Button variant="ghost" size="icon" className={cn("h-7 w-7", !item.itemsPerSheet && "pointer-events-auto")} onClick={() => !item.itemsPerSheet && onUpdateQuantity(item.id, item.kolicina + 1)}>
                             <Plus className="h-4 w-4" />
                         </Button>
                    </div>

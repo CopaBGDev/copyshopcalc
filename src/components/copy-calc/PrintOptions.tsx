@@ -31,13 +31,9 @@ function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sh
     const usableSheetW = sheetW - (MARGIN * 2);
     const usableSheetH = sheetH - (MARGIN * 2);
 
-    if (itemW > usableSheetW || itemH > usableSheetH) {
-      // Check rotated
-      if (itemH > usableSheetW || itemW > usableSheetH) {
-        return 0;
-      }
-    }
-
+    if (itemW > usableSheetW && itemW > usableSheetH) return 0;
+    if (itemH > usableSheetH && itemH > usableSheetW) return 0;
+    
     // First orientation
     const itemsNormal = Math.floor(usableSheetW / itemW) * Math.floor(usableSheetH / itemH);
 
@@ -179,6 +175,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     let opis = "";
     let finalQuantity = quantity;
     let finalUnitPrice = unitPrice;
+    let itemsPerSheetPayload: number | undefined = undefined;
 
     if (format === 'custom') {
         if (itemsPerSheet <= 0) return;
@@ -186,6 +183,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         finalQuantity = itemsPerSheet * quantity;
         opis = `${customWidth}x${customHeight}mm na ${customSheetFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka)`;
         finalUnitPrice = totalPrice / finalQuantity;
+        itemsPerSheetPayload = itemsPerSheet;
     } else {
         const displayFormat = format === 'SRA3_330x482' ? 'SRA3 (482x330mm)' : format;
         opis = `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
@@ -205,6 +203,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       kolicina: finalQuantity,
       cena_jedinice: finalUnitPrice,
       cena_ukupno: totalPrice,
+      itemsPerSheet: itemsPerSheetPayload,
     });
   };
 
@@ -395,14 +394,3 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     </div>
   );
 }
-
-    
-
-    
-
-
-    
-
-    
-
-    
