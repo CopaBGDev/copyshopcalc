@@ -488,3 +488,5 @@ export function FinishingOptions({ onAddToBasket }: FinishingOptionsProps) {
         </div>
     );
 }
+
+  

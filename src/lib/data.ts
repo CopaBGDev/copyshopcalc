@@ -219,7 +219,10 @@ export const finishingServices: FinishingServiceData = {
         { id: 'secenje-tabak', name: 'Sečenje više tabaka', price: 100.00, unit: 'rez', sifra: 802 },
         { id: 'bigovanje', name: 'Bigovanje', price: 250.00, price_over_50: 6.00, unit: 'big', sifra: 337 },
         { id: 'busenje-rupa', name: 'Bušenje rupa za registrator', price: 3.00, unit: 'list', sifra: 511 },
-        { id: 'heftanje', name: 'Hefanje', price: 5.00, unit: 'mesto', sifra: 520 }
+        { id: 'heftanje', name: 'Hefanje', price: 5.00, unit: 'mesto', sifra: 520 },
+        { id: 'termo', name: 'Termo koričenje', price: 410.00, unit: 'kom', sifra: 700 },
+        { id: 'raskoricavanje', name: 'Raskoričavanje spiralnog poveza', price: 90.00, unit: 'kom', sifra: 14 },
+        { id: 'jemstvenik', name: 'Povezivanje projekata jemstvenikom', price: 300.00, unit: 'kom', sifra: 266 }
     ]
 }
 
@@ -468,3 +471,6 @@ export const officeSuppliesData: OfficeSuppliesData = {
     ]
 }
 
+
+
+  
