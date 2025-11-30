@@ -200,6 +200,29 @@ export type BusinessCardData = {
 }
 // --- END: Business Card Service Specific Types ---
 
+// --- START: Flyer Service Specific Types ---
+export type FlyerPriceTier = {
+    kolicina: number;
+    cena: number;
+}
+
+export type FlyerData = {
+    digitalA6: {
+        oneSided: FlyerPriceTier[];
+        twoSided: FlyerPriceTier[];
+    };
+    offsetA6: {
+        oneSided: { kolicina: number; cena: number; };
+        twoSided: { kolicina: number; cena: number; };
+    };
+    offsetA5: {
+        oneSided: { kolicina: number; cena: number; };
+        twoSided: { kolicina: number; cena: number; };
+    };
+}
+// --- END: Flyer Service Specific Types ---
+
+
 // --- START: Large Format Service Specific Types ---
 
 export type PlottingService = {

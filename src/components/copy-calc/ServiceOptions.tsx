@@ -10,6 +10,7 @@ import { KeyOptions } from "./KeyOptions";
 import { BusinessCardOptions } from "./BusinessCardOptions";
 import { LargeFormatOptions } from "./LargeFormatOptions";
 import { CanvasOptions } from "./CanvasOptions";
+import { FlyerOptions } from "./FlyerOptions";
 
 type ServiceOptionsProps = {
   category: AppCategory;
@@ -38,12 +39,7 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
       case 'kanvas':
         return <CanvasOptions onAddToBasket={onAddToBasket} />;
       case 'flajeri':
-         return (
-            <div className="text-center text-muted-foreground py-8">
-                <p className="font-semibold">Kalkulator za flajere.</p>
-                <p className="text-sm mt-2">Uskoro dostupno...</p>
-            </div>
-        )
+         return <FlyerOptions onAddToBasket={onAddToBasket} />;
       case 'promo':
         return (
             <div className="text-center text-muted-foreground py-8">

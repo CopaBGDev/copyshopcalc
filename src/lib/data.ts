@@ -1,4 +1,4 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData } from './types';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData, FlyerData } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon, Newspaper } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
@@ -298,6 +298,32 @@ export const businessCardServices: BusinessCardData = {
         uv_doplata: "na upit",
     }
 };
+
+export const flyerServices: FlyerData = {
+    digitalA6: {
+        oneSided: [
+            {kolicina: 100, cena: 1940.00},
+            {kolicina: 300, cena: 4180.00},
+            {kolicina: 500, cena: 5560.00},
+            {kolicina: 1000, cena: 8250.00}
+        ],
+        twoSided: [
+            {kolicina: 100, cena: 2350.00},
+            {kolicina: 300, cena: 4960.00},
+            {kolicina: 500, cena: 7100.00},
+            {kolicina: 1000, cena: 11400.00}
+        ]
+    },
+    offsetA6: {
+        oneSided: { kolicina: 4000, cena: 9800.00 },
+        twoSided: { kolicina: 4000, cena: 10800.00 },
+    },
+     offsetA5: {
+        oneSided: { kolicina: 4000, cena: 12500.00 },
+        twoSided: { kolicina: 4000, cena: 13500.00 },
+    }
+}
+
 
 export const largeFormatServices: LargeFormatData = {
     plotting: {
