@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Printer, ScanLine, Scissors, Palette } from "lucide-react";
+import { Printer, ScanLine, Scissors, Palette, KeyRound, Shirt, ShoppingBag, Smartphone } from "lucide-react";
 import type { ReactNode } from "react";
 
 type Category = {

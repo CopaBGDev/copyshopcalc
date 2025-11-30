@@ -16,11 +16,13 @@ export const mockServices: Service[] = [
   // --- SKENIRANJE ---
   { id: 's1', naziv: 'Skeniranje po strani', kategorija: 'Skeniranje', cena_jedinice: 10, jedinica_mere: 'strana', specifikacije: {}, tip_kalkulacije: 'po_strani' },
 
-  // --- DORADA ---
-  { id: 'd1', naziv: 'Plastifikacija A4', kategorija: 'Dorada', cena_jedinice: 100, jedinica_mere: 'komad', specifikacije: { usluga: 'Plastifikacija A4' }, tip_kalkulacije: 'po_komadu' },
-  { id: 'd2', naziv: 'Plastifikacija A3', kategorija: 'Dorada', cena_jedinice: 200, jedinica_mere: 'komad', specifikacije: { usluga: 'Plastifikacija A3' }, tip_kalkulacije: 'po_komadu' },
-  { id: 'd3', naziv: 'Koričenje spiralom', kategorija: 'Dorada', cena_jedinice: 150, jedinica_mere: 'komad', specifikacije: { usluga: 'Koričenje spiralom' }, tip_kalkulacije: 'po_komadu' },
-
+  // --- DORADA --- (Koričenje)
+  { id: 'd1', naziv: 'Tvrdi povez sa zlatotiskom (1-4 kom)', kategorija: 'Dorada', cena_jedinice: 1500, jedinica_mere: 'komad', specifikacije: { usluga: 'Tvrdi povez sa zlatotiskom (1-4 kom)' }, tip_kalkulacije: 'po_komadu' },
+  { id: 'd2', naziv: 'Tvrdi povez sa zlatotiskom (5+ kom)', kategorija: 'Dorada', cena_jedinice: 1350, jedinica_mere: 'komad', specifikacije: { usluga: 'Tvrdi povez sa zlatotiskom (5+ kom)' }, tip_kalkulacije: 'po_komadu' },
+  { id: 'd3', naziv: 'Termo koričenje', kategorija: 'Dorada', cena_jedinice: 410, jedinica_mere: 'komad', specifikacije: { usluga: 'Termo koričenje' }, tip_kalkulacije: 'po_komadu' },
+  { id: 'd4', naziv: 'Plastična spirala A4 (do 80 listova) - spirala', kategorija: 'Dorada', cena_jedinice: 140, jedinica_mere: 'komad', specifikacije: { usluga: 'Plastična spirala A4 (do 80 listova) - spirala' }, tip_kalkulacije: 'po_komadu' },
+  { id: 'd5', naziv: 'Plastična spirala A4 (do 80 listova) - sa koricama', kategorija: 'Dorada', cena_jedinice: 180, jedinica_mere: 'komad', specifikacije: { usluga: 'Plastična spirala A4 (do 80 listova) - sa koricama' }, tip_kalkulacije: 'po_komadu' },
+  
   // --- DIZAJN ---
   { id: 'dz1', naziv: 'Grafički dizajn', kategorija: 'Dizajn', cena_jedinice: 1500, jedinica_mere: 'sat', specifikacije: {}, tip_kalkulacije: 'po_satu' },
 ];
