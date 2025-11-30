@@ -13,6 +13,8 @@ import { ServiceOptions } from "@/components/copy-calc/ServiceOptions";
 import { OrderBasket } from "@/components/copy-calc/OrderBasket";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 
 export default function Home() {
@@ -20,6 +22,7 @@ export default function Home() {
   const [basket, setBasket] = useState<OrderItem[]>([]);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleCategoryToggle = (categoryId: string) => {
     setActiveCategories(prev =>
@@ -45,42 +48,42 @@ export default function Home() {
 
   const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
     setBasket((prevBasket) => {
+      const itemToUpdate = prevBasket.find(item => item.id === itemId);
+      if (!itemToUpdate) return prevBasket;
+
       if (newQuantity <= 0) {
         return prevBasket.filter((item) => item.id !== itemId);
       }
+
+      // Handle custom print items that are calculated per sheet
+      if (itemToUpdate.itemsPerSheet && itemToUpdate.itemsPerSheet > 0) {
+        const itemsPerSheet = itemToUpdate.itemsPerSheet;
+        
+        // We calculate the number of sheets based on the *original* quantity before this update
+        const originalKolicina = prevBasket.find(i => i.id === itemId)?.kolicina || 0;
+        let currentSheets = Math.ceil(originalKolicina / itemsPerSheet);
+
+        if(newQuantity > originalKolicina) {
+            currentSheets++;
+        } else {
+            currentSheets = Math.max(1, currentSheets - 1);
+        }
+
+        const newTotalItems = currentSheets * itemsPerSheet;
+        const pricePerSheet = (itemToUpdate.cena_jedinice * itemsPerSheet);
+        const newTotalPrice = pricePerSheet * currentSheets;
+
+        return prevBasket.map(item => item.id === itemId ? {
+          ...item,
+          kolicina: newTotalItems,
+          cena_ukupno: newTotalPrice,
+          opis: item.opis.replace(/\(x\d+\)/, `(x${newTotalItems})`).replace(/\d+ tabak(a)?/, `${currentSheets} tabaka`),
+        } : item);
+      }
+      
+      // Handle regular items
       return prevBasket.map((item) => {
         if (item.id === itemId) {
-          // Handle custom print items that are calculated per sheet
-          if (item.itemsPerSheet && item.itemsPerSheet > 0) {
-            const itemsPerSheet = item.itemsPerSheet;
-            const isIncreasing = newQuantity > item.kolicina;
-            
-            let currentSheets = Math.ceil(item.kolicina / itemsPerSheet);
-            let newSheets: number;
-
-            if (isIncreasing) {
-                 newSheets = currentSheets + 1;
-            } else { // decreasing
-                 newSheets = currentSheets - 1;
-            }
-
-            if (newSheets <= 0) {
-              return { ...item, kolicina: 0, cena_ukupno: 0 }; // Will be filtered out
-            }
-            
-            const newTotalItems = newSheets * itemsPerSheet;
-            const pricePerSheet = (item.cena_jedinice * itemsPerSheet);
-            const newTotalPrice = pricePerSheet * newSheets;
-
-            return {
-              ...item,
-              kolicina: newTotalItems,
-              cena_ukupno: newTotalPrice,
-              opis: item.opis.replace(/\(x\d+\)/, `(x${newTotalItems})`).replace(/\d+ tabak/, `${newSheets} tabak`),
-            };
-          }
-          
-          // Handle regular items
           const newTotal = item.cena_jedinice * newQuantity;
           return {
             ...item,
@@ -123,6 +126,24 @@ export default function Home() {
       }
     });
   };
+  
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery) {
+      return appCategories;
+    }
+    return appCategories.filter(cat =>
+      cat.naziv.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cat.opis.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
+  const displayedCategories = useMemo(() => {
+    if (searchQuery) {
+        return filteredCategories.map(c => c.id);
+    }
+    return activeCategories;
+  }, [searchQuery, filteredCategories, activeCategories]);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -133,18 +154,29 @@ export default function Home() {
              <Card className="shadow-lg">
                 <CardContent className="p-6">
                     <h2 className="text-2xl font-bold tracking-tight mb-1">Započnite novu porudžbinu</h2>
-                    <p className="text-muted-foreground mb-6">Izaberite kategoriju usluge za unos stavki.</p>
+                    <p className="text-muted-foreground mb-6">Pretražite ili izaberite kategoriju usluge za unos stavki.</p>
+                    
+                    <div className="relative mb-6">
+                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                       <Input
+                          placeholder="Pretraži kategorije (npr. 'majice', 'vizitke', 'plotovanje'...)"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10"
+                       />
+                    </div>
+                    
                     <Accordion 
                       type="multiple" 
-                      value={activeCategories}
-                      onValueChange={setActiveCategories}
+                      value={displayedCategories}
+                      onValueChange={setSearchQuery ? undefined : setActiveCategories}
                       className="w-full"
                     >
-                      {appCategories.map(cat => (
+                      {filteredCategories.map(cat => (
                         <CategorySelector
                           key={cat.id}
                           category={cat}
-                          isOpen={activeCategories.includes(cat.id)}
+                          isOpen={displayedCategories.includes(cat.id)}
                           onToggle={() => handleCategoryToggle(cat.id)}
                         >
                           <ServiceOptions
