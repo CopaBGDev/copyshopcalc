@@ -18,7 +18,7 @@ export const appCategories: AppCategory[] = [
     id: 'veliki_formati',
     naziv: 'Veliki Formati',
     icon: Ruler,
-    opis: 'Baneri, rollup, posteri, folije.'
+    opis: 'Plotovanje, posteri, baneri.'
   },
    {
     id: 'kanvas',
@@ -28,9 +28,9 @@ export const appCategories: AppCategory[] = [
   },
   {
     id: 'tekstil',
-    naziv: 'Tekstil',
+    naziv: 'Štampa na Tekstilu',
     icon: Shirt,
-    opis: 'Štampa na majicama, duks.'
+    opis: 'Majice, duksevi, cegeri.'
   },
   {
     id: 'promo',
@@ -52,15 +52,15 @@ export const appCategories: AppCategory[] = [
   },
   {
     id: 'kljucevi',
-    naziv: 'Ključevi',
+    naziv: 'Narezivanje Ključeva',
     icon: Key,
-    opis: 'Narezivanje klasičnih i tačkastih ključeva.'
+    opis: 'Klasični, tačkasti, tagovi.'
   },
   {
     id: 'dizajn',
-    naziv: 'Dizajn',
+    naziv: 'Usluge Dizajna',
     icon: Palette,
-    opis: 'Usluge grafičkog dizajna i pripreme.'
+    opis: 'Grafička priprema, dizajn i prelom.'
   },
 ];
 
