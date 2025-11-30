@@ -23,8 +23,10 @@ export type PriceTier = {
   sifra?: number;
 };
 
+export type PrintFormat = 'A4' | 'A3' | 'A5' | 'A6' | 'SRA3';
+
 export type PrintOption = {
-  format: 'A4' | 'A3';
+  format: 'A4' | 'A3'; // Base format for pricing
   color: 'cb' | 'kolor';
   name: string;
   oneSided: PriceTier[];

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import type { OrderItem, PaperType, PriceTier, PrintOption } from "@/lib/types";
+import type { OrderItem, PaperType, PriceTier, PrintOption, PrintFormat } from "@/lib/types";
 import { printServices } from "@/lib/data";
 
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ type PrintOptionsProps = {
 };
 
 export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
-  const [format, setFormat] = useState<'A4' | 'A3'>('A4');
+  const [format, setFormat] = useState<PrintFormat>('A4');
   const [color, setColor] = useState<'cb' | 'kolor'>('cb');
   const [side, setSide] = useState<'oneSided' | 'twoSided'>('oneSided');
   const [paperId, setPaperId] = useState<string>('80gr');
@@ -28,7 +28,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const selectedPaper: PaperType | undefined = useMemo(() => printServices.papers.find(p => p.id === paperId), [paperId]);
   
   const activePrintOption: PrintOption | undefined = useMemo(() => {
-    return printServices.options.find(opt => opt.format === format && opt.color === color);
+    const baseFormat = (format === 'A5' || format === 'A6') ? 'A4' : (format === 'SRA3' ? 'A3' : format);
+    return printServices.options.find(opt => opt.format === baseFormat && opt.color === color);
   }, [format, color]);
 
   useEffect(() => {
@@ -43,13 +44,23 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     
     let currentUnitPrice = tier.cena;
 
+    // Adjust price for smaller formats
+    if (format === 'A5') {
+        currentUnitPrice /= 2;
+    } else if (format === 'A6') {
+        currentUnitPrice /= 4;
+    }
+
     // Paper price calculation logic
     let paperPricePerCopy = 0;
     if (selectedPaper.price > 0) {
       if (selectedPaper.format === 'SRA3') {
-        const copiesPerSheet = format === 'A4' ? 2 : 1;
+        let copiesPerSheet = 1; // for A3 or SRA3
+        if (format === 'A4') copiesPerSheet = 2;
+        if (format === 'A5') copiesPerSheet = 4;
+        if (format === 'A6') copiesPerSheet = 8;
         paperPricePerCopy = selectedPaper.price / copiesPerSheet;
-      } else {
+      } else { // Assuming other special papers are per-sheet for the selected format
         paperPricePerCopy = selectedPaper.price;
       }
     }
@@ -68,7 +79,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     
     onAddToBasket({
       serviceId: `stampa-${format}-${color}-${side}-${paperId}`,
-      naziv: `Štampa: ${activePrintOption.name}`,
+      naziv: `Štampa: ${activePrintOption.name.replace('A4', format).replace('A3', format)}`,
       opis,
       kolicina: quantity,
       cena_jedinice: unitPrice,
@@ -80,23 +91,37 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-3">Opcije štampe i kopiranja</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
-            {/* Format & Color */}
+            {/* Format */}
+            <div className="space-y-2">
+                <Label>Format papira</Label>
+                <RadioGroup defaultValue="A4" value={format} onValueChange={(v) => setFormat(v as PrintFormat)} className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="A4" id="format-a4" />
+                        <Label htmlFor="format-a4">A4</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="A3" id="format-a3" />
+                        <Label htmlFor="format-a3">A3</Label>
+                    </div>
+                     <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="A5" id="format-a5" />
+                        <Label htmlFor="format-a5">A5</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="A6" id="format-a6" />
+                        <Label htmlFor="format-a6">A6</Label>
+                    </div>
+                     <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="SRA3" id="format-sra3" />
+                        <Label htmlFor="format-sra3">SRA3</Label>
+                    </div>
+                </RadioGroup>
+            </div>
+
+            {/* Color & Side */}
             <div className="space-y-4">
-                 <div className="space-y-2">
-                    <Label>Format papira</Label>
-                    <RadioGroup defaultValue="A4" value={format} onValueChange={(v) => setFormat(v as 'A4'|'A3')} className="flex gap-4">
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="A4" id="format-a4" />
-                            <Label htmlFor="format-a4">A4</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="A3" id="format-a3" />
-                            <Label htmlFor="format-a3">A3</Label>
-                        </div>
-                    </RadioGroup>
-                </div>
                  <div className="space-y-2">
                     <Label>Boja</Label>
                     <RadioGroup defaultValue="cb" value={color} onValueChange={(v) => setColor(v as 'cb'|'kolor')} className="flex gap-4">
@@ -110,11 +135,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                         </div>
                     </RadioGroup>
                 </div>
-            </div>
-
-            {/* Side & Paper */}
-            <div className="space-y-4">
-                <div className="space-y-2">
+                 <div className="space-y-2">
                     <Label>Štampa</Label>
                     <RadioGroup defaultValue="oneSided" value={side} onValueChange={(v) => setSide(v as 'oneSided'|'twoSided')} className="flex gap-4">
                         <div className="flex items-center space-x-2">
@@ -127,19 +148,21 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                         </div>
                     </RadioGroup>
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="paper-type">Vrsta papira</Label>
-                    <Select value={paperId} onValueChange={setPaperId}>
-                        <SelectTrigger id="paper-type">
-                            <SelectValue placeholder="Izaberite vrstu papira" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {printServices.papers.map(p => (
-                                <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+            </div>
+
+            {/* Paper */}
+            <div className="space-y-2">
+                <Label htmlFor="paper-type">Vrsta papira</Label>
+                <Select value={paperId} onValueChange={setPaperId}>
+                    <SelectTrigger id="paper-type">
+                        <SelectValue placeholder="Izaberite vrstu papira" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {printServices.papers.map(p => (
+                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
         </div>
       </div>
