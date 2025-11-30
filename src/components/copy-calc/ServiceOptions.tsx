@@ -31,12 +31,19 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
         return <TextileOptions onAddToBasket={onAddToBasket} />;
       case 'kljucevi':
         return <KeyOptions onAddToBasket={onAddToBasket} />;
-      case 'vizitke_flajeri':
+      case 'vizitke':
         return <BusinessCardOptions onAddToBasket={onAddToBasket} />;
       case 'veliki_formati':
         return <LargeFormatOptions onAddToBasket={onAddToBasket} />;
       case 'kanvas':
         return <CanvasOptions onAddToBasket={onAddToBasket} />;
+      case 'flajeri':
+         return (
+            <div className="text-center text-muted-foreground py-8">
+                <p className="font-semibold">Kalkulator za flajere.</p>
+                <p className="text-sm mt-2">Uskoro dostupno...</p>
+            </div>
+        )
       case 'promo':
         return (
             <div className="text-center text-muted-foreground py-8">

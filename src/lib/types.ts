@@ -168,6 +168,20 @@ export type BusinessCardDoplate = {
         dvostrano: number;
     };
     coskanje: number;
+    uv_doplata: string;
+}
+
+export type LuxPVCData = {
+    kolicina: number;
+    jednostrane: number;
+    dvostrane: number;
+    min_kom: number;
+}
+
+export type LuxPaperData = {
+    kolicina: number;
+    jednostrane: number;
+    dvostrane: number;
 }
 
 export type BusinessCardData = {
@@ -175,6 +189,13 @@ export type BusinessCardData = {
         oneSided: BusinessCardPriceTier[];
         twoSided: BusinessCardPriceTier[];
     };
+    lux: {
+        pvc: {
+            standard: LuxPVCData,
+            special: LuxPVCData,
+        },
+        paper350g: LuxPaperData
+    },
     doplate: BusinessCardDoplate;
 }
 // --- END: Business Card Service Specific Types ---

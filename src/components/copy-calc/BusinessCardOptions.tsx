@@ -8,10 +8,13 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { PlusCircle, FileText } from 'lucide-react';
+import { PlusCircle, FileText, Info } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Checkbox } from '../ui/checkbox';
+import { Input } from '../ui/input';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 
 type BusinessCardOptionsProps = {
   onAddToBasket: (item: Omit<OrderItem, 'id'>) => void;
@@ -143,34 +146,156 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
     )
 }
 
+const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
+    const [luxType, setLuxType] = useState<'pvc-standard' | 'pvc-special' | 'paper350g'>('paper350g');
+    const [side, setSide] = useState<'oneSided' | 'twoSided'>('oneSided');
+    const [quantity, setQuantity] = useState(100);
+
+    const { totalPrice, description, unitPrice } = useMemo(() => {
+        let price = 0;
+        let desc = '';
+        let uPrice = 0;
+
+        const sideKey = side === 'oneSided' ? 'jednostrane' : 'dvostrane';
+
+        switch (luxType) {
+            case 'pvc-standard':
+                price = businessCardServices.lux.pvc.standard[sideKey];
+                desc = `Lux PVC vizit karte, ${side === 'oneSided' ? 'jednostrane' : 'dvostrane'}`;
+                break;
+            case 'pvc-special':
+                price = businessCardServices.lux.pvc.special[sideKey];
+                desc = `Lux PVC vizit karte (crne/zlatne/srebrne), ${side === 'oneSided' ? 'jednostrane' : 'dvostrane'}`;
+                break;
+            case 'paper350g':
+                price = businessCardServices.lux.paper350g[sideKey];
+                desc = `Lux vizit karte 350g+ papir, ${side === 'oneSided' ? 'jednostrane' : 'dvostrane'}`;
+                break;
+        }
+
+        uPrice = price; // Per 100pc
+        price = (price / 100) * quantity;
+        
+        desc += `, ${quantity} kom`;
+
+        return { totalPrice: price, description: desc, unitPrice: uPrice };
+    }, [luxType, side, quantity]);
+
+    const handleAddToBasket = () => {
+        if (totalPrice <= 0) return;
+        
+        onAddToBasket({
+            serviceId: `vizitke-lux-${luxType}-${side}-${quantity}`,
+            naziv: 'Lux Vizit karte',
+            opis: description,
+            kolicina: quantity,
+            cena_jedinice: totalPrice / quantity,
+            cena_ukupno: totalPrice,
+        });
+    };
+
+    const minQuantity = luxType.startsWith('pvc') ? businessCardServices.lux.pvc.standard.min_kom : 1;
+     if (quantity < minQuantity) {
+        setQuantity(minQuantity);
+     }
+
+
+    return (
+         <Card className="border-none shadow-none">
+            <CardContent className="p-4 space-y-6">
+                 <div className="space-y-2">
+                    <Label htmlFor="lux-type">Tip Lux vizit karti</Label>
+                    <Select onValueChange={(v) => setLuxType(v as any)} defaultValue={luxType}>
+                        <SelectTrigger id="lux-type">
+                            <SelectValue placeholder="Izaberite tip" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="paper350g">350g+ Papir</SelectItem>
+                            <SelectItem value="pvc-standard">PVC Standard bele</SelectItem>
+                            <SelectItem value="pvc-special">PVC Specijalne (crne/zlatne/srebrne)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <Label>Štampa</Label>
+                        <RadioGroup value={side} onValueChange={(v) => setSide(v as 'oneSided' | 'twoSided')} className="flex gap-4">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="oneSided" id="lux-one-sided" />
+                                <Label htmlFor="lux-one-sided">Jednostrana</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="twoSided" id="lux-two-sided" />
+                                <Label htmlFor="lux-two-sided">Dvostrana</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="lux-quantity">Količina</Label>
+                        <Input 
+                            id="lux-quantity"
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(Math.max(minQuantity, parseInt(e.target.value) || minQuantity))}
+                            min={minQuantity}
+                            step={luxType.startsWith('pvc') ? 100 : 50}
+                        />
+                         {luxType.startsWith('pvc') && <p className="text-xs text-muted-foreground">Minimalna količina je {minQuantity} kom.</p>}
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-end bg-primary/5 p-4 rounded-lg">
+                    <Label className="text-sm text-muted-foreground">Ukupna cena za {quantity} kom</Label>
+                    <p className="text-3xl font-bold font-mono tracking-tight text-primary">
+                        {totalPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
+                    </p>
+                    <p className="text-xs text-muted-foreground h-4">
+                        Cena za 100 kom: {unitPrice.toFixed(2)} RSD
+                    </p>
+                </div>
+                 <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Dodatne opcije</AlertTitle>
+                    <AlertDescription>
+                        Za doradu (plastifikacija, ćoškanje) i UV štampu, molimo dodajte kao zasebnu stavku ili kontaktirajte menadžera.
+                    </AlertDescription>
+                </Alert>
+
+                <Separator />
+
+                <div className="flex justify-end">
+                    <Button size="lg" onClick={handleAddToBasket} disabled={totalPrice <= 0}>
+                        <PlusCircle className="mr-2" />
+                        Dodaj u korpu
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
 
 export function BusinessCardOptions({ onAddToBasket }: BusinessCardOptionsProps) {
     return (
         <div className="space-y-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
                 <FileText className="w-5 h-5" />
-                Opcije za vizit karte i flajere
+                Opcije za vizit karte
             </h3>
             <Tabs defaultValue="standard" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="standard">
                         Standardne vizitke
                     </TabsTrigger>
-                    <TabsTrigger value="lux" disabled>
+                    <TabsTrigger value="lux">
                         Lux vizitke
-                    </TabsTrigger>
-                    <TabsTrigger value="flyers" disabled>
-                        Flajeri
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="standard">
                     <DigitalCardCalculator onAddToBasket={onAddToBasket} />
                 </TabsContent>
                 <TabsContent value="lux">
-                   <p className="p-4 text-center text-muted-foreground">Uskoro dostupno...</p>
-                </TabsContent>
-                 <TabsContent value="flyers">
-                   <p className="p-4 text-center text-muted-foreground">Uskoro dostupno...</p>
+                   <LuxCardCalculator onAddToBasket={onAddToBasket} />
                 </TabsContent>
             </Tabs>
         </div>

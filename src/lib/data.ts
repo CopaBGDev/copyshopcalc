@@ -1,5 +1,5 @@
 import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData } from './types';
-import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon } from 'lucide-react';
+import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon, Newspaper } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
   {
@@ -9,10 +9,16 @@ export const appCategories: AppCategory[] = [
     opis: 'A4/A3, C/B i kolor, razni papiri.'
   },
   {
-    id: 'vizitke_flajeri',
-    naziv: 'Vizitke i Flajeri',
+    id: 'vizitke',
+    naziv: 'Vizit Karte',
     icon: FileText,
-    opis: 'Dizajn i štampa vizit karti i flajera.'
+    opis: 'Standardne, lux, PVC, sa doradom.'
+  },
+  {
+    id: 'flajeri',
+    naziv: 'Flajeri',
+    icon: Newspaper,
+    opis: 'Digitalna i ofset štampa flajera.'
   },
   {
     id: 'veliki_formati',
@@ -274,12 +280,22 @@ export const businessCardServices: BusinessCardData = {
             { kolicina: 1000, cena: 5430.00, sifra: 681 }
         ]
     },
+    lux: {
+        pvc: {
+            standard: { kolicina: 100, jednostrane: 6500.00, dvostrane: 8500.00, min_kom: 20 },
+            special: { kolicina: 100, jednostrane: 13000.00, dvostrane: 16000.00, min_kom: 20 },
+        },
+        paper350g: {
+             kolicina: 100, jednostrane: 4800.00, dvostrane: 5800.00
+        }
+    },
     doplate: {
         plastifikacija: {
             jednostrano: 1.80,
             dvostrano: 3.60
         },
-        coskanje: 3.60
+        coskanje: 3.60,
+        uv_doplata: "na upit",
     }
 };
 
