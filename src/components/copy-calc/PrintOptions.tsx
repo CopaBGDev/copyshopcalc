@@ -72,6 +72,17 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     return printServices.options.find(opt => opt.format === baseFormatForPrice && opt.color === color);
   }, [format, color]);
 
+  const isOneSidedOnlyPaper = useMemo(() => {
+    return ['muflon', 'pvc-folija', 'pvc-bela'].includes(paperId);
+  }, [paperId]);
+
+  useEffect(() => {
+    if (isOneSidedOnlyPaper) {
+      setSide('oneSided');
+    }
+  }, [paperId, isOneSidedOnlyPaper]);
+
+
   useEffect(() => {
     if (!activePrintOption || quantity <= 0 || !selectedPaper) {
       setTotalPrice(0);
@@ -150,12 +161,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     let naziv = "Štampa";
     let opis = "";
     let finalQuantity = quantity;
+    let finalUnitPrice = unitPrice;
 
     if (format === 'custom') {
         if (itemsPerSRA3 <= 0) return;
         naziv = `Štampa proizvoljnog formata`;
         finalQuantity = itemsPerSRA3 * quantity;
         opis = `${customWidth}x${customHeight}mm, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Količina: ${finalQuantity} kom (${quantity} tabaka)`;
+        finalUnitPrice = totalPrice / finalQuantity;
     } else {
         const displayFormat = format === 'SRA3_330x482' ? 'SRA3 (482x330mm)' : format;
         opis = `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
@@ -173,7 +186,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       naziv: naziv,
       opis,
       kolicina: finalQuantity,
-      cena_jedinice: unitPrice,
+      cena_jedinice: finalUnitPrice,
       cena_ukupno: totalPrice,
     });
   };
@@ -232,13 +245,13 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                 </div>
                  <div className="space-y-2">
                     <Label>Štampa</Label>
-                    <RadioGroup defaultValue="oneSided" value={side} onValueChange={(v) => setSide(v as 'oneSided'|'twoSided')} className="flex gap-4">
+                    <RadioGroup defaultValue="oneSided" value={side} onValueChange={(v) => setSide(v as 'oneSided'|'twoSided')} className="flex gap-4" disabled={isOneSidedOnlyPaper}>
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="oneSided" id="side-one" />
                             <Label htmlFor="side-one">Jednostrano</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="twoSided" id="side-two" />
+                            <RadioGroupItem value="twoSided" id="side-two" disabled={isOneSidedOnlyPaper}/>
                             <Label htmlFor="side-two">Obostrano</Label>
                         </div>
                     </RadioGroup>
@@ -360,5 +373,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
 
     
 
+
+    
 
     
