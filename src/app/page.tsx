@@ -49,10 +49,12 @@ export default function Home() {
       }
       return prevBasket.map((item) => {
         if (item.id === itemId) {
+          const newTotal = item.cena_jedinice * newQuantity;
           return { 
             ...item, 
             kolicina: newQuantity,
-            cena_ukupno: item.cena_jedinice * newQuantity,
+            cena_ukupno: newTotal,
+            opis: item.opis.includes("x") ? item.opis.substring(0, item.opis.lastIndexOf(" (x")) + ` (x${newQuantity})` : `${item.opis} (x${newQuantity})`,
            };
         }
         return item;

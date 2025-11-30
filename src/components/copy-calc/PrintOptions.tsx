@@ -61,10 +61,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         baseFormatForPrice = 'A3';
     }
 
-    const effectiveColor = (selectedPaper && selectedPaper.price > 0 && color === 'cb') ? 'kolor' : color;
-
-    return printServices.options.find(opt => opt.format === baseFormatForPrice && opt.color === effectiveColor);
-  }, [format, color, selectedPaper]);
+    return printServices.options.find(opt => opt.format === baseFormatForPrice && opt.color === color);
+  }, [format, color]);
 
   useEffect(() => {
     if (!activePrintOption || quantity <= 0 || !selectedPaper) {
@@ -74,14 +72,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     }
 
     if (format === 'custom') {
-        const sra3PrintPriceOption = printServices.options.find(opt => opt.format === 'A3' && opt.color === activePrintOption.color);
+        const sra3PrintPriceOption = printServices.options.find(opt => opt.format === 'A3' && opt.color === color);
         if (!sra3PrintPriceOption) return;
 
         const sra3PriceTiers: PriceTier[] = sra3PrintPriceOption[side];
         const sra3Tier = sra3PriceTiers[0]; // Price for 1-20 copies is the base for sheet
         
         const sra3PrintPrice = sra3Tier.cena;
-        const sra3PaperPrice = selectedPaper.price > 0 ? selectedPaper.price : (activePrintOption.format === 'A3' ? printServices.papers.find(p => p.id === '80gr-a3')?.price || 0 : 0);
+        const sra3PaperPrice = selectedPaper.price; // Price is per SRA3 sheet
 
         const totalSheetPrice = sra3PrintPrice + sra3PaperPrice;
         
@@ -144,16 +142,15 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         naziv = `Štampa proizvoljnog formata`;
         opis = `${customWidth}x${customHeight}mm, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
     } else {
-        const effectiveColor = (selectedPaper && selectedPaper.price > 0 && color === 'cb') ? 'kolor' : color;
-        const displayFormat = format === 'SRA3_330x482' ? 'SRA3 (330x482mm)' : format;
-        opis = `${displayFormat}, ${effectiveColor === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
+        const displayFormat = format === 'SRA3_330x482' ? 'SRA3 (482x330mm)' : format;
+        opis = `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
         
         let baseFormatForName: 'A4' | 'A3' = 'A4';
         if (format === 'A3' || format === 'SRA3_330x482') {
             baseFormatForName = 'A3';
         }
         
-        naziv = printServices.options.find(opt => opt.format === baseFormatForName && opt.color === effectiveColor)?.name.replace('A4', displayFormat).replace('A3', displayFormat) || "Štampa";
+        naziv = printServices.options.find(opt => opt.format === baseFormatForName && opt.color === color)?.name.replace('A4', displayFormat).replace('A3', displayFormat) || "Štampa";
     }
     
     onAddToBasket({
@@ -194,7 +191,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     </div>
                      <div className="flex items-center space-x-2">
                         <RadioGroupItem value="SRA3_330x482" id="format-sra3" />
-                        <Label htmlFor="format-sra3">SRA3 (330x482mm)</Label>
+                        <Label htmlFor="format-sra3">SRA3 (482x330mm)</Label>
                     </div>
                      <div className="flex items-center space-x-2">
                         <RadioGroupItem value="custom" id="format-custom" />
@@ -248,7 +245,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                 </Select>
                  {selectedPaper && selectedPaper.price > 0 && (
                     <p className="text-xs text-muted-foreground">
-                        Doplata za ovaj papir se automatski obračunava. Crno-bela štampa na ovom papiru se naplaćuje kao kolor.
+                        Cena ovog papira se dodaje na cenu štampe.
                     </p>
                 )}
             </div>
