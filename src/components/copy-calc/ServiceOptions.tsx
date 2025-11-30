@@ -6,17 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 
 type ServiceOptionsProps = {
   category: string;
   services: Service[];
   onAddToBasket: (service: Service, quantity: number) => void;
-  onBack: () => void;
 };
 
-export function ServiceOptions({ category, services, onAddToBasket, onBack }: ServiceOptionsProps) {
+export function ServiceOptions({ category, services, onAddToBasket }: ServiceOptionsProps) {
   // Common state
   const [quantity, setQuantity] = useState(1);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -40,6 +38,21 @@ export function ServiceOptions({ category, services, onAddToBasket, onBack }: Se
   const doradaOptions = useMemo(() => {
     return [...new Set(services.map(s => s.specifikacije.usluga).filter(Boolean))];
   }, [services]);
+
+  useEffect(() => {
+    // Reset state when category changes
+    setQuantity(1);
+    setSelectedService(null);
+    setFormat('');
+    setBoja('');
+    setStrana('');
+    setDoradaUsluga('');
+
+    if (category !== 'Printanje' && category !== 'Dorada' && services.length > 0) {
+      setSelectedService(services[0]);
+    }
+  }, [category, services]);
+
 
   useEffect(() => {
     if (category === 'Printanje') {
@@ -122,12 +135,8 @@ export function ServiceOptions({ category, services, onAddToBasket, onBack }: Se
   }
 
   return (
-    <div>
-        <Button variant="ghost" onClick={onBack} className="mb-4 -ml-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Sve kategorije
-        </Button>
-      <h2 className="text-2xl font-bold tracking-tight mb-6">Unos stavke: {category}</h2>
+    <div className="animate-in fade-in duration-300">
+      <h2 className="text-xl font-bold tracking-tight mb-4">Unos stavke: {category}</h2>
 
       <div className="space-y-6">
         {renderOptions()}

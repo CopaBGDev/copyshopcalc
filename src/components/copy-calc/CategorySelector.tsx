@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Printer, ScanLine, Scissors, Palette, KeyRound, Shirt, ShoppingBag, Smartphone } from "lucide-react";
+import { Printer, ScanLine, Scissors, Palette } from "lucide-react";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 type Category = {
   name: string;
@@ -36,9 +37,10 @@ const categories: Category[] = [
 
 type CategorySelectorProps = {
   onSelectCategory: (category: string) => void;
+  selectedCategory: string | null;
 };
 
-export function CategorySelector({ onSelectCategory }: CategorySelectorProps) {
+export function CategorySelector({ onSelectCategory, selectedCategory }: CategorySelectorProps) {
   return (
     <div>
       <h2 className="text-2xl font-bold tracking-tight mb-1">Započnite novu porudžbinu</h2>
@@ -47,17 +49,20 @@ export function CategorySelector({ onSelectCategory }: CategorySelectorProps) {
         {categories.map((category) => (
           <Button
             key={category.name}
-            variant="outline"
-            className="h-auto w-full p-6 text-left justify-start transition-all hover:border-primary hover:shadow-lg"
+            variant={selectedCategory === category.name ? 'default' : 'outline'}
+            className={cn(
+              "h-auto w-full p-6 text-left justify-start transition-all hover:border-primary hover:shadow-lg",
+               selectedCategory === category.name && "border-primary ring-2 ring-primary"
+            )}
             onClick={() => onSelectCategory(category.name)}
           >
             <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-lg text-primary">
+                <div className={cn("p-3 rounded-lg", selectedCategory === category.name ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-primary/10 text-primary')}>
                     {category.icon}
                 </div>
                 <div>
                     <p className="font-semibold text-lg">{category.name}</p>
-                    <p className="text-muted-foreground text-sm">{category.description}</p>
+                    <p className={cn("text-sm", selectedCategory === category.name ? "text-primary-foreground/80" : "text-muted-foreground")}>{category.description}</p>
                 </div>
             </div>
           </Button>

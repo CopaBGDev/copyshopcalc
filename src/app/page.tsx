@@ -11,6 +11,7 @@ import { CategorySelector } from "@/components/copy-calc/CategorySelector";
 import { ServiceOptions } from "@/components/copy-calc/ServiceOptions";
 import { OrderBasket } from "@/components/copy-calc/OrderBasket";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -24,11 +25,7 @@ export default function Home() {
   }, [selectedCategory]);
 
   const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
-  };
-
-  const handleBackToCategories = () => {
-    setSelectedCategory(null);
+    setSelectedCategory(prev => prev === category ? null : category);
   };
 
   const handleAddToBasket = (service: Service, quantity: number) => {
@@ -111,16 +108,17 @@ export default function Home() {
           <div className="lg:col-span-2">
              <Card className="shadow-lg animate-in fade-in duration-500">
                 <CardContent className="p-6">
-                    {!selectedCategory ? (
-                        <CategorySelector onSelectCategory={handleCategorySelect} />
-                    ) : (
+                    <CategorySelector onSelectCategory={handleCategorySelect} selectedCategory={selectedCategory} />
+                    {selectedCategory && (
+                      <>
+                        <Separator className="my-6" />
                         <ServiceOptions
                             key={selectedCategory} // Reset component state on category change
                             category={selectedCategory}
                             services={servicesForCategory}
                             onAddToBasket={handleAddToBasket}
-                            onBack={handleBackToCategories}
                         />
+                      </>
                     )}
                 </CardContent>
             </Card>
