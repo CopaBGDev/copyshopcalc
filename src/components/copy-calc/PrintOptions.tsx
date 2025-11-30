@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -56,7 +57,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const activePrintOption: PrintOption | undefined = useMemo(() => {
     // For price calculation, we always use A3 or A4 as base
     let baseFormatForPrice: 'A3' | 'A4' = 'A4';
-    if (format === 'A3' || format === 'SRA3' || format === 'custom') {
+    if (format === 'A3' || format === 'SRA3_330x482' || format === 'custom') {
         baseFormatForPrice = 'A3';
     }
 
@@ -114,7 +115,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (selectedPaper.price > 0) {
             if (selectedPaper.format === 'SRA3') {
                 let copiesPerSheet = 1;
-                if (format === 'SRA3') copiesPerSheet = 1;
+                if (format === 'SRA3_330x482') copiesPerSheet = 1;
                 else if (format === 'A3') copiesPerSheet = 1; // approx
                 else if (format === 'A4') copiesPerSheet = 2;
                 else if (format === 'A5') copiesPerSheet = 4;
@@ -144,9 +145,15 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         opis = `${customWidth}x${customHeight}mm, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
     } else {
         const effectiveColor = (selectedPaper && selectedPaper.price > 0 && color === 'cb') ? 'kolor' : color;
-        opis = `${format}, ${effectiveColor === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
-        const baseFormatForName = (format === 'A5' || format === 'A6' || format === 'SRA3') ? 'A4' : format;
-        naziv = printServices.options.find(opt => opt.format === baseFormatForName && opt.color === effectiveColor)?.name.replace('A4', format).replace('A3', format) || "Štampa";
+        const displayFormat = format === 'SRA3_330x482' ? 'SRA3 (330x482mm)' : format;
+        opis = `${displayFormat}, ${effectiveColor === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
+        
+        let baseFormatForName: 'A4' | 'A3' = 'A4';
+        if (format === 'A3' || format === 'SRA3_330x482') {
+            baseFormatForName = 'A3';
+        }
+        
+        naziv = printServices.options.find(opt => opt.format === baseFormatForName && opt.color === effectiveColor)?.name.replace('A4', displayFormat).replace('A3', displayFormat) || "Štampa";
     }
     
     onAddToBasket({
@@ -186,8 +193,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                         <Label htmlFor="format-a6">A6</Label>
                     </div>
                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="SRA3" id="format-sra3" />
-                        <Label htmlFor="format-sra3">SRA3</Label>
+                        <RadioGroupItem value="SRA3_330x482" id="format-sra3" />
+                        <Label htmlFor="format-sra3">SRA3 (330x482mm)</Label>
                     </div>
                      <div className="flex items-center space-x-2">
                         <RadioGroupItem value="custom" id="format-custom" />
@@ -281,7 +288,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     <Calculator className="h-4 w-4" />
                     <AlertTitle>Obračun</AlertTitle>
                     <AlertDescription>
-                        Cena se računa na osnovu broja komada koji staju na SRA3 tabak ({SRA3_W}x{SRA3_H}mm, sa marginama od {MARGIN}mm). 
+                        Cena se računa na osnovu broja komada koji staju na tabak formata {SRA3_W}x{SRA3_H}mm, sa uračunatim marginama od {MARGIN}mm po strani. 
                         Na jedan tabak staje: <span className="font-bold">{itemsPerSRA3}</span> kom.
                     </AlertDescription>
                 </Alert>

@@ -1,3 +1,4 @@
+
 export type OrderItem = {
   id: string; // Unique ID for the basket item instance
   serviceId: string;
@@ -23,7 +24,7 @@ export type PriceTier = {
   sifra?: number;
 };
 
-export type PrintFormat = 'A4' | 'A3' | 'A5' | 'A6' | 'SRA3';
+export type PrintFormat = 'A4' | 'A3' | 'A5' | 'A6' | 'SRA3_330x482';
 
 export type PrintOption = {
   format: 'A4' | 'A3'; // Base format for pricing
