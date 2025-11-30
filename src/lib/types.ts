@@ -71,12 +71,34 @@ export type HardcoverBindingType = {
   services: HardcoverService[];
 }
 
+export type LaminationPocketService = {
+  id: string;
+  name: string;
+  price: number;
+  sifra?: number;
+}
+
+export type LaminationRollService = {
+  id: string;
+  name: string;
+  priceA4: number;
+  priceA3: number;
+  sifra?: number;
+}
+
+export type LaminationServiceData = {
+  pocket: LaminationPocketService[];
+  roll: LaminationRollService[];
+}
+
+
 export type FinishingServiceData = {
   binding: {
     plasticSpiral: BindingType;
     wireSpiral: BindingType;
   };
   hardcover: HardcoverBindingType;
+  lamination: LaminationServiceData;
 }
 
 // --- END: Finishing Service Specific Types ---

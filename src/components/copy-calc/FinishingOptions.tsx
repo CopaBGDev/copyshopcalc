@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { PlusCircle, BookCopy, ShieldCheck } from 'lucide-react';
+import { PlusCircle, BookCopy, ShieldCheck, Layers } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from '../ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -214,11 +214,136 @@ const HardcoverBinding = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderI
 };
 
 
-const Lamination = () => (
-     <div className="text-center text-muted-foreground p-8">
-        <p>Opcije za plastifikaciju će biti uskoro dostupne.</p>
-    </div>
-);
+const LaminationCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
+    const { pocket: pocketServices, roll: rollServices } = finishingServices.lamination;
+    const [laminationType, setLaminationType] = useState<'pocket' | 'roll'>('pocket');
+    const [selectedPocketServiceId, setSelectedPocketServiceId] = useState<string>(pocketServices[0].id);
+    const [selectedRollFormat, setSelectedRollFormat] = useState<'A4' | 'A3'>('A4');
+    const [quantity, setQuantity] = useState<number>(1);
+
+    const { unitPrice, totalPrice, description } = useMemo(() => {
+        let price = 0;
+        let desc = '';
+
+        if (laminationType === 'pocket') {
+            const service = pocketServices.find(s => s.id === selectedPocketServiceId);
+            if (service) {
+                price = service.price;
+                desc = service.name;
+            }
+        } else { // roll
+            const service = rollServices[0];
+            if (service) {
+                price = selectedRollFormat === 'A4' ? service.priceA4 : service.priceA3;
+                desc = `${service.name} - ${selectedRollFormat}`;
+            }
+        }
+        
+        return { 
+            unitPrice: price, 
+            totalPrice: price * quantity,
+            description: desc
+        };
+
+    }, [laminationType, selectedPocketServiceId, selectedRollFormat, quantity, pocketServices, rollServices]);
+
+    const handleAddToBasket = () => {
+        if (totalPrice <= 0) return;
+        onAddToBasket({
+            serviceId: `plastifikacija-${laminationType}-${laminationType === 'pocket' ? selectedPocketServiceId : selectedRollFormat}`,
+            naziv: 'Plastifikacija',
+            opis: `${description} (x${quantity})`,
+            kolicina: quantity,
+            cena_jedinice: unitPrice,
+            cena_ukupno: totalPrice,
+        });
+    };
+
+    return (
+        <Card className="border-none shadow-none">
+            <CardContent className="p-4 space-y-6">
+                <div className="space-y-2">
+                    <Label>Vrsta plastifikacije</Label>
+                    <RadioGroup value={laminationType} onValueChange={(v) => setLaminationType(v as 'pocket' | 'roll')} className="flex gap-4">
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="pocket" id="lam-pocket" />
+                            <Label htmlFor="lam-pocket">Džepna (folija)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="roll" id="lam-roll" />
+                            <Label htmlFor="lam-roll">Iz rolne</Label>
+                        </div>
+                    </RadioGroup>
+                </div>
+
+                {laminationType === 'pocket' ? (
+                     <div className="space-y-2">
+                        <Label htmlFor="pocket-type">Veličina folije</Label>
+                        <Select onValueChange={setSelectedPocketServiceId} defaultValue={selectedPocketServiceId}>
+                            <SelectTrigger id="pocket-type">
+                                <SelectValue placeholder="Izaberite veličinu" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {pocketServices.map(s => (
+                                    <SelectItem key={s.id} value={s.id}>
+                                        {s.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                ) : (
+                    <div className="space-y-2">
+                        <Label>Format</Label>
+                         <RadioGroup value={selectedRollFormat} onValueChange={(v) => setSelectedRollFormat(v as 'A4' | 'A3')} className="flex gap-4">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="A4" id="roll-a4" />
+                                <Label htmlFor="roll-a4">A4</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="A3" id="roll-a3" />
+                                <Label htmlFor="roll-a3">A3</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                    <div className="space-y-2">
+                        <Label htmlFor="lamination-quantity">Količina</Label>
+                        <Input
+                            id="lamination-quantity"
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                            min="1"
+                            className="max-w-xs"
+                        />
+                    </div>
+                     <div className="flex flex-col items-start md:items-end bg-primary/5 p-4 rounded-lg">
+                        <Label className="text-sm text-muted-foreground">Ukupna cena</Label>
+                        <p className="text-3xl font-bold font-mono tracking-tight text-primary">
+                            {totalPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground h-4">
+                           {quantity > 0 && `(${unitPrice.toFixed(2)} RSD / kom)`}
+                        </p>
+                    </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-end">
+                    <Button size="lg" onClick={handleAddToBasket} disabled={totalPrice <= 0}>
+                        <PlusCircle className="mr-2" />
+                        Dodaj u korpu
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
 
 
 export function FinishingOptions({ onAddToBasket }: FinishingOptionsProps) {
@@ -235,7 +360,8 @@ export function FinishingOptions({ onAddToBasket }: FinishingOptionsProps) {
                         <ShieldCheck className="mr-2 h-4 w-4"/>
                         Tvrdi Povez
                     </TabsTrigger>
-                    <TabsTrigger value="lamination" disabled>
+                    <TabsTrigger value="lamination">
+                        <Layers className="mr-2 h-4 w-4" />
                         Plastifikacija
                     </TabsTrigger>
                 </TabsList>
@@ -246,7 +372,7 @@ export function FinishingOptions({ onAddToBasket }: FinishingOptionsProps) {
                    <HardcoverBinding onAddToBasket={onAddToBasket} />
                 </TabsContent>
                  <TabsContent value="lamination">
-                   <Lamination />
+                   <LaminationCalculator onAddToBasket={onAddToBasket} />
                 </TabsContent>
             </Tabs>
         </div>

@@ -184,5 +184,16 @@ export const finishingServices: FinishingServiceData = {
             { name: 'Tvrdi povez (materijal koji nije štampan kod nas)', price: 1500.00, sifra: 25 },
             { name: 'Tvrdi povez sa UV štampom bela i CMYK', price: 1400.00, sifra: 26 }
         ]
+    },
+    lamination: {
+        pocket: [
+            { id: 'id-60x95', name: 'ID plastifikacija 60x95 mm', price: 58.00 },
+            { id: 'id-75x105', name: 'ID plastifikacija 75x105 mm', price: 74.00 },
+            { id: 'a6', name: 'A6 plastifikacija 125mic', price: 80.00 },
+            { id: 'a5', name: 'A5 plastifikacija 125mic', price: 90.00 },
+        ],
+        roll: [
+            { id: 'roll-32', name: 'Plastifikacija iz rolne (mat/sjaj)', priceA4: 40.00, priceA3: 300.00 },
+        ]
     }
 }
