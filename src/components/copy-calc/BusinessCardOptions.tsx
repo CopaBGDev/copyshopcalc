@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { PlusCircle, FileText } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Checkbox } from '../ui/checkbox';
 
 type BusinessCardOptionsProps = {
   onAddToBasket: (item: Omit<OrderItem, 'id'>) => void;
@@ -20,18 +21,42 @@ type BusinessCardOptionsProps = {
 const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
     const [side, setSide] = useState<'oneSided' | 'twoSided'>('oneSided');
     const [quantity, setQuantity] = useState<string>('100');
+    const [finishing, setFinishing] = useState({
+        lamination: false,
+        rounding: false,
+    });
 
     const { totalPrice, description } = useMemo(() => {
         const quantityNum = parseInt(quantity, 10);
         const priceList = businessCardServices.digital[side];
         const tier = priceList.find(p => p.kolicina === quantityNum);
 
-        if (!tier) return { totalPrice: 0, description: '' };
+        if (!tier || !businessCardServices.doplate) return { totalPrice: 0, description: '' };
 
-        const desc = `Vizit karte, ${side === 'oneSided' ? 'jednostrane' : 'dvostrane'}, ${quantityNum} kom`;
-        return { totalPrice: tier.cena, description: desc };
+        let basePrice = tier.cena;
+        let finishingDesc: string[] = [];
+        
+        if (finishing.lamination) {
+            const laminationPrice = side === 'oneSided' 
+                ? businessCardServices.doplate.plastifikacija.jednostrano * quantityNum
+                : businessCardServices.doplate.plastifikacija.dvostrano * quantityNum;
+            basePrice += laminationPrice;
+            finishingDesc.push('plastifikacija');
+        }
 
-    }, [side, quantity]);
+        if (finishing.rounding) {
+            basePrice += businessCardServices.doplate.coskanje * quantityNum;
+            finishingDesc.push('ćoškanje');
+        }
+
+        let desc = `Vizit karte, ${side === 'oneSided' ? 'jednostrane' : 'dvostrane'}, ${quantityNum} kom`;
+        if (finishingDesc.length > 0) {
+            desc += `, ${finishingDesc.join(' + ')}`;
+        }
+
+        return { totalPrice: basePrice, description: desc };
+
+    }, [side, quantity, finishing]);
 
     const handleAddToBasket = () => {
         if (totalPrice <= 0) return;
@@ -78,6 +103,20 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
                                 ))}
                             </SelectContent>
                         </Select>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <Label>Dorada</Label>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex items-center space-x-2">
+                            <Checkbox id="lamination" checked={finishing.lamination} onCheckedChange={(checked) => setFinishing(f => ({ ...f, lamination: !!checked }))} />
+                            <Label htmlFor="lamination" className="font-normal">Plastifikacija (mat/sjaj)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox id="rounding" checked={finishing.rounding} onCheckedChange={(checked) => setFinishing(f => ({ ...f, rounding: !!checked }))} />
+                            <Label htmlFor="rounding" className="font-normal">Ćoškanje (zaobljene ivice)</Label>
+                        </div>
                     </div>
                 </div>
 

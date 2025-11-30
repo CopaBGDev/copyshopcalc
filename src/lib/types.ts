@@ -162,11 +162,20 @@ export type BusinessCardPriceTier = {
     sifra: number;
 }
 
+export type BusinessCardDoplate = {
+    plastifikacija: {
+        jednostrano: number;
+        dvostrano: number;
+    };
+    coskanje: number;
+}
+
 export type BusinessCardData = {
     digital: {
         oneSided: BusinessCardPriceTier[];
         twoSided: BusinessCardPriceTier[];
-    }
+    };
+    doplate: BusinessCardDoplate;
 }
 // --- END: Business Card Service Specific Types ---
 

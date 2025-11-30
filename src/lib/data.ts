@@ -273,6 +273,13 @@ export const businessCardServices: BusinessCardData = {
             { kolicina: 500, cena: 3070.00, sifra: 680 },
             { kolicina: 1000, cena: 5430.00, sifra: 681 }
         ]
+    },
+    doplate: {
+        plastifikacija: {
+            jednostrano: 1.80,
+            dvostrano: 3.60
+        },
+        coskanje: 3.60
     }
 };
 
