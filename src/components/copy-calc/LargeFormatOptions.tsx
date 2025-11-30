@@ -181,7 +181,7 @@ export function LargeFormatOptions({ onAddToBasket }: LargeFormatOptionsProps) {
                     <TabsTrigger value="plotting">
                         Plotovanje crteža
                     </TabsTrigger>
-                    <TabsTrigger value="posters" disabled>
+                    <TabsTrigger value="posters">
                         Štampa postera
                     </TabsTrigger>
                     <TabsTrigger value="banners" disabled>
