@@ -1,3 +1,4 @@
+
 import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData, FlyerData, CanvasServiceData, GiftServiceData, OfficeSuppliesData, DesignServiceData } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon, Newspaper, Gift, Briefcase } from 'lucide-react';
 
@@ -104,11 +105,11 @@ export const printServices: PrintServiceData = {
                 {kolicina: {min: 1001, max: Infinity}, cena: 4.90, sifra: 601}
             ],
             twoSided: [
-                {kolicina: {min: 1, max: 20}, cena: 19.40, sifra: 615},
-                {kolicina: {min: 21, max: 100}, cena: 9.40, sifra: 614},
-                {kolicina: {min: 101, max: 200}, cena: 7.20, sifra: 613},
-                {kolicina: {min: 201, max: 1000}, cena: 6.00, sifra: 612},
-                {kolicina: {min: 1001, max: Infinity}, cena: 4.40, sifra: 611}
+                {kolicina: {min: 1, max: 20}, cena: 38.80, sifra: 615}, // 19.9 * 2 - 1
+                {kolicina: {min: 21, max: 100}, cena: 18.80, sifra: 614}, // 9.9 * 2 - 1
+                {kolicina: {min: 101, max: 200}, cena: 14.40, sifra: 613}, // 7.7 * 2 - 1
+                {kolicina: {min: 201, max: 1000}, cena: 12.00, sifra: 612}, // 6.5 * 2 - 1
+                {kolicina: {min: 1001, max: Infinity}, cena: 8.80, sifra: 611} // 4.9 * 2 - 1
             ]
         },
         {
@@ -123,11 +124,11 @@ export const printServices: PrintServiceData = {
                 {kolicina: {min: 1001, max: Infinity}, cena: 9.50, sifra: 621}
             ],
             twoSided: [
-                {kolicina: {min: 1, max: 20}, cena: 24.00, sifra: 635},
-                {kolicina: {min: 21, max: 100}, cena: 15.00, sifra: 634},
-                {kolicina: {min: 101, max: 200}, cena: 12.50, sifra: 633},
-                {kolicina: {min: 201, max: 1000}, cena: 9.50, sifra: 632},
-                {kolicina: {min: 1001, max: Infinity}, cena: 8.30, sifra: 631}
+                {kolicina: {min: 1, max: 20}, cena: 49.00, sifra: 635}, // 25 * 2 - 1
+                {kolicina: {min: 21, max: 100}, cena: 31.00, sifra: 634}, // 16 * 2 - 1
+                {kolicina: {min: 101, max: 200}, cena: 26.00, sifra: 633}, // 13.5 * 2 - 1
+                {kolicina: {min: 201, max: 1000}, cena: 20.00, sifra: 632}, // 10.5 * 2 - 1
+                {kolicina: {min: 1001, max: Infinity}, cena: 18.00, sifra: 631} // 9.5 * 2 - 1
             ]
         },
         {
@@ -142,11 +143,11 @@ export const printServices: PrintServiceData = {
                 {kolicina: {min: 1001, max: Infinity}, cena: 26.50, sifra: 68}
             ],
             twoSided: [
-                {kolicina: {min: 1, max: 20}, cena: 44.00, sifra: 61},
-                {kolicina: {min: 21, max: 100}, cena: 41.00, sifra: 63},
-                {kolicina: {min: 101, max: 200}, cena: 31.00, sifra: 65},
-                {kolicina: {min: 201, max: 1000}, cena: 26.00, sifra: 67},
-                {kolicina: {min: 1001, max: Infinity}, cena: 24.00, sifra: 69}
+                {kolicina: {min: 1, max: 20}, cena: 90.00, sifra: 61},
+                {kolicina: {min: 21, max: 100}, cena: 84.00, sifra: 63},
+                {kolicina: {min: 101, max: 200}, cena: 62.00, sifra: 65},
+                {kolicina: {min: 201, max: 1000}, cena: 51.00, sifra: 67},
+                {kolicina: {min: 1001, max: Infinity}, cena: 47.00, sifra: 69}
             ]
         },
         {
@@ -161,11 +162,11 @@ export const printServices: PrintServiceData = {
                 {kolicina: {min: 1001, max: Infinity}, cena: 46.00, sifra: 88}
             ],
             twoSided: [
-                {kolicina: {min: 1, max: 20}, cena: 76.00, sifra: 81},
-                {kolicina: {min: 21, max: 100}, cena: 70.50, sifra: 83},
-                {kolicina: {min: 101, max: 200}, cena: 59.50, sifra: 85},
-                {kolicina: {min: 201, max: 1000}, cena: 44.00, sifra: 87},
-                {kolicina: {min: 1001, max: Infinity}, cena: 41.00, sifra: 89}
+                {kolicina: {min: 1, max: 20}, cena: 151.00, sifra: 81},
+                {kolicina: {min: 21, max: 100}, cena: 140.00, sifra: 83},
+                {kolicina: {min: 101, max: 200}, cena: 118.00, sifra: 85},
+                {kolicina: {min: 201, max: 1000}, cena: 87.00, sifra: 87},
+                {kolicina: {min: 1001, max: Infinity}, cena: 81.00, sifra: 89}
             ]
         }
     ]
@@ -483,3 +484,6 @@ export const designServices: DesignServiceData = [
 
   
 
+
+
+    
