@@ -37,9 +37,20 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
         return <LargeFormatOptions onAddToBasket={onAddToBasket} />;
       case 'kanvas':
         return <CanvasOptions onAddToBasket={onAddToBasket} />;
-      // Add cases for other categories here
       case 'promo':
+        return (
+            <div className="text-center text-muted-foreground py-8">
+                <p className="font-semibold">Promo materijal je dostupan na upit.</p>
+                <p className="text-sm mt-2">Za cene i dostupnost olovaka, upaljača, privezaka, rokovnika i ostalog promo materijala, molimo kontaktirajte menadžera.</p>
+            </div>
+        )
       case 'dizajn':
+          return (
+            <div className="text-center text-muted-foreground py-8">
+                <p className="font-semibold">Usluge grafičkog dizajna i pripreme.</p>
+                <p className="text-sm mt-2">Za sve potrebe dizajna, preloma teksta i pripreme za štampu, obratite se našem dizajnerskom timu radi konsultacija i formiranja cene.</p>
+            </div>
+        )
       default:
         return (
             <div className="text-center text-muted-foreground py-8">
