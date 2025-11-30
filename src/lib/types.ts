@@ -155,6 +155,21 @@ export type KeyService = {
 
 // --- END: Key Service Specific Types ---
 
+// --- START: Business Card Service Specific Types ---
+export type BusinessCardPriceTier = {
+    kolicina: number;
+    cena: number;
+    sifra: number;
+}
+
+export type BusinessCardData = {
+    digital: {
+        oneSided: BusinessCardPriceTier[];
+        twoSided: BusinessCardPriceTier[];
+    }
+}
+// --- END: Business Card Service Specific Types ---
+
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {

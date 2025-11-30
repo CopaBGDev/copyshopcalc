@@ -7,6 +7,7 @@ import { FinishingOptions } from "./FinishingOptions";
 import { ScanOptions } from "./ScanOptions";
 import { TextileOptions } from "./TextileOptions";
 import { KeyOptions } from "./KeyOptions";
+import { BusinessCardOptions } from "./BusinessCardOptions";
 
 type ServiceOptionsProps = {
   category: AppCategory;
@@ -28,6 +29,8 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
         return <TextileOptions onAddToBasket={onAddToBasket} />;
       case 'kljucevi':
         return <KeyOptions onAddToBasket={onAddToBasket} />;
+      case 'vizitke_flajeri':
+        return <BusinessCardOptions onAddToBasket={onAddToBasket} />;
       // Add cases for other categories here
       default:
         return (

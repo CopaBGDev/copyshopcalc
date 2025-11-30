@@ -1,4 +1,4 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService } from './types';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
@@ -254,3 +254,24 @@ export const keyServices: KeyService[] = [
     { naziv: "Plastični privezak", cena: 35.00, sifra: 559 },
     { naziv: "Kopiranje ključa (u kasi je cena 1 din)", cena: 130.00, sifra: 558 }
 ];
+
+export const businessCardServices: BusinessCardData = {
+    digital: {
+        oneSided: [
+            { kolicina: 50, cena: 750.00, sifra: 500 },
+            { kolicina: 100, cena: 837.00, sifra: 501 },
+            { kolicina: 200, cena: 1155.00, sifra: 503 },
+            { kolicina: 300, cena: 1390.00, sifra: 504 },
+            { kolicina: 500, cena: 2130.00, sifra: 509 },
+            { kolicina: 1000, cena: 3690.00, sifra: 510 }
+        ],
+        twoSided: [
+            { kolicina: 50, cena: 1090.00, sifra: 511 },
+            { kolicina: 100, cena: 1198.00, sifra: 512 },
+            { kolicina: 200, cena: 1750.00, sifra: 513 },
+            { kolicina: 300, cena: 2080.00, sifra: 520 },
+            { kolicina: 500, cena: 3070.00, sifra: 680 },
+            { kolicina: 1000, cena: 5430.00, sifra: 681 }
+        ]
+    }
+}
