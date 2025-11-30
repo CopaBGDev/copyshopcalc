@@ -32,6 +32,10 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
       case 'vizitke_flajeri':
         return <BusinessCardOptions onAddToBasket={onAddToBasket} />;
       // Add cases for other categories here
+      case 'promo':
+      case 'kanvas':
+      case 'veliki_formati':
+      case 'dizajn':
       default:
         return (
             <div className="text-center text-muted-foreground py-8">

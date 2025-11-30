@@ -9,6 +9,36 @@ export const appCategories: AppCategory[] = [
     opis: 'A4/A3, C/B i kolor, razni papiri.'
   },
   {
+    id: 'vizitke_flajeri',
+    naziv: 'Vizitke i Flajeri',
+    icon: FileText,
+    opis: 'Dizajn i štampa vizit karti i flajera.'
+  },
+  {
+    id: 'veliki_formati',
+    naziv: 'Veliki Formati',
+    icon: Ruler,
+    opis: 'Baneri, rollup, posteri, folije.'
+  },
+   {
+    id: 'kanvas',
+    naziv: 'Kanvas Platno',
+    icon: ImageIcon,
+    opis: 'Štampa i zatezanje na blind ram.'
+  },
+  {
+    id: 'tekstil',
+    naziv: 'Tekstil',
+    icon: Shirt,
+    opis: 'Štampa na majicama, duks.'
+  },
+  {
+    id: 'promo',
+    naziv: 'Promo Materijal',
+    icon: ShoppingBag,
+    opis: 'Kese, olovke, upaljači, rokovnici...'
+  },
+  {
     id: 'dorada',
     naziv: 'Dorada',
     icon: Scissors,
@@ -20,41 +50,11 @@ export const appCategories: AppCategory[] = [
     icon: ScanLine,
     opis: 'Digitalizacija dokumenata i planova.'
   },
-   {
-    id: 'tekstil',
-    naziv: 'Tekstil',
-    icon: Shirt,
-    opis: 'Štampa na majicama, duks.'
-  },
   {
     id: 'kljucevi',
     naziv: 'Ključevi',
     icon: Key,
     opis: 'Narezivanje klasičnih i tačkastih ključeva.'
-  },
-   {
-    id: 'vizitke_flajeri',
-    naziv: 'Vizitke i Flajeri',
-    icon: FileText,
-    opis: 'Dizajn i štampa vizit karti i flajera.'
-  },
-   {
-    id: 'promo',
-    naziv: 'Promo Materijal',
-    icon: ShoppingBag,
-    opis: 'Kese, olovke, upaljači, rokovnici...'
-  },
-    {
-    id: 'kanvas',
-    naziv: 'Kanvas Platno',
-    icon: ImageIcon,
-    opis: 'Štampa i zatezanje na blind ram.'
-  },
-  {
-    id: 'veliki_formati',
-    naziv: 'Veliki Formati',
-    icon: Ruler,
-    opis: 'Baneri, rollup, posteri, folije.'
   },
   {
     id: 'dizajn',
