@@ -59,25 +59,23 @@ export default function Home() {
       if (itemToUpdate.itemsPerSheet && itemToUpdate.itemsPerSheet > 0) {
         const itemsPerSheet = itemToUpdate.itemsPerSheet;
         
-        // We calculate the number of sheets based on the *original* quantity before this update
-        const originalKolicina = prevBasket.find(i => i.id === itemId)?.kolicina || 0;
-        let currentSheets = Math.ceil(originalKolicina / itemsPerSheet);
-
-        if(newQuantity > originalKolicina) {
-            currentSheets++;
-        } else {
-            currentSheets = Math.max(1, currentSheets - 1);
+        let newTotalItems = itemToUpdate.kolicina;
+        if(newQuantity > itemToUpdate.kolicina) {
+           newTotalItems += itemsPerSheet;
+        } else if (newQuantity < itemToUpdate.kolicina) {
+            newTotalItems = Math.max(itemsPerSheet, newTotalItems - itemsPerSheet);
         }
-
-        const newTotalItems = currentSheets * itemsPerSheet;
+        
+        const numSheets = Math.ceil(newTotalItems / itemsPerSheet);
         const pricePerSheet = (itemToUpdate.cena_jedinice * itemsPerSheet);
-        const newTotalPrice = pricePerSheet * currentSheets;
+        const newTotalPrice = pricePerSheet * numSheets;
+        newTotalItems = numSheets * itemsPerSheet;
 
         return prevBasket.map(item => item.id === itemId ? {
           ...item,
           kolicina: newTotalItems,
           cena_ukupno: newTotalPrice,
-          opis: item.opis.replace(/\(x\d+\)/, `(x${newTotalItems})`).replace(/\d+ tabak(a)?/, `${currentSheets} tabaka`),
+          opis: item.opis.replace(/\(x\d+\)/, `(x${newTotalItems})`).replace(/\d+ tabak(a)?/, `${numSheets} tabaka`),
         } : item);
       }
       
@@ -129,20 +127,22 @@ export default function Home() {
   
   const filteredCategories = useMemo(() => {
     if (!searchQuery) {
-      return appCategories;
+      return [];
     }
-    return appCategories.filter(cat =>
-      cat.naziv.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cat.opis.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return appCategories
+      .filter(cat =>
+        cat.naziv.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        cat.opis.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .map(cat => cat.id);
   }, [searchQuery]);
 
   const displayedCategories = useMemo(() => {
     if (searchQuery) {
-        return filteredCategories.map(c => c.id);
+      return [...new Set([...activeCategories, ...filteredCategories])];
     }
     return activeCategories;
-  }, [searchQuery, filteredCategories, activeCategories]);
+  }, [searchQuery, activeCategories, filteredCategories]);
 
 
   return (
@@ -169,10 +169,10 @@ export default function Home() {
                     <Accordion 
                       type="multiple" 
                       value={displayedCategories}
-                      onValueChange={setSearchQuery ? undefined : setActiveCategories}
+                      onValueChange={setActiveCategories}
                       className="w-full"
                     >
-                      {filteredCategories.map(cat => (
+                      {appCategories.map(cat => (
                         <CategorySelector
                           key={cat.id}
                           category={cat}
