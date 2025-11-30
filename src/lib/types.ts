@@ -317,6 +317,33 @@ export type GiftServiceData = {
 }
 // --- END: Gift Service Specific Types ---
 
+// --- START: Office Supplies Types ---
+export type MemorandumTier = {
+    kolicina: number;
+    cena: number;
+}
+
+export type EnvelopeTier = {
+    type: 'ameriken' | 'c4';
+    kolicina: number;
+    cena: number;
+}
+
+export type BrochureService = {
+    id: string;
+    name: string;
+    price: number;
+    pricePerPage?: number;
+    unit: 'po strani' | 'paket';
+}
+
+export type OfficeSuppliesData = {
+    memorandums: MemorandumTier[];
+    envelopes: EnvelopeTier[];
+    brochures: BrochureService[];
+}
+
+// --- END: Office Supplies Types ---
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {

@@ -1,5 +1,5 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData, FlyerData, CanvasServiceData, GiftServiceData } from './types';
-import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon, Newspaper, Gift } from 'lucide-react';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService, BusinessCardData, LargeFormatData, FlyerData, CanvasServiceData, GiftServiceData, OfficeSuppliesData } from './types';
+import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon, Newspaper, Gift, Briefcase } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
   {
@@ -19,6 +19,12 @@ export const appCategories: AppCategory[] = [
     naziv: 'Flajeri',
     icon: Newspaper,
     opis: 'Digitalna i ofset štampa flajera.'
+  },
+   {
+    id: 'kancelarijski',
+    naziv: 'Kancelarijski Materijal',
+    icon: Briefcase,
+    opis: 'Memorandumi, koverte, brošure.'
   },
   {
     id: 'veliki_formati',
@@ -436,3 +442,29 @@ export const giftServices: GiftServiceData = {
     { id: "maska-telefon", name: "Maska za telefon sa štampom", price: 1500.00, sifra: 335 }
   ]
 }
+
+export const officeSuppliesData: OfficeSuppliesData = {
+    memorandums: [
+        { kolicina: 100, cena: 2200.00 },
+        { kolicina: 200, cena: 3300.00 },
+        { kolicina: 500, cena: 7100.00 },
+    ],
+    envelopes: [
+        { type: 'ameriken', kolicina: 50, cena: 2500.00 },
+        { type: 'ameriken', kolicina: 100, cena: 2600.00 },
+        { type: 'ameriken', kolicina: 200, cena: 4250.00 },
+        { type: 'ameriken', kolicina: 500, cena: 8350.00 },
+        { type: 'c4', kolicina: 50, cena: 1700.00 },
+        { type: 'c4', kolicina: 100, cena: 2900.00 },
+        { type: 'c4', kolicina: 200, cena: 3900.00 },
+        { type: 'c4', kolicina: 500, cena: 7900.00 },
+    ],
+    brochures: [
+        { id: 'buklet-a4', name: 'Brošura - buklet A4 (kolor)', pricePerPage: 60.00, unit: 'po strani' },
+        { id: 'katalog-a5', name: 'Katalog - buklet A5 (kolor)', pricePerPage: 32.00, unit: 'po strani' },
+        { id: 'liflet-a4-50', name: 'Liflet A4 (2 savijanja, 50 kom)', price: 4150.00, unit: 'paket' },
+        { id: 'liflet-a4-100', name: 'Liflet A4 (2 savijanja, 100 kom)', price: 5950.00, unit: 'paket' },
+        { id: 'liflet-a3-50', name: 'Liflet A3 (1 savijanje, 50 kom)', price: 5750.00, unit: 'paket' },
+    ]
+}
+
