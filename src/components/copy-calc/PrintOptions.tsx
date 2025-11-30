@@ -18,8 +18,11 @@ type PrintOptionsProps = {
   onAddToBasket: (item: Omit<OrderItem, 'id'>) => void;
 };
 
-const SRA3_W = 482;
-const SRA3_H = 330;
+const SHEET_DIMENSIONS = {
+  SRA3: { w: 482, h: 330 },
+  A3: { w: 420, h: 297 },
+  A4: { w: 297, h: 210 },
+}
 const MARGIN = 5;
 
 function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sheetH: number): number {
@@ -57,20 +60,22 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   // Custom dimension state
   const [customWidth, setCustomWidth] = useState<number>(90);
   const [customHeight, setCustomHeight] = useState<number>(50);
-  const [itemsPerSRA3, setItemsPerSRA3] = useState<number>(0);
+  const [itemsPerSheet, setItemsPerSheet] = useState<number>(0);
   const [sheetPrice, setSheetPrice] = useState<number>(0);
+  const [customSheetFormat, setCustomSheetFormat] = useState<'A4' | 'A3' | 'SRA3'>('SRA3');
+
 
   const selectedPaper: PaperType | undefined = useMemo(() => printServices.papers.find(p => p.id === paperId), [paperId]);
   
   const activePrintOption: PrintOption | undefined = useMemo(() => {
     // For price calculation, we always use A3 or A4 as base
     let baseFormatForPrice: 'A3' | 'A4' = 'A4';
-    if (format === 'A3' || format === 'SRA3_330x482' || format === 'custom') {
+    if (format === 'A3' || format === 'SRA3_330x482' || (format === 'custom' && (customSheetFormat === 'A3' || customSheetFormat === 'SRA3'))) {
         baseFormatForPrice = 'A3';
     }
 
     return printServices.options.find(opt => opt.format === baseFormatForPrice && opt.color === color);
-  }, [format, color]);
+  }, [format, color, customSheetFormat]);
 
   const isOneSidedOnlyPaper = useMemo(() => {
     return ['muflon', 'pvc-folija', 'pvc-bela'].includes(paperId);
@@ -91,34 +96,46 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     }
 
     if (format === 'custom') {
-        const sra3PrintPriceOption = printServices.options.find(opt => opt.format === 'A3' && opt.color === color);
-        if (!sra3PrintPriceOption) return;
+        const baseFormatForPrice = customSheetFormat === 'A4' ? 'A4' : 'A3';
+        const customPrintPriceOption = printServices.options.find(opt => opt.format === baseFormatForPrice && opt.color === color);
+        if (!customPrintPriceOption) return;
 
-        const sra3PriceTiers: PriceTier[] = sra3PrintPriceOption[side];
+        const priceTiers: PriceTier[] = customPrintPriceOption[side];
+        const tier = priceTiers.find(t => t.kolicina.min === 1) || priceTiers[0];
         
-        // Find the base price for a single sheet
-        const sra3Tier = sra3PriceTiers.find(t => t.kolicina.min === 1) || sra3PriceTiers[0];
+        let printPrice = tier.cena;
+        let paperPrice = 0;
         
-        const sra3PrintPrice = sra3Tier.cena;
-        const sra3PaperPrice = selectedPaper.price; // Price is per SRA3 sheet
-
-        const totalSheetPrice = sra3PrintPrice + sra3PaperPrice;
-        setSheetPrice(totalSheetPrice);
-        
-        const itemsCount = calculateItemsPerSheet(customWidth, customHeight, SRA3_W, SRA3_H);
-        setItemsPerSRA3(itemsCount);
-
-        if(itemsCount > 0) {
-            const finalUnitPrice = totalSheetPrice / itemsCount;
-            setUnitPrice(finalUnitPrice);
-            setTotalPrice(totalSheetPrice * quantity);
-        } else {
-            setUnitPrice(0);
-            setTotalPrice(0);
+        if (selectedPaper.price > 0) {
+            let copiesPerSheet = 1;
+            if (selectedPaper.format === 'SRA3') {
+                if (customSheetFormat === 'SRA3') copiesPerSheet = 1;
+                else if (customSheetFormat === 'A3') copiesPerSheet = 1; // approx.
+                else if (customSheetFormat === 'A4') copiesPerSheet = 2;
+            } else { // Assuming paper price is for A4 if not SRA3
+                 if (customSheetFormat === 'A3') copiesPerSheet = 0.5;
+                 else if (customSheetFormat === 'SRA3') copiesPerSheet = 0.5; // This case is less likely, should be SRA3 paper
+                 else copiesPerSheet = 1;
+            }
+             paperPrice = selectedPaper.price / copiesPerSheet;
         }
 
+        const totalSheetPrice = printPrice + paperPrice;
+        setSheetPrice(totalSheetPrice);
+        
+        const sheetDims = SHEET_DIMENSIONS[customSheetFormat];
+        const itemsCount = calculateItemsPerSheet(customWidth, customHeight, sheetDims.w, sheetDims.h);
+        setItemsPerSheet(itemsCount);
+
+        if(itemsCount > 0) {
+            setTotalPrice(totalSheetPrice * quantity);
+        } else {
+            setTotalPrice(0);
+        }
+        setUnitPrice(itemsCount > 0 ? totalSheetPrice / itemsCount : 0);
+
     } else {
-        setItemsPerSRA3(0);
+        setItemsPerSheet(0);
         setSheetPrice(0);
         const priceTiers: PriceTier[] = activePrintOption[side];
         const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
@@ -142,7 +159,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                 else if (format === 'A5') copiesPerSheet = 4;
                 else if (format === 'A6') copiesPerSheet = 8;
                 paperPricePerCopy = selectedPaper.price / copiesPerSheet;
-            } else {
+            } else { // Assuming price is per A4 if format is not SRA3
                  paperPricePerCopy = selectedPaper.price;
             }
         }
@@ -152,7 +169,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         setTotalPrice(finalUnitPrice * quantity);
     }
 
-  }, [quantity, format, color, side, paperId, activePrintOption, selectedPaper, customWidth, customHeight]);
+  }, [quantity, format, color, side, paperId, activePrintOption, selectedPaper, customWidth, customHeight, customSheetFormat]);
   
 
   const handleAddToBasket = () => {
@@ -164,10 +181,10 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     let finalUnitPrice = unitPrice;
 
     if (format === 'custom') {
-        if (itemsPerSRA3 <= 0) return;
+        if (itemsPerSheet <= 0) return;
         naziv = `Štampa proizvoljnog formata`;
-        finalQuantity = itemsPerSRA3 * quantity;
-        opis = `${customWidth}x${customHeight}mm, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Količina: ${finalQuantity} kom (${quantity} tabaka)`;
+        finalQuantity = itemsPerSheet * quantity;
+        opis = `${customWidth}x${customHeight}mm na ${customSheetFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka)`;
         finalUnitPrice = totalPrice / finalQuantity;
     } else {
         const displayFormat = format === 'SRA3_330x482' ? 'SRA3 (482x330mm)' : format;
@@ -190,6 +207,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       cena_ukupno: totalPrice,
     });
   };
+
+  const sheetDims = SHEET_DIMENSIONS[customSheetFormat];
 
   return (
     <div className="space-y-6">
@@ -308,12 +327,25 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                             />
                         </div>
                     </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="custom-sheet-format">Osnovni format za obračun</Label>
+                        <Select onValueChange={(v) => setCustomSheetFormat(v as any)} defaultValue={customSheetFormat}>
+                            <SelectTrigger id="custom-sheet-format">
+                                <SelectValue placeholder="Izaberite format" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="SRA3">SRA3 (482x330mm)</SelectItem>
+                                <SelectItem value="A3">A3 (420x297mm)</SelectItem>
+                                <SelectItem value="A4">A4 (297x210mm)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <Alert>
                     <Calculator className="h-4 w-4" />
                     <AlertTitle>Obračun po tabaku</AlertTitle>
                     <AlertDescription>
-                        Obračun se vrši po broju tabaka. Na jedan SRA3 ({SRA3_W}x{SRA3_H}mm) tabak staje: <span className="font-bold">{itemsPerSRA3}</span> kom.
+                        Obračun se vrši po broju tabaka. Na jedan {customSheetFormat} ({sheetDims.w}x{sheetDims.h}mm) tabak staje: <span className="font-bold">{itemsPerSheet}</span> kom.
                         <br />
                         Cena po tabaku: <span className="font-bold">{sheetPrice.toFixed(2)} RSD</span>.
                     </AlertDescription>
@@ -344,14 +376,9 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
            <p className="text-3xl font-bold font-mono tracking-tight text-primary">
              {totalPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
            </p>
-            {quantity > 0 && unitPrice > 0 && format !== 'custom' && (
+            {quantity > 0 && unitPrice > 0 && (
                  <p className="text-xs text-muted-foreground font-mono">
                     ({unitPrice.toFixed(2)} RSD / kom)
-                </p>
-            )}
-            {format === 'custom' && itemsPerSRA3 > 0 && (
-                <p className="text-xs text-muted-foreground font-mono">
-                    ({(totalPrice / (itemsPerSRA3 * quantity)).toFixed(2)} RSD / kom)
                 </p>
             )}
         </div>
@@ -360,7 +387,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       <Separator className="my-6" />
 
       <div className="flex justify-end">
-        <Button size="lg" onClick={handleAddToBasket} disabled={quantity <= 0 || !activePrintOption || totalPrice <= 0 || (format === 'custom' && itemsPerSRA3 <= 0)}>
+        <Button size="lg" onClick={handleAddToBasket} disabled={quantity <= 0 || !activePrintOption || totalPrice <= 0 || (format === 'custom' && itemsPerSheet <= 0)}>
           <PlusCircle className="mr-2"/>
           Dodaj u korpu
         </Button>
@@ -373,6 +400,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
 
     
 
+
+    
 
     
 
