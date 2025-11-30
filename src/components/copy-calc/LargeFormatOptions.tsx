@@ -169,6 +169,13 @@ const PlottingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
     );
 };
 
+const PosterCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
+    return (
+        <p className="p-4 text-center text-muted-foreground">Uskoro dostupno...</p>
+    )
+}
+
+
 export function LargeFormatOptions({ onAddToBasket }: LargeFormatOptionsProps) {
     return (
         <div className="space-y-6">
@@ -195,7 +202,7 @@ export function LargeFormatOptions({ onAddToBasket }: LargeFormatOptionsProps) {
                     <PlottingCalculator onAddToBasket={onAddToBasket} />
                 </TabsContent>
                 <TabsContent value="posters">
-                   <p className="p-4 text-center text-muted-foreground">Uskoro dostupno...</p>
+                   <PosterCalculator onAddToBasket={onAddToBasket} />
                 </TabsContent>
                 <TabsContent value="banners">
                    <p className="p-4 text-center text-muted-foreground">Uskoro dostupno...</p>
