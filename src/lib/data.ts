@@ -1,4 +1,4 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData } from './types';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
@@ -197,3 +197,16 @@ export const finishingServices: FinishingServiceData = {
         ]
     }
 }
+
+export const scanServices: ScanServiceData = {
+    manual: [
+        { kolicina: { min: 1, max: 10 }, priceA4: 41.00, priceA3: 73.00 },
+        { kolicina: { min: 11, max: 50 }, priceA4: 30.00, priceA3: 41.00 },
+        { kolicina: { min: 51, max: Infinity }, priceA4: 13.00, priceA3: 25.00 },
+    ],
+    auto: [
+        { kolicina: { min: 1, max: 50 }, priceA4: 13.00, priceA3: 25.00 }, // Assuming auto scan for small quantities is same as manual 51+
+        { kolicina: { min: 51, max: 100 }, priceA4: 7.00, priceA3: 13.00 },
+        { kolicina: { min: 101, max: Infinity }, priceA4: 4.50, priceA3: 7.50 },
+    ]
+};

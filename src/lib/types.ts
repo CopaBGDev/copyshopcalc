@@ -103,6 +103,21 @@ export type FinishingServiceData = {
 
 // --- END: Finishing Service Specific Types ---
 
+// --- START: Scanning Service Specific Types ---
+
+export type ScanPriceTier = {
+  kolicina: { min: number; max: number };
+  priceA4: number;
+  priceA3: number;
+};
+
+export type ScanServiceData = {
+  manual: ScanPriceTier[];
+  auto: ScanPriceTier[];
+};
+
+// --- END: Scanning Service Specific Types ---
+
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {
