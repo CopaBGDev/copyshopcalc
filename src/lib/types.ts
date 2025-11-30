@@ -20,7 +20,7 @@ export type AppCategory = {
 export type PriceTier = {
   kolicina: { min: number; max: number };
   cena: number;
-  sifra: number;
+  sifra?: number;
 };
 
 export type PrintOption = {
@@ -44,6 +44,31 @@ export type PrintServiceData = {
 };
 
 // --- END: Print Service Specific Types ---
+
+// --- START: Finishing Service Specific Types ---
+
+export type BindingTier = {
+  sheets: { min: number; max: number };
+  diameter: string;
+  priceSpiralOnly: number;
+  priceWithCovers: number;
+  sifra?: number;
+};
+
+export type BindingType = {
+  name: string;
+  tiers: BindingTier[];
+}
+
+export type FinishingServiceData = {
+  binding: {
+    plasticSpiral: BindingType;
+    wireSpiral: BindingType;
+  }
+}
+
+// --- END: Finishing Service Specific Types ---
+
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {

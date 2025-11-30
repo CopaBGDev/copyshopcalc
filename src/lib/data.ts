@@ -1,4 +1,4 @@
-import type { AppCategory, PrintServiceData } from './types';
+import type { AppCategory, PrintServiceData, FinishingServiceData } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
@@ -152,3 +152,28 @@ export const printServices: PrintServiceData = {
         }
     ]
 };
+
+
+export const finishingServices: FinishingServiceData = {
+    binding: {
+        plasticSpiral: {
+            name: 'Plastična spirala A4',
+            tiers: [
+                { sheets: { min: 1, max: 80 }, diameter: '6, 8, 10, 12', priceSpiralOnly: 140.00, priceWithCovers: 180.00 },
+                { sheets: { min: 81, max: 150 }, diameter: '14, 16, 19', priceSpiralOnly: 160.00, priceWithCovers: 200.00 },
+                { sheets: { min: 151, max: 210 }, diameter: '22, 25', priceSpiralOnly: 180.00, priceWithCovers: 220.00 },
+                { sheets: { min: 211, max: 300 }, diameter: '28, 32, 45', priceSpiralOnly: 200.00, priceWithCovers: 250.00 },
+                { sheets: { min: 301, max: 450 }, diameter: '52', priceSpiralOnly: 250.00, priceWithCovers: 320.00 }
+            ]
+        },
+        wireSpiral: {
+            name: 'Žičana spirala A4',
+            tiers: [
+                { sheets: { min: 1, max: 80 }, diameter: '6.9/8/9.5/11', priceSpiralOnly: 160.00, priceWithCovers: 200.00 },
+                { sheets: { min: 81, max: 150 }, diameter: '12.7/14.3/16/19', priceSpiralOnly: 200.00, priceWithCovers: 230.00 },
+                { sheets: { min: 151, max: 210 }, diameter: '22 / 25,4', priceSpiralOnly: 220.00, priceWithCovers: 280.00 },
+                { sheets: { min: 211, max: 300 }, diameter: '28.5 / 32', priceSpiralOnly: 270.00, priceWithCovers: 330.00 }
+            ]
+        }
+    }
+}
