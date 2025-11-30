@@ -28,6 +28,13 @@ function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sh
     const usableSheetW = sheetW - (MARGIN * 2);
     const usableSheetH = sheetH - (MARGIN * 2);
 
+    if (itemW > usableSheetW || itemH > usableSheetH) {
+      // Check rotated
+      if (itemH > usableSheetW || itemW > usableSheetH) {
+        return 0;
+      }
+    }
+
     // First orientation
     const itemsNormal = Math.floor(usableSheetW / itemW) * Math.floor(usableSheetH / itemH);
 
@@ -51,6 +58,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const [customWidth, setCustomWidth] = useState<number>(90);
   const [customHeight, setCustomHeight] = useState<number>(50);
   const [itemsPerSRA3, setItemsPerSRA3] = useState<number>(0);
+  const [sheetPrice, setSheetPrice] = useState<number>(0);
 
   const selectedPaper: PaperType | undefined = useMemo(() => printServices.papers.find(p => p.id === paperId), [paperId]);
   
@@ -76,12 +84,15 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (!sra3PrintPriceOption) return;
 
         const sra3PriceTiers: PriceTier[] = sra3PrintPriceOption[side];
-        const sra3Tier = sra3PriceTiers[0]; // Price for 1-20 copies is the base for sheet
+        
+        // Find the base price for a single sheet
+        const sra3Tier = sra3PriceTiers.find(t => t.kolicina.min === 1) || sra3PriceTiers[0];
         
         const sra3PrintPrice = sra3Tier.cena;
         const sra3PaperPrice = selectedPaper.price; // Price is per SRA3 sheet
 
         const totalSheetPrice = sra3PrintPrice + sra3PaperPrice;
+        setSheetPrice(totalSheetPrice);
         
         const itemsCount = calculateItemsPerSheet(customWidth, customHeight, SRA3_W, SRA3_H);
         setItemsPerSRA3(itemsCount);
@@ -89,7 +100,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if(itemsCount > 0) {
             const finalUnitPrice = totalSheetPrice / itemsCount;
             setUnitPrice(finalUnitPrice);
-            setTotalPrice(finalUnitPrice * quantity);
+            setTotalPrice(totalSheetPrice * quantity);
         } else {
             setUnitPrice(0);
             setTotalPrice(0);
@@ -97,6 +108,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
 
     } else {
         setItemsPerSRA3(0);
+        setSheetPrice(0);
         const priceTiers: PriceTier[] = activePrintOption[side];
         const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
         
@@ -137,10 +149,13 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     
     let naziv = "Štampa";
     let opis = "";
+    let finalQuantity = quantity;
 
     if (format === 'custom') {
+        if (itemsPerSRA3 <= 0) return;
         naziv = `Štampa proizvoljnog formata`;
-        opis = `${customWidth}x${customHeight}mm, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
+        finalQuantity = itemsPerSRA3 * quantity;
+        opis = `${customWidth}x${customHeight}mm, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Količina: ${finalQuantity} kom (${quantity} tabaka)`;
     } else {
         const displayFormat = format === 'SRA3_330x482' ? 'SRA3 (482x330mm)' : format;
         opis = `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
@@ -157,7 +172,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       serviceId: `stampa-${format}-${color}-${side}-${paperId}-${customWidth}x${customHeight}`,
       naziv: naziv,
       opis,
-      kolicina: quantity,
+      kolicina: finalQuantity,
       cena_jedinice: unitPrice,
       cena_ukupno: totalPrice,
     });
@@ -283,10 +298,11 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                 </div>
                 <Alert>
                     <Calculator className="h-4 w-4" />
-                    <AlertTitle>Obračun</AlertTitle>
+                    <AlertTitle>Obračun po tabaku</AlertTitle>
                     <AlertDescription>
-                        Cena se računa na osnovu broja komada koji staju na tabak formata {SRA3_W}x{SRA3_H}mm, sa uračunatim marginama od {MARGIN}mm po strani. 
-                        Na jedan tabak staje: <span className="font-bold">{itemsPerSRA3}</span> kom.
+                        Obračun se vrši po broju tabaka. Na jedan SRA3 ({SRA3_W}x{SRA3_H}mm) tabak staje: <span className="font-bold">{itemsPerSRA3}</span> kom.
+                        <br />
+                        Cena po tabaku: <span className="font-bold">{sheetPrice.toFixed(2)} RSD</span>.
                     </AlertDescription>
                 </Alert>
             </div>
@@ -298,7 +314,9 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       {/* Quantity & Price */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
         <div className="space-y-2">
-          <Label htmlFor="quantity">Količina (broj komada)</Label>
+          <Label htmlFor="quantity">
+            {format === 'custom' ? 'Količina (broj tabaka)' : 'Količina (broj komada)'}
+          </Label>
           <Input 
             id="quantity" 
             type="number" 
@@ -313,9 +331,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
            <p className="text-3xl font-bold font-mono tracking-tight text-primary">
              {totalPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
            </p>
-            {quantity > 0 && unitPrice > 0 && (
+            {quantity > 0 && unitPrice > 0 && format !== 'custom' && (
                  <p className="text-xs text-muted-foreground font-mono">
                     ({unitPrice.toFixed(2)} RSD / kom)
+                </p>
+            )}
+            {format === 'custom' && itemsPerSRA3 > 0 && (
+                <p className="text-xs text-muted-foreground font-mono">
+                    ({(totalPrice / (itemsPerSRA3 * quantity)).toFixed(2)} RSD / kom)
                 </p>
             )}
         </div>
@@ -324,7 +347,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       <Separator className="my-6" />
 
       <div className="flex justify-end">
-        <Button size="lg" onClick={handleAddToBasket} disabled={quantity <= 0 || !activePrintOption || totalPrice <= 0}>
+        <Button size="lg" onClick={handleAddToBasket} disabled={quantity <= 0 || !activePrintOption || totalPrice <= 0 || (format === 'custom' && itemsPerSRA3 <= 0)}>
           <PlusCircle className="mr-2"/>
           Dodaj u korpu
         </Button>
