@@ -170,8 +170,178 @@ const PlottingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
 };
 
 const PosterCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
+    const [calcType, setCalcType] = useState<'fixed' | 'by-meter'>('fixed');
+    
+    // Fixed format state
+    const [fixedFormat, setFixedFormat] = useState<'50x70' | '70x100'>('50x70');
+    const [fixedPaper, setFixedPaper] = useState(largeFormatServices.posters.fixedFormat['50x70'][0].paper);
+    const [fixedQuantity, setFixedQuantity] = useState(1);
+
+    // By meter state
+    const [byMeterPaperId, setByMeterPaperId] = useState(0);
+    const [width, setWidth] = useState(1);
+    const [height, setHeight] = useState(1);
+
+    const { fixedPrice, fixedDescription } = useMemo(() => {
+        const paperOptions = largeFormatServices.posters.fixedFormat[fixedFormat];
+        const selected = paperOptions.find(p => p.paper === fixedPaper);
+        if (!selected) return { fixedPrice: 0, fixedDescription: '' };
+        
+        const price = selected.price * fixedQuantity;
+        const desc = `Poster ${fixedFormat}cm, ${fixedPaper}`;
+
+        return { fixedPrice: price, fixedDescription: desc };
+    }, [fixedFormat, fixedPaper, fixedQuantity]);
+
+
+    const { byMeterPrice, byMeterDescription } = useMemo(() => {
+        const selected = largeFormatServices.posters.byMeter[byMeterPaperId];
+        if (!selected || width <=0 || height <= 0) return { byMeterPrice: 0, byMeterDescription: '' };
+
+        const area = width * height;
+        const price = area * selected.priceM2;
+        const desc = `Poster ${width.toFixed(2)}x${height.toFixed(2)}m (${area.toFixed(2)}m²), ${selected.paper}`;
+
+        return { byMeterPrice: price, byMeterDescription: desc };
+    }, [byMeterPaperId, width, height]);
+
+
+    const handleFixedAddToBasket = () => {
+        if (fixedPrice <= 0) return;
+        const paperOptions = largeFormatServices.posters.fixedFormat[fixedFormat];
+        const selected = paperOptions.find(p => p.paper === fixedPaper);
+        
+        onAddToBasket({
+            serviceId: `poster-fixed-${fixedFormat}-${fixedPaper}`,
+            naziv: 'Štampa postera',
+            opis: `${fixedDescription} (x${fixedQuantity})`,
+            kolicina: fixedQuantity,
+            cena_jedinice: selected?.price || 0,
+            cena_ukupno: fixedPrice,
+        });
+    }
+
+    const handleByMeterAddToBasket = () => {
+        if (byMeterPrice <= 0) return;
+        const selected = largeFormatServices.posters.byMeter[byMeterPaperId];
+        onAddToBasket({
+            serviceId: `poster-bymeter-${byMeterPaperId}-${width}x${height}`,
+            naziv: 'Štampa postera po meri',
+            opis: byMeterDescription,
+            kolicina: 1,
+            cena_jedinice: byMeterPrice,
+            cena_ukupno: byMeterPrice,
+        });
+    }
+
+    const handleFixedFormatChange = (value: string) => {
+        const newFormat = value as '50x70' | '70x100';
+        setFixedFormat(newFormat);
+        setFixedPaper(largeFormatServices.posters.fixedFormat[newFormat][0].paper);
+    }
+
     return (
-        <p className="p-4 text-center text-muted-foreground">Uskoro dostupno...</p>
+        <Card className="border-none shadow-none">
+            <CardContent className="p-4 space-y-6">
+                <RadioGroup value={calcType} onValueChange={(v) => setCalcType(v as any)} className="flex gap-4">
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="fixed" id="poster-fixed" />
+                        <Label htmlFor="poster-fixed">Fiksni formati</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="by-meter" id="poster-by-meter" />
+                        <Label htmlFor="poster-by-meter">Po metru</Label>
+                    </div>
+                </RadioGroup>
+                <Separator />
+
+                {calcType === 'fixed' && (
+                    <div className="space-y-6">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label>Format</Label>
+                                <Select onValueChange={handleFixedFormatChange} defaultValue={fixedFormat}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="50x70">50x70 cm</SelectItem>
+                                        <SelectItem value="70x100">70x100 cm</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Vrsta papira</Label>
+                                <Select onValueChange={setFixedPaper} value={fixedPaper}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>
+                                        {largeFormatServices.posters.fixedFormat[fixedFormat].map(p => (
+                                            <SelectItem key={p.paper} value={p.paper}>{p.paper}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                         </div>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                            <div className="space-y-2">
+                                <Label htmlFor="fixed-poster-qty">Količina</Label>
+                                <Input id="fixed-poster-qty" type="number" value={fixedQuantity} onChange={(e) => setFixedQuantity(Math.max(1, parseInt(e.target.value) || 1))} min="1" className="max-w-xs"/>
+                            </div>
+                            <div className="flex flex-col items-start md:items-end bg-primary/5 p-4 rounded-lg">
+                                <Label className="text-sm text-muted-foreground">Ukupna cena</Label>
+                                <p className="text-3xl font-bold font-mono tracking-tight text-primary">
+                                    {fixedPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
+                                </p>
+                            </div>
+                         </div>
+                         <Separator/>
+                         <div className="flex justify-end">
+                            <Button size="lg" onClick={handleFixedAddToBasket} disabled={fixedPrice <= 0}>
+                                <PlusCircle className="mr-2" />
+                                Dodaj u korpu
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {calcType === 'by-meter' && (
+                     <div className="space-y-6">
+                         <div className="space-y-2">
+                            <Label>Vrsta papira i širina rolne</Label>
+                            <Select onValueChange={(v) => setByMeterPaperId(parseInt(v, 10))} defaultValue={byMeterPaperId.toString()}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    {largeFormatServices.posters.byMeter.map((p, idx) => (
+                                        <SelectItem key={idx} value={idx.toString()}>{p.paper} ({p.rollWidth})</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                         </div>
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                            <div className="space-y-2">
+                                <Label htmlFor="poster-width">Širina (m)</Label>
+                                <Input id="poster-width" type="number" value={width} onChange={(e) => setWidth(parseFloat(e.target.value) || 0)} min="0.1" step="0.1" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="poster-height">Visina (m)</Label>
+                                <Input id="poster-height" type="number" value={height} onChange={(e) => setHeight(parseFloat(e.target.value) || 0)} min="0.1" step="0.1" />
+                            </div>
+                             <div className="flex flex-col items-end bg-primary/5 p-4 rounded-lg">
+                                <Label className="text-sm text-muted-foreground">Ukupna cena</Label>
+                                <p className="text-3xl font-bold font-mono tracking-tight text-primary">
+                                    {byMeterPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
+                                </p>
+                            </div>
+                         </div>
+                         <Separator/>
+                         <div className="flex justify-end">
+                            <Button size="lg" onClick={handleByMeterAddToBasket} disabled={byMeterPrice <= 0}>
+                                <PlusCircle className="mr-2" />
+                                Dodaj u korpu
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
     )
 }
 
@@ -214,5 +384,3 @@ export function LargeFormatOptions({ onAddToBasket }: LargeFormatOptionsProps) {
         </div>
     );
 }
-
-    
