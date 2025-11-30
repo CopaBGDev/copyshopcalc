@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PrintOptions } from "./PrintOptions";
 import { FinishingOptions } from "./FinishingOptions";
 import { ScanOptions } from "./ScanOptions";
+import { TextileOptions } from "./TextileOptions";
 
 type ServiceOptionsProps = {
   category: AppCategory;
@@ -22,6 +23,8 @@ export function ServiceOptions({ category, onAddToBasket }: ServiceOptionsProps)
         return <FinishingOptions onAddToBasket={onAddToBasket} />;
       case 'skeniranje':
         return <ScanOptions onAddToBasket={onAddToBasket} />;
+      case 'tekstil':
+        return <TextileOptions onAddToBasket={onAddToBasket} />;
       // Add cases for other categories here
       default:
         return (

@@ -1,4 +1,4 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData } from './types';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
@@ -208,5 +208,34 @@ export const scanServices: ScanServiceData = {
         { kolicina: { min: 1, max: 50 }, priceA4: 13.00, priceA3: 25.00 }, // Assuming auto scan for small quantities is same as manual 51+
         { kolicina: { min: 51, max: 100 }, priceA4: 7.00, priceA3: 13.00 },
         { kolicina: { min: 101, max: Infinity }, priceA4: 4.50, priceA3: 7.50 },
+    ]
+};
+
+export const textileServices: TextileServiceData = {
+    directPrint: {
+        kolicina: "1-5 kom",
+        options: [
+            { naziv: "Bela majica direktna štampa A4", cena: 1400.00, sifra: 317 },
+            { naziv: "Bela majica direktna štampa A3", cena: 1700.00, sifra: 318 },
+            { naziv: "Crna majica direktna štampa A4", cena: 1800.00, sifra: 319 },
+            { naziv: "Crna majica direktna štampa A3", cena: 2200.00, sifra: 320 }
+        ]
+    },
+    flexFoil: {
+        kolicina: "1-5 kom",
+        options: [
+            { naziv: "Bela i crna majica sa flex folijom A4", cena: 1300.00, sifra: 321 },
+            { naziv: "Bela i crna majica sa flex folijom A3", cena: 1800.00, sifra: 322 },
+            { naziv: "Bela i crna majica sa flex folijom A4 srebrna i zlatna", cena: 1600.00, sifra: 323 },
+            { naziv: "Bela i crna majica sa flex folijom A3 srebrna i zlatna", cena: 2100.00, sifra: 324 }
+        ]
+    },
+    broughtIn: [
+        { naziv: "Flex folija A4 (za donete majice)", cena: 1000.00, sifra: 330 },
+        { naziv: "Flex folija A4 srebrna i zlatna (za donete majice)", cena: 1200.00, sifra: 331 },
+        { naziv: "Cena štampe A4 aplikacije na BELOJ majici DONETE", cena: 1300.00, sifra: 325 },
+        { naziv: "Cena štampe A3 aplikacije na BELOJ majici DONETE", cena: 1900.00, sifra: 327 },
+        { naziv: "Cena štampe A4 aplikacije na CRNOJ majici DONETE", cena: 1600.00, sifra: 326 },
+        { naziv: "Cena štampe A3 aplikacije na CRNOJ majici DONETE", cena: 2100.00, sifra: 328 }
     ]
 };

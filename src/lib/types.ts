@@ -118,6 +118,33 @@ export type ScanServiceData = {
 
 // --- END: Scanning Service Specific Types ---
 
+// --- START: Textile Service Specific Types ---
+
+export type TextilePrintOption = {
+    naziv: string;
+    cena: number;
+    sifra: number;
+};
+
+export type TextileService = {
+    kolicina: string;
+    options: TextilePrintOption[];
+};
+
+export type BroughtInTextileService = {
+    naziv: string;
+    cena: number;
+    sifra: number;
+}
+
+export type TextileServiceData = {
+    directPrint: TextileService;
+    flexFoil: TextileService;
+    broughtIn: BroughtInTextileService[];
+}
+
+// --- END: Textile Service Specific Types ---
+
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {
