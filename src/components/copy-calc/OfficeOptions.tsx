@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { PlusCircle, FileText, Mail, BookOpen } from 'lucide-react';
+import { PlusCircle, FileText, Mail, BookOpen, Briefcase } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
