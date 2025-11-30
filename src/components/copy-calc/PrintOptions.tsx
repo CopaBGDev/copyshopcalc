@@ -28,9 +28,12 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const selectedPaper: PaperType | undefined = useMemo(() => printServices.papers.find(p => p.id === paperId), [paperId]);
   
   const activePrintOption: PrintOption | undefined = useMemo(() => {
-    const baseFormat = (format === 'A5' || format === 'A6') ? 'A4' : (format === 'SRA3' ? 'A3' : format);
-    return printServices.options.find(opt => opt.format === baseFormat && opt.color === color);
-  }, [format, color]);
+    const baseFormat = (format === 'A5' || format === 'A6' || format === 'SRA3') ? 'A4' : format;
+    const effectiveColor = (selectedPaper && selectedPaper.price > 0 && color === 'cb') ? 'kolor' : color;
+    const baseFormatForPrice = (format === 'A5' || format === 'A6') ? 'A4' : (format === 'SRA3' ? 'A3' : format);
+
+    return printServices.options.find(opt => opt.format === baseFormatForPrice && opt.color === effectiveColor);
+  }, [format, color, selectedPaper]);
 
   useEffect(() => {
     if (!activePrintOption || quantity <= 0 || !selectedPaper) {
@@ -75,11 +78,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const handleAddToBasket = () => {
     if (!activePrintOption || !selectedPaper || quantity <= 0) return;
     
-    const opis = `${format}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
-    
+    const effectiveColor = (selectedPaper && selectedPaper.price > 0 && color === 'cb') ? 'kolor' : color;
+    const opis = `${format}, ${effectiveColor === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
+    const baseFormatForName = (format === 'A5' || format === 'A6' || format === 'SRA3') ? 'A4' : format;
+    const finalName = printServices.options.find(opt => opt.format === baseFormatForName && opt.color === effectiveColor)?.name || "Štampa";
+
     onAddToBasket({
       serviceId: `stampa-${format}-${color}-${side}-${paperId}`,
-      naziv: `Štampa: ${activePrintOption.name.replace('A4', format).replace('A3', format)}`,
+      naziv: `${finalName.replace('A4', format).replace('A3', format)}`,
       opis,
       kolicina: quantity,
       cena_jedinice: unitPrice,
@@ -163,6 +169,11 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                         ))}
                     </SelectContent>
                 </Select>
+                 {selectedPaper && selectedPaper.price > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                        Doplata za ovaj papir se automatski obračunava. Crno-bela štampa na ovom papiru se naplaćuje kao kolor.
+                    </p>
+                )}
             </div>
         </div>
       </div>
