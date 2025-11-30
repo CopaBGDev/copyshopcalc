@@ -60,11 +60,23 @@ export type BindingType = {
   tiers: BindingTier[];
 }
 
+export type HardcoverService = {
+  name: string;
+  price: number;
+  sifra: number;
+}
+
+export type HardcoverBindingType = {
+  name: string;
+  services: HardcoverService[];
+}
+
 export type FinishingServiceData = {
   binding: {
     plasticSpiral: BindingType;
     wireSpiral: BindingType;
-  }
+  };
+  hardcover: HardcoverBindingType;
 }
 
 // --- END: Finishing Service Specific Types ---

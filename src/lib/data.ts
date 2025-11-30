@@ -24,7 +24,7 @@ export const appCategories: AppCategory[] = [
     id: 'tekstil',
     naziv: 'Tekstil',
     icon: Shirt,
-    opis: 'Štampa na majicama, duks.',
+    opis: 'Štampa na majicama, duks.'
   },
   {
     id: 'kljucevi',
@@ -175,5 +175,14 @@ export const finishingServices: FinishingServiceData = {
                 { sheets: { min: 211, max: 300 }, diameter: '28.5 / 32', priceSpiralOnly: 270.00, priceWithCovers: 330.00 }
             ]
         }
+    },
+    hardcover: {
+        name: 'Koričenje diplomskih radova - tvrdi povez',
+        services: [
+            { name: 'Tvrdi povez sa zlatotiskom (1-4 kom)', price: 1500.00, sifra: 21 },
+            { name: 'Tvrdi povez sa zlatotiskom (5+ kom)', price: 1350.00, sifra: 23 },
+            { name: 'Tvrdi povez (materijal koji nije štampan kod nas)', price: 1500.00, sifra: 25 },
+            { name: 'Tvrdi povez sa UV štampom bela i CMYK', price: 1400.00, sifra: 26 }
+        ]
     }
 }
