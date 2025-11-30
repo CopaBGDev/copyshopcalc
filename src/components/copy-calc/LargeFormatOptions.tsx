@@ -87,7 +87,7 @@ const PlottingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                         <Label>Širina rolne</Label>
-                        <Select onValueChange={setRollWidth} defaultValue={rollWidth}>
+                        <Select onValueChange={(v) => setRollWidth(v)} defaultValue={rollWidth}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Izaberite širinu rolne" />
                             </SelectTrigger>
@@ -129,15 +129,15 @@ const PlottingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
                     <div className="flex flex-col sm:flex-row gap-4">
                          <div className="flex items-center space-x-2">
                             <Checkbox id="cut" checked={finishing.cut} onCheckedChange={checked => setFinishing(f => ({ ...f, cut: !!checked }))} />
-                            <Label htmlFor="cut">Sečenje (+{largeFormatServices.plotting.finishing[0].price} RSD/m)</Label>
+                            <Label htmlFor="cut">Sečenje (+{largeFormatServices.plotting.finishing[0].price.toFixed(2)} RSD/m)</Label>
                         </div>
                         <div className="flex items-center space-x-2">
                             <Checkbox id="foldA4" checked={finishing.foldA4} onCheckedChange={checked => setFinishing(f => ({ ...f, foldA4: !!checked }))} />
-                            <Label htmlFor="foldA4">Savijanje na A4 (+{largeFormatServices.plotting.finishing[1].price} RSD/m)</Label>
+                            <Label htmlFor="foldA4">Savijanje na A4 (+{largeFormatServices.plotting.finishing[1].price.toFixed(2)} RSD/m)</Label>
                         </div>
                         <div className="flex items-center space-x-2">
                             <Checkbox id="foldA3" checked={finishing.foldA3} onCheckedChange={checked => setFinishing(f => ({ ...f, foldA3: !!checked }))} />
-                            <Label htmlFor="foldA3">Savijanje na A3 (+{largeFormatServices.plotting.finishing[2].price} RSD/m)</Label>
+                            <Label htmlFor="foldA3">Savijanje na A3 (+{largeFormatServices.plotting.finishing[2].price.toFixed(2)} RSD/m)</Label>
                         </div>
                     </div>
                 </div>
@@ -207,3 +207,5 @@ export function LargeFormatOptions({ onAddToBasket }: LargeFormatOptionsProps) {
         </div>
     );
 }
+
+    
