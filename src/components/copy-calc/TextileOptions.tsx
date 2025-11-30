@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { OrderItem } from '@/lib/types';
-import { finishingServices, printServices, scanServices, textileServices } from '@/lib/data';
+import { textileServices } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,23 +24,26 @@ const DigitalPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<
     const { unitPrice, description, serviceName } = useMemo(() => {
         let service;
         if(isBroughtIn){
-            const broughtInMap = {
-                '317': textileServices.broughtIn.find(s => s.sifra === 325), // A4 White
-                '318': textileServices.broughtIn.find(s => s.sifra === 327), // A3 White
-                '319': textileServices.broughtIn.find(s => s.sifra === 326), // A4 Black
-                '320': textileServices.broughtIn.find(s => s.sifra === 328), // A3 Black
+            const broughtInMap: {[key: string]: number | undefined} = {
+                '317': 325, // A4 White -> Brought in white
+                '318': 327, // A3 White -> Brought in white
+                '319': 326, // A4 Black -> Brought in black
+                '320': 328, // A3 Black -> Brought in black
             };
-            service = broughtInMap[serviceId];
+            const broughtInSifra = broughtInMap[serviceId];
+            service = textileServices.broughtIn.find(s => s.sifra === broughtInSifra);
         } else {
             service = services.find(s => s.sifra.toString() === serviceId);
         }
 
         if (!service) return { unitPrice: 0, description: '', serviceName: '' };
+
+        const originalServiceName = services.find(s => s.sifra.toString() === serviceId)?.naziv || '';
         
         return { 
             unitPrice: service.cena, 
-            description: `${service.naziv}${isBroughtIn ? ' (doneta majica)' : ''}`,
-            serviceName: service.naziv.split(' direktna')[0]
+            description: `${originalServiceName}${isBroughtIn ? ' (doneta majica)' : ''}`,
+            serviceName: originalServiceName.split(' direktna')[0]
         };
     }, [serviceId, isBroughtIn, services]);
     
@@ -125,6 +128,9 @@ const FlexPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Ord
         let service;
         const selectedFlexService = services.find(s => s.sifra.toString() === serviceId);
 
+        if(!selectedFlexService) return { unitPrice: 0, description: '', serviceName: '' };
+
+
         if(isBroughtIn){
             // Logic for brought in items with flex foil
             if(serviceId === '323' || serviceId === '324') { // Gold/Silver
@@ -132,7 +138,7 @@ const FlexPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Ord
             } else { // Standard
                 service = textileServices.broughtIn.find(s => s.sifra === 330);
             }
-             if (service && selectedFlexService) {
+             if (service) {
                 return {
                     unitPrice: service.cena,
                     description: `${selectedFlexService.naziv.replace('Bela i crna majica sa ', '')} (doneta majica)`,
@@ -249,3 +255,5 @@ export function TextileOptions({ onAddToBasket }: { onAddToBasket: (item: Omit<O
         </div>
     );
 }
+
+    

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { OrderItem } from '@/lib/types';
-import { canvasServices } from '@/data/canvas';
+import { canvasServices } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -101,3 +101,5 @@ export function CanvasOptions({ onAddToBasket }: CanvasOptionsProps) {
         </div>
     );
 }
+
+    

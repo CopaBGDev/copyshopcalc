@@ -290,6 +290,20 @@ export type LargeFormatData = {
 
 // --- END: Large Format Service Specific Types ---
 
+// --- START: Canvas Service Specific Types ---
+export type CanvasReadyFormat = {
+    id: string;
+    dimension: string;
+    price: number;
+}
+
+export type CanvasServiceData = {
+    printByMeter: { name: string; roll: string; price: number; }[];
+    blindFrameServices: { name: string; pricePerMeter: number; }[];
+    readyFormats: CanvasReadyFormat[];
+}
+// --- END: Canvas Service Specific Types ---
+
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {
@@ -298,3 +312,5 @@ export type OtherService = {
     kategorija: string;
     cena: number;
 }
+
+    

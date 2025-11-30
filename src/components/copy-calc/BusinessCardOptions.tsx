@@ -151,6 +151,10 @@ const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
     const [side, setSide] = useState<'oneSided' | 'twoSided'>('oneSided');
     const [quantity, setQuantity] = useState(100);
 
+    const minQuantity = useMemo(() => {
+        return luxType.startsWith('pvc') ? businessCardServices.lux.pvc.standard.min_kom : 1;
+    }, [luxType]);
+
     const { totalPrice, description, unitPrice } = useMemo(() => {
         let price = 0;
         let desc = '';
@@ -174,12 +178,13 @@ const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
         }
 
         uPrice = price; // Per 100pc
-        price = (price / 100) * quantity;
+        const validQuantity = Math.max(minQuantity, quantity);
+        price = (price / 100) * validQuantity;
         
-        desc += `, ${quantity} kom`;
+        desc += `, ${validQuantity} kom`;
 
         return { totalPrice: price, description: desc, unitPrice: uPrice };
-    }, [luxType, side, quantity]);
+    }, [luxType, side, quantity, minQuantity]);
 
     const handleAddToBasket = () => {
         if (totalPrice <= 0) return;
@@ -193,11 +198,17 @@ const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
             cena_ukupno: totalPrice,
         });
     };
-
-    const minQuantity = luxType.startsWith('pvc') ? businessCardServices.lux.pvc.standard.min_kom : 1;
-     if (quantity < minQuantity) {
-        setQuantity(minQuantity);
-     }
+    
+    const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = parseInt(e.target.value) || minQuantity;
+        setQuantity(val);
+    }
+    
+    const handleQuantityBlur = () => {
+        if (quantity < minQuantity) {
+            setQuantity(minQuantity);
+        }
+    }
 
 
     return (
@@ -205,7 +216,14 @@ const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
             <CardContent className="p-4 space-y-6">
                  <div className="space-y-2">
                     <Label htmlFor="lux-type">Tip Lux vizit karti</Label>
-                    <Select onValueChange={(v) => setLuxType(v as any)} defaultValue={luxType}>
+                    <Select onValueChange={(v) => {
+                        const newType = v as any;
+                        setLuxType(newType);
+                        const newMinQty = newType.startsWith('pvc') ? businessCardServices.lux.pvc.standard.min_kom : 1;
+                        if(quantity < newMinQty) {
+                            setQuantity(newMinQty);
+                        }
+                    }} defaultValue={luxType}>
                         <SelectTrigger id="lux-type">
                             <SelectValue placeholder="Izaberite tip" />
                         </SelectTrigger>
@@ -236,9 +254,10 @@ const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
                             id="lux-quantity"
                             type="number"
                             value={quantity}
-                            onChange={(e) => setQuantity(Math.max(minQuantity, parseInt(e.target.value) || minQuantity))}
+                            onChange={handleQuantityChange}
+                            onBlur={handleQuantityBlur}
                             min={minQuantity}
-                            step={luxType.startsWith('pvc') ? 100 : 50}
+                            step={luxType.startsWith('pvc') ? 20 : 50}
                         />
                          {luxType.startsWith('pvc') && <p className="text-xs text-muted-foreground">Minimalna količina je {minQuantity} kom.</p>}
                     </div>
@@ -301,3 +320,5 @@ export function BusinessCardOptions({ onAddToBasket }: BusinessCardOptionsProps)
         </div>
     );
 }
+
+    
