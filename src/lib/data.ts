@@ -1,4 +1,4 @@
-import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData } from './types';
+import type { AppCategory, PrintServiceData, FinishingServiceData, ScanServiceData, TextileServiceData, KeyService } from './types';
 import { Printer, Scissors, ScanLine, Palette, Key, Shirt, Book, FileText, ShoppingBag, Ruler, Image as ImageIcon } from 'lucide-react';
 
 export const appCategories: AppCategory[] = [
@@ -239,3 +239,18 @@ export const textileServices: TextileServiceData = {
         { naziv: "Cena štampe A3 aplikacije na CRNOJ majici DONETE", cena: 2100.00, sifra: 328 }
     ]
 };
+
+export const keyServices: KeyService[] = [
+    { naziv: "Klasični ključevi", cena: 240.00, sifra: 370 },
+    { naziv: "Klasični ključevi II", cena: 280.00, sifra: 371 },
+    { naziv: "Tačkasti ključevi", cena: 800.00, sifra: 372 },
+    { naziv: "Tačkasti ključevi II", cena: 900.00, sifra: 373 },
+    { naziv: "Kasa ključevi", cena: 1050.00, sifra: 374 },
+    { naziv: "Kasa ključevi sa dužim vratom", cena: 1200.00, sifra: 375 },
+    { naziv: "Tagovi za otvaranje vrata", cena: 300.00, sifra: 390 },
+    { naziv: "Tagovi za otvaranje vrata dečiji", cena: 350.00, sifra: 392 },
+    { naziv: "Alkice za ključeve", cena: 17.00, sifra: 377 },
+    { naziv: "Gumice u boji za ključeve", cena: 25.00, sifra: 378 },
+    { naziv: "Plastični privezak", cena: 35.00, sifra: 559 },
+    { naziv: "Kopiranje ključa (u kasi je cena 1 din)", cena: 130.00, sifra: 558 }
+];

@@ -145,6 +145,16 @@ export type TextileServiceData = {
 
 // --- END: Textile Service Specific Types ---
 
+// --- START: Key Service Specific Types ---
+
+export type KeyService = {
+  naziv: string;
+  cena: number;
+  sifra: number;
+}
+
+// --- END: Key Service Specific Types ---
+
 
 // Generic service types can be defined below if needed for other categories
 export type OtherService = {
