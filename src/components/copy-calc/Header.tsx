@@ -1,3 +1,4 @@
+import { ThemeToggle } from "../theme-toggle";
 import { Logo } from "./Logo";
 
 export function Header() {
@@ -11,6 +12,7 @@ export function Header() {
               Copy<span className="text-primary">Calc</span>
             </h1>
           </div>
+          <ThemeToggle />
         </div>
       </div>
     </header>
