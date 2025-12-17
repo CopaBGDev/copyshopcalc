@@ -19,7 +19,8 @@ type PrintOptionsProps = {
 };
 
 const SHEET_DIMENSIONS = {
-  SRA3: { w: 482, h: 330 },
+  SRA3_482x330: { w: 482, h: 330 },
+  SRA3_450x320: { w: 450, h: 320 },
   A3: { w: 420, h: 297 },
   A4: { w: 297, h: 210 },
 }
@@ -58,7 +59,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const [customHeight, setCustomHeight] = useState<number>(50);
   const [itemsPerSheet, setItemsPerSheet] = useState<number>(0);
   const [sheetPrice, setSheetPrice] = useState<number>(0);
-  const [customSheetFormat, setCustomSheetFormat] = useState<'A4' | 'A3' | 'SRA3'>('SRA3');
+  const [customSheetFormat, setCustomSheetFormat] = useState<'A4' | 'A3' | 'SRA3_450x320' | 'SRA3_482x330'>('SRA3_482x330');
 
 
   const selectedPaper: PaperType | undefined = useMemo(() => printServices.papers.find(p => p.id === paperId), [paperId]);
@@ -66,7 +67,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const activePrintOption: PrintOption | undefined = useMemo(() => {
     // For price calculation, we always use A3 or A4 as base
     let baseFormatForPrice: 'A3' | 'A4' = 'A4';
-    if (format === 'A3' || format === 'SRA3_330x482' || (format === 'custom' && (customSheetFormat === 'A3' || customSheetFormat === 'SRA3'))) {
+    if (format === 'A3' || format === 'SRA3_482x330' || format === 'SRA3_450x320' || (format === 'custom' && (customSheetFormat === 'A3' || customSheetFormat === 'SRA3_482x330' || customSheetFormat === 'SRA3_450x320'))) {
         baseFormatForPrice = 'A3';
     }
 
@@ -105,12 +106,12 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (selectedPaper.price > 0) {
             let copiesPerSheet = 1;
             if (selectedPaper.format === 'SRA3') {
-                if (customSheetFormat === 'SRA3') copiesPerSheet = 1;
+                if (customSheetFormat === 'SRA3_482x330' || customSheetFormat === 'SRA3_450x320') copiesPerSheet = 1;
                 else if (customSheetFormat === 'A3') copiesPerSheet = 1; // approx.
                 else if (customSheetFormat === 'A4') copiesPerSheet = 2;
             } else { // Assuming paper price is for A4 if not SRA3
                  if (customSheetFormat === 'A3') copiesPerSheet = 0.5;
-                 else if (customSheetFormat === 'SRA3') copiesPerSheet = 0.5; // This case is less likely, should be SRA3 paper
+                 else if (customSheetFormat === 'SRA3_482x330' || customSheetFormat === 'SRA3_450x320') copiesPerSheet = 0.5; // This case is less likely, should be SRA3 paper
                  else copiesPerSheet = 1;
             }
              paperPrice = selectedPaper.price / copiesPerSheet;
@@ -142,7 +143,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (selectedPaper.price > 0) {
             if (selectedPaper.format === 'SRA3') {
                 let copiesPerSheet = 1;
-                if (format === 'SRA3_330x482') copiesPerSheet = 1;
+                if (format === 'SRA3_482x330' || format === 'SRA3_450x320') copiesPerSheet = 1;
                 else if (format === 'A3') copiesPerSheet = 1; // approx
                 else if (format === 'A4') copiesPerSheet = 2;
                 paperPricePerCopy = selectedPaper.price / copiesPerSheet;
@@ -172,15 +173,16 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (itemsPerSheet <= 0) return;
         naziv = `Štampa proizvoljnog formata`;
         finalQuantity = itemsPerSheet * quantity;
-        opis = `${customWidth}x${customHeight}mm na ${customSheetFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka)`;
+        const sheetDimLabel = customSheetFormat.replace('_', ' (').replace('x', 'x') + 'mm)';
+        opis = `${customWidth}x${customHeight}mm na ${sheetDimLabel}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka)`;
         finalUnitPrice = totalPrice / finalQuantity;
         itemsPerSheetPayload = itemsPerSheet;
     } else {
-        const displayFormat = format === 'SRA3_330x482' ? 'SRA3 (482x330mm)' : format;
+        const displayFormat = format.replace('_', ' (').replace('x', 'x') + 'mm)';
         opis = `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
         
         let baseFormatForName: 'A4' | 'A3' = 'A4';
-        if (format === 'A3' || format === 'SRA3_330x482') {
+        if (format === 'A3' || format === 'SRA3_482x330' || format === 'SRA3_450x320') {
             baseFormatForName = 'A3';
         }
         
@@ -219,8 +221,12 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                         <Label htmlFor="format-a3">A3</Label>
                     </div>
                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="SRA3_330x482" id="format-sra3" />
-                        <Label htmlFor="format-sra3">SRA3 (482x330mm)</Label>
+                        <RadioGroupItem value="SRA3_450x320" id="format-sra3-450" />
+                        <Label htmlFor="format-sra3-450">SRA3 450x320mm</Label>
+                    </div>
+                     <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="SRA3_482x330" id="format-sra3-482" />
+                        <Label htmlFor="format-sra3-482">SRA3 482x330mm</Label>
                     </div>
                      <div className="flex items-center space-x-2">
                         <RadioGroupItem value="custom" id="format-custom" />
@@ -316,7 +322,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                                 <SelectValue placeholder="Izaberite format" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="SRA3">SRA3 (482x330mm)</SelectItem>
+                                <SelectItem value="SRA3_482x330">SRA3 (482x330mm)</SelectItem>
+                                <SelectItem value="SRA3_450x320">SRA3 (450x320mm)</SelectItem>
                                 <SelectItem value="A3">A3 (420x297mm)</SelectItem>
                                 <SelectItem value="A4">A4 (297x210mm)</SelectItem>
                             </SelectContent>
@@ -327,7 +334,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     <Calculator className="h-4 w-4" />
                     <AlertTitle>Obračun po tabaku</AlertTitle>
                     <AlertDescription>
-                        Obračun se vrši po broju tabaka. Na jedan {customSheetFormat} ({sheetDims.w}x{sheetDims.h}mm) tabak staje: <span className="font-bold">{itemsPerSheet}</span> kom.
+                        Obračun se vrši po broju tabaka. Na jedan {customSheetFormat.replace('_', ' (').replace('x','x') + 'mm)'} tabak staje: <span className="font-bold">{itemsPerSheet}</span> kom.
                         <br />
                         Cena po tabaku: <span className="font-bold">{sheetPrice.toFixed(2)} RSD</span>.
                     </AlertDescription>
