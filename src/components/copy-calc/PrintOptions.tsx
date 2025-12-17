@@ -1,9 +1,10 @@
 
+
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
 import type { OrderItem, PaperType, PriceTier, PrintOption, PrintFormat } from "@/lib/types";
-import { printServices } from "@/lib/data";
+import { printServices, finishingServices } from "@/lib/data";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -26,22 +27,30 @@ const SHEET_DIMENSIONS = {
 }
 const MARGIN = 5;
 
-function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sheetH: number): number {
-    if (itemW <= 0 || itemH <= 0) return 0;
+function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sheetH: number): { items: number, cols: number, rows: number } {
+    if (itemW <= 0 || itemH <= 0) return { items: 0, cols: 0, rows: 0 };
     
     const usableSheetW = sheetW - (MARGIN * 2);
     const usableSheetH = sheetH - (MARGIN * 2);
 
-    if (itemW > usableSheetW && itemW > usableSheetH) return 0;
-    if (itemH > usableSheetH && itemH > usableSheetW) return 0;
+    if (itemW > usableSheetW && itemW > usableSheetH) return { items: 0, cols: 0, rows: 0 };
+    if (itemH > usableSheetH && itemH > usableSheetW) return { items: 0, cols: 0, rows: 0 };
     
     // First orientation
-    const itemsNormal = Math.floor(usableSheetW / itemW) * Math.floor(usableSheetH / itemH);
+    const colsNormal = Math.floor(usableSheetW / itemW);
+    const rowsNormal = Math.floor(usableSheetH / itemH);
+    const itemsNormal = colsNormal * rowsNormal;
 
     // Rotated orientation
-    const itemsRotated = Math.floor(usableSheetW / itemH) * Math.floor(usableSheetH / itemW);
+    const colsRotated = Math.floor(usableSheetW / itemH);
+    const rowsRotated = Math.floor(usableSheetH / itemW);
+    const itemsRotated = colsRotated * rowsRotated;
 
-    return Math.max(itemsNormal, itemsRotated);
+    if (itemsNormal > itemsRotated) {
+      return { items: itemsNormal, cols: colsNormal, rows: rowsNormal };
+    } else {
+      return { items: itemsRotated, cols: colsRotated, rows: rowsRotated };
+    }
 }
 
 
@@ -61,6 +70,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const [itemsPerSheet, setItemsPerSheet] = useState<number>(0);
   const [sheetPrice, setSheetPrice] = useState<number>(0);
   const [customSheetFormat, setCustomSheetFormat] = useState<'A4' | 'A3' | 'SRA3_450x320' | 'SRA3_482x330'>('SRA3_482x330');
+  const [cuts, setCuts] = useState(0);
 
 
   const selectedPaper: PaperType | undefined = useMemo(() => printServices.papers.find(p => p.id === paperId), [paperId]);
@@ -124,19 +134,30 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         setSheetPrice(totalSheetPrice);
         
         const sheetDims = SHEET_DIMENSIONS[customSheetFormat];
-        const itemsCount = calculateItemsPerSheet(customWidth, customHeight, sheetDims.w, sheetDims.h);
-        setItemsPerSheet(itemsCount);
+        const { items, cols, rows } = calculateItemsPerSheet(customWidth, customHeight, sheetDims.w, sheetDims.h);
+        setItemsPerSheet(items);
 
-        if(itemsCount > 0) {
-            setTotalPrice(totalSheetPrice * quantity);
+        let totalCuts = 0;
+        if (items > 0) {
+          totalCuts = (cols > 1 ? cols - 1 : 0) + (rows > 1 ? rows - 1 : 0);
+        }
+        setCuts(totalCuts);
+        
+        const cuttingPriceService = finishingServices.other.find(s => s.id === 'secenje-tabak');
+        const cuttingPrice = cuttingPriceService ? cuttingPriceService.price * totalCuts * quantity : 0;
+
+
+        if(items > 0) {
+            setTotalPrice(totalSheetPrice * quantity + cuttingPrice);
         } else {
             setTotalPrice(0);
         }
-        setUnitPrice(itemsCount > 0 ? totalSheetPrice / itemsCount : 0);
+        setUnitPrice(items > 0 ? (totalSheetPrice * quantity + cuttingPrice) / (items * quantity) : 0);
 
     } else {
         setItemsPerSheet(0);
         setSheetPrice(0);
+        setCuts(0);
         const priceTiers: PriceTier[] = activePrintOption[side];
         const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
         setSifra(tier?.sifra);
@@ -179,8 +200,37 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         finalQuantity = itemsPerSheet * quantity;
         const sheetDimLabel = customSheetFormat.replace('_', ' (').replace('x', 'x') + 'mm)';
         opis = `${customWidth}x${customHeight}mm na ${sheetDimLabel}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka)`;
-        finalUnitPrice = totalPrice / finalQuantity;
-        itemsPerSheetPayload = itemsPerSheet;
+        
+        const totalSheetPrice = sheetPrice * quantity;
+        const totalPrintPrice = totalSheetPrice;
+        finalUnitPrice = totalPrintPrice / finalQuantity;
+
+        onAddToBasket({
+            serviceId: `stampa-custom-${color}-${side}-${paperId}-${customWidth}x${customHeight}`,
+            naziv: naziv,
+            opis,
+            kolicina: finalQuantity,
+            cena_jedinice: finalUnitPrice,
+            cena_ukupno: totalPrintPrice,
+            itemsPerSheet: itemsPerSheet,
+            sifra: sifra,
+        });
+
+        const cuttingPriceService = finishingServices.other.find(s => s.id === 'secenje-tabak');
+        if (cuttingPriceService && cuts > 0) {
+            const totalCutsQuantity = cuts * quantity;
+            const totalCuttingPrice = cuttingPriceService.price * totalCutsQuantity;
+
+             onAddToBasket({
+                serviceId: `dorada-secenje-custom`,
+                naziv: "Sečenje tabaka",
+                opis: `Sečenje za štampu ${customWidth}x${customHeight}mm (${totalCutsQuantity} rezova)`,
+                kolicina: totalCutsQuantity,
+                cena_jedinice: cuttingPriceService.price,
+                cena_ukupno: totalCuttingPrice,
+                sifra: cuttingPriceService.sifra,
+            });
+        }
     } else {
         const displayFormat = format.replace('_', ' (').replace('x', 'x') + 'mm)';
         opis = `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
@@ -191,18 +241,18 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         }
         
         naziv = printServices.options.find(opt => opt.format === baseFormatForName && opt.color === color)?.name.replace('A4', displayFormat).replace('A3', displayFormat) || "Štampa";
+
+         onAddToBasket({
+          serviceId: `stampa-${format}-${color}-${side}-${paperId}`,
+          naziv: naziv,
+          opis,
+          kolicina: finalQuantity,
+          cena_jedinice: finalUnitPrice,
+          cena_ukupno: totalPrice,
+          itemsPerSheet: itemsPerSheetPayload,
+          sifra: sifra,
+        });
     }
-    
-    onAddToBasket({
-      serviceId: `stampa-${format}-${color}-${side}-${paperId}-${customWidth}x${customHeight}`,
-      naziv: naziv,
-      opis,
-      kolicina: finalQuantity,
-      cena_jedinice: finalUnitPrice,
-      cena_ukupno: totalPrice,
-      itemsPerSheet: itemsPerSheetPayload,
-      sifra: sifra,
-    });
   };
 
   const sheetDims = SHEET_DIMENSIONS[customSheetFormat];
@@ -339,9 +389,11 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     <Calculator className="h-4 w-4" />
                     <AlertTitle>Obračun po tabaku</AlertTitle>
                     <AlertDescription>
-                        Obračun se vrši po broju tabaka. Na jedan {customSheetFormat.replace('_', ' (').replace('x','x') + 'mm)'} tabak staje: <span className="font-bold">{itemsPerSheet}</span> kom.
+                        Na jedan {customSheetFormat.replace('_', ' (').replace('x','x') + 'mm)'} tabak staje: <span className="font-bold">{itemsPerSheet}</span> kom.
                         <br />
                         Cena po tabaku: <span className="font-bold">{sheetPrice.toFixed(2)} RSD</span>.
+                        <br />
+                        Broj rezova po tabaku: <span className="font-bold">{cuts}</span>.
                     </AlertDescription>
                 </Alert>
             </div>
@@ -370,9 +422,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
            <p className="text-3xl font-bold font-mono tracking-tight text-primary">
              {totalPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
            </p>
-            {quantity > 0 && unitPrice > 0 && (
+            {quantity > 0 && unitPrice > 0 && format !== 'custom' && (
                  <p className="text-xs text-muted-foreground font-mono">
                     ({unitPrice.toFixed(2)} RSD / kom)
+                </p>
+            )}
+             {quantity > 0 && unitPrice > 0 && format === 'custom' && itemsPerSheet > 0 && (
+                 <p className="text-xs text-muted-foreground font-mono">
+                    ({(totalPrice / (itemsPerSheet*quantity)).toFixed(2)} RSD / kom)
                 </p>
             )}
         </div>
