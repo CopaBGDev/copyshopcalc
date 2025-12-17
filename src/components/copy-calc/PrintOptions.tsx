@@ -137,22 +137,21 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         const { items, cols, rows } = calculateItemsPerSheet(customWidth, customHeight, sheetDims.w, sheetDims.h);
         setItemsPerSheet(items);
 
-        let totalCuts = 0;
         if (items > 0) {
-          totalCuts = (cols > 1 ? cols - 1 : 0) + (rows > 1 ? rows - 1 : 0);
+            // User's formula
+            const totalCuts = (cols + 1) + (rows + 1);
+            setCuts(totalCuts);
+        } else {
+            setCuts(0);
         }
-        setCuts(totalCuts);
         
-        const cuttingPriceService = finishingServices.other.find(s => s.id === 'secenje-tabak');
-        const cuttingPrice = cuttingPriceService ? cuttingPriceService.price * totalCuts * quantity : 0;
-
-
         if(items > 0) {
-            setTotalPrice(totalSheetPrice * quantity + cuttingPrice);
+            setTotalPrice(totalSheetPrice * quantity);
+            setUnitPrice((totalSheetPrice * quantity) / (items * quantity));
         } else {
             setTotalPrice(0);
+            setUnitPrice(0);
         }
-        setUnitPrice(items > 0 ? (totalSheetPrice * quantity + cuttingPrice) / (items * quantity) : 0);
 
     } else {
         setItemsPerSheet(0);
@@ -192,7 +191,6 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     let opis = "";
     let finalQuantity = quantity;
     let finalUnitPrice = unitPrice;
-    let itemsPerSheetPayload: number | undefined = undefined;
 
     if (format === 'custom') {
         if (itemsPerSheet <= 0) return;
@@ -216,21 +214,6 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             sifra: sifra,
         });
 
-        const cuttingPriceService = finishingServices.other.find(s => s.id === 'secenje-tabak');
-        if (cuttingPriceService && cuts > 0) {
-            const totalCutsQuantity = cuts * quantity;
-            const totalCuttingPrice = cuttingPriceService.price * totalCutsQuantity;
-
-             onAddToBasket({
-                serviceId: `dorada-secenje-custom`,
-                naziv: "Sečenje tabaka",
-                opis: `Sečenje za štampu ${customWidth}x${customHeight}mm (${totalCutsQuantity} rezova)`,
-                kolicina: totalCutsQuantity,
-                cena_jedinice: cuttingPriceService.price,
-                cena_ukupno: totalCuttingPrice,
-                sifra: cuttingPriceService.sifra,
-            });
-        }
     } else {
         const displayFormat = format.replace('_', ' (').replace('x', 'x') + 'mm)';
         opis = `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
@@ -249,7 +232,6 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
           kolicina: finalQuantity,
           cena_jedinice: finalUnitPrice,
           cena_ukupno: totalPrice,
-          itemsPerSheet: itemsPerSheetPayload,
           sifra: sifra,
         });
     }
