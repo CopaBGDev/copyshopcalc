@@ -30,8 +30,10 @@ export function OrderBasket({ items, onUpdateQuantity, onFinalizeOrder, isFinali
       </CardHeader>
       <CardContent className="max-h-[45vh] overflow-y-auto pr-3">
         {items.length === 0 ? (
-          <div className="text-center text-muted-foreground py-10">
-            <p>Korpa je trenutno prazna.</p>
+          <div className="text-center text-muted-foreground py-10 flex flex-col items-center gap-4">
+            <ShoppingCart className="w-16 h-16 text-muted-foreground/50" />
+            <p className="font-medium">Korpa je prazna.</p>
+            <p className="text-sm">Započnite dodavanjem usluga iz ponude.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -40,6 +42,7 @@ export function OrderBasket({ items, onUpdateQuantity, onFinalizeOrder, isFinali
                 <div className="flex-grow">
                   <p className="font-medium leading-tight">{item.naziv}</p>
                   <p className="text-xs text-muted-foreground">{item.opis}</p>
+                   {item.sifra && <p className="text-xs font-mono text-muted-foreground/70 pt-1">Šifra: {item.sifra}</p>}
                   <p className="text-sm text-muted-foreground mt-1">
                     {item.kolicina} x {item.cena_jedinice.toFixed(2)} RSD
                   </p>

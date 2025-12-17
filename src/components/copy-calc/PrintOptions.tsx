@@ -53,6 +53,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const [quantity, setQuantity] = useState<number>(1);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [unitPrice, setUnitPrice] = useState<number>(0);
+  const [sifra, setSifra] = useState<number | undefined>(undefined);
 
   // Custom dimension state
   const [customWidth, setCustomWidth] = useState<number>(90);
@@ -89,10 +90,12 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     if (!activePrintOption || quantity <= 0 || !selectedPaper) {
       setTotalPrice(0);
       setUnitPrice(0);
+      setSifra(undefined);
       return;
     }
 
     if (format === 'custom') {
+        setSifra(undefined); // No specific code for custom print
         const baseFormatForPrice = customSheetFormat === 'A4' ? 'A4' : 'A3';
         const customPrintPriceOption = printServices.options.find(opt => opt.format === baseFormatForPrice && opt.color === color);
         if (!customPrintPriceOption) return;
@@ -136,6 +139,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         setSheetPrice(0);
         const priceTiers: PriceTier[] = activePrintOption[side];
         const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
+        setSifra(tier?.sifra);
         
         let currentUnitPrice = tier.cena;
         
@@ -197,6 +201,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
       cena_jedinice: finalUnitPrice,
       cena_ukupno: totalPrice,
       itemsPerSheet: itemsPerSheetPayload,
+      sifra: sifra,
     });
   };
 

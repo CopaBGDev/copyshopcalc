@@ -1,3 +1,4 @@
+
 "use client";
 import { useState, useMemo } from 'react';
 import type { OrderItem } from '@/lib/types';
@@ -21,18 +22,18 @@ const BindingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
     const [sheetCount, setSheetCount] = useState<number>(1);
     const [withCovers, setWithCovers] = useState<boolean>(true);
 
-    const { unitPrice, description } = useMemo(() => {
+    const { unitPrice, description, sifra } = useMemo(() => {
         const service = bindingType === 'plastic' ? finishingServices.binding.plasticSpiral : finishingServices.binding.wireSpiral;
         const tier = service.tiers.find(t => sheetCount > (t.sheets.min || 0) && sheetCount <= t.sheets.max);
 
         if (!tier) {
-            return { unitPrice: 0, description: "Unesite validan broj listova" };
+            return { unitPrice: 0, description: "Unesite validan broj listova", sifra: undefined };
         }
 
         const price = withCovers ? tier.priceWithCovers : tier.priceSpiralOnly;
         const desc = `${service.name}, ${sheetCount} listova, ${withCovers ? 'sa koricama' : 'samo spirala'}`;
         
-        return { unitPrice: price, description: desc };
+        return { unitPrice: price, description: desc, sifra: tier.sifra };
     }, [bindingType, sheetCount, withCovers]);
 
     const handleAddToBasket = () => {
@@ -45,6 +46,7 @@ const BindingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
             kolicina: 1, // Binding is usually per piece
             cena_jedinice: unitPrice,
             cena_ukupno: unitPrice,
+            sifra: sifra,
         });
     };
     
@@ -142,6 +144,7 @@ const HardcoverBinding = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderI
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: selectedService.sifra,
         });
     }
 
@@ -221,28 +224,32 @@ const LaminationCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Or
     const [selectedRollFormat, setSelectedRollFormat] = useState<'A4' | 'A3'>('A4');
     const [quantity, setQuantity] = useState<number>(1);
 
-    const { unitPrice, totalPrice, description } = useMemo(() => {
+    const { unitPrice, totalPrice, description, sifra } = useMemo(() => {
         let price = 0;
         let desc = '';
+        let serviceCode: number | undefined = undefined;
 
         if (laminationType === 'pocket') {
             const service = pocketServices.find(s => s.id === selectedPocketServiceId);
             if (service) {
                 price = service.price;
                 desc = service.name;
+                serviceCode = service.sifra;
             }
         } else { // roll
             const service = rollServices[0];
             if (service) {
                 price = selectedRollFormat === 'A4' ? service.priceA4 : service.priceA3;
                 desc = `${service.name} - ${selectedRollFormat}`;
+                serviceCode = service.sifra;
             }
         }
         
         return { 
             unitPrice: price, 
             totalPrice: price * quantity,
-            description: desc
+            description: desc,
+            sifra: serviceCode
         };
 
     }, [laminationType, selectedPocketServiceId, selectedRollFormat, quantity, pocketServices, rollServices]);
@@ -256,6 +263,7 @@ const LaminationCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Or
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 
@@ -350,9 +358,9 @@ const OtherFinishingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omi
     const [selectedServiceId, setSelectedServiceId] = useState<string>(services[0].id);
     const [quantity, setQuantity] = useState<number>(1);
 
-    const { unitPrice, description, serviceName } = useMemo(() => {
+    const { unitPrice, description, serviceName, sifra } = useMemo(() => {
         const service = services.find(s => s.id === selectedServiceId);
-        if (!service) return { unitPrice: 0, description: '', serviceName: '' };
+        if (!service) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
         
         let price = service.price;
         // Special price logic for bigovanje
@@ -363,7 +371,8 @@ const OtherFinishingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omi
         return { 
             unitPrice: price, 
             description: service.name,
-            serviceName: service.name
+            serviceName: service.name,
+            sifra: service.sifra
         };
     }, [selectedServiceId, quantity, services]);
     
@@ -385,6 +394,7 @@ const OtherFinishingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omi
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 

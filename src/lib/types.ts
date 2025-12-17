@@ -8,6 +8,7 @@ export type OrderItem = {
   cena_jedinice: number;
   cena_ukupno: number;
   itemsPerSheet?: number; // For custom print jobs, how many items fit on one sheet
+  sifra?: number | string;
 };
 
 export type AppCategory = {
@@ -369,3 +370,4 @@ export type OtherService = {
     kategorija: string;
     cena: number;
 }
+

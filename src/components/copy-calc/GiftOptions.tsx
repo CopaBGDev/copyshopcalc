@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -19,15 +20,16 @@ export function GiftOptions({ onAddToBasket }: GiftOptionsProps) {
     const [selectedServiceId, setSelectedServiceId] = useState<string>(giftServices.items[0].id);
     const [quantity, setQuantity] = useState(1);
 
-    const { unitPrice, description, serviceName } = useMemo(() => {
+    const { unitPrice, description, serviceName, sifra } = useMemo(() => {
         const service = giftServices.items.find(s => s.id === selectedServiceId);
 
-        if (!service) return { unitPrice: 0, description: '', serviceName: '' };
+        if (!service) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
         
         return { 
             unitPrice: service.price, 
             description: service.name,
-            serviceName: "Foto poklon"
+            serviceName: "Foto poklon",
+            sifra: service.sifra
         };
     }, [selectedServiceId]);
     
@@ -42,6 +44,7 @@ export function GiftOptions({ onAddToBasket }: GiftOptionsProps) {
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 

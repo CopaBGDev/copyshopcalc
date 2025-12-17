@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -21,7 +22,7 @@ const DigitalPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<
     const [isBroughtIn, setIsBroughtIn] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    const { unitPrice, description, serviceName } = useMemo(() => {
+    const { unitPrice, description, serviceName, sifra } = useMemo(() => {
         let service;
         if(isBroughtIn){
             const broughtInMap: {[key: string]: number | undefined} = {
@@ -36,14 +37,15 @@ const DigitalPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<
             service = services.find(s => s.sifra.toString() === serviceId);
         }
 
-        if (!service) return { unitPrice: 0, description: '', serviceName: '' };
+        if (!service) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
 
         const originalServiceName = services.find(s => s.sifra.toString() === serviceId)?.naziv || '';
         
         return { 
             unitPrice: service.cena, 
             description: `${originalServiceName}${isBroughtIn ? ' (doneta majica)' : ''}`,
-            serviceName: originalServiceName.split(' direktna')[0]
+            serviceName: originalServiceName.split(' direktna')[0],
+            sifra: service.sifra,
         };
     }, [serviceId, isBroughtIn, services]);
     
@@ -58,6 +60,7 @@ const DigitalPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 
@@ -124,11 +127,11 @@ const FlexPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Ord
     const [isBroughtIn, setIsBroughtIn] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    const { unitPrice, description, serviceName } = useMemo(() => {
+    const { unitPrice, description, serviceName, sifra } = useMemo(() => {
         let service;
         const selectedFlexService = services.find(s => s.sifra.toString() === serviceId);
 
-        if(!selectedFlexService) return { unitPrice: 0, description: '', serviceName: '' };
+        if(!selectedFlexService) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
 
 
         if(isBroughtIn){
@@ -142,19 +145,21 @@ const FlexPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Ord
                 return {
                     unitPrice: service.cena,
                     description: `${selectedFlexService.naziv.replace('Bela i crna majica sa ', '')} (doneta majica)`,
-                    serviceName: `Flex folija`
+                    serviceName: `Flex folija`,
+                    sifra: service.sifra
                 }
             }
         } else {
             service = selectedFlexService;
         }
 
-        if (!service) return { unitPrice: 0, description: '', serviceName: '' };
+        if (!service) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
         
         return { 
             unitPrice: service.cena, 
             description: service.naziv,
-            serviceName: `Flex folija`
+            serviceName: `Flex folija`,
+            sifra: service.sifra
         };
     }, [serviceId, isBroughtIn, services]);
     
@@ -169,6 +174,7 @@ const FlexPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Ord
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 

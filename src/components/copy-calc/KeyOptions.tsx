@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -19,15 +20,16 @@ export function KeyOptions({ onAddToBasket }: KeyOptionsProps) {
     const [selectedServiceId, setSelectedServiceId] = useState<string>(keyServices[0].sifra.toString());
     const [quantity, setQuantity] = useState(1);
 
-    const { unitPrice, description, serviceName } = useMemo(() => {
+    const { unitPrice, description, serviceName, sifra } = useMemo(() => {
         const service = keyServices.find(s => s.sifra.toString() === selectedServiceId);
 
-        if (!service) return { unitPrice: 0, description: '', serviceName: '' };
+        if (!service) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
         
         return { 
             unitPrice: service.cena, 
             description: service.naziv,
-            serviceName: "Izrada ključeva i tagova"
+            serviceName: "Izrada ključeva i tagova",
+            sifra: service.sifra,
         };
     }, [selectedServiceId]);
     
@@ -42,6 +44,7 @@ export function KeyOptions({ onAddToBasket }: KeyOptionsProps) {
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 

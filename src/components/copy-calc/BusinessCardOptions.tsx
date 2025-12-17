@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -29,12 +30,12 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
         rounding: false,
     });
 
-    const { totalPrice, description } = useMemo(() => {
+    const { totalPrice, description, sifra } = useMemo(() => {
         const quantityNum = parseInt(quantity, 10);
         const priceList = businessCardServices.digital[side];
         const tier = priceList.find(p => p.kolicina === quantityNum);
 
-        if (!tier || !businessCardServices.doplate) return { totalPrice: 0, description: '' };
+        if (!tier || !businessCardServices.doplate) return { totalPrice: 0, description: '', sifra: undefined };
 
         let basePrice = tier.cena;
         let finishingDesc: string[] = [];
@@ -57,7 +58,7 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
             desc += `, ${finishingDesc.join(' + ')}`;
         }
 
-        return { totalPrice: basePrice, description: desc };
+        return { totalPrice: basePrice, description: desc, sifra: tier.sifra };
 
     }, [side, quantity, finishing]);
 
@@ -72,6 +73,7 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
             kolicina: quantityNum,
             cena_jedinice: totalPrice / quantityNum,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 
