@@ -36,12 +36,12 @@ function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sh
     if (itemW > usableSheetW && itemW > usableSheetH) return { items: 0, cols: 0, rows: 0 };
     if (itemH > usableSheetH && itemH > usableSheetW) return { items: 0, cols: 0, rows: 0 };
     
-    // First orientation
+    // First orientation: item not rotated
     const colsNormal = Math.floor(usableSheetW / itemW);
     const rowsNormal = Math.floor(usableSheetH / itemH);
     const itemsNormal = colsNormal * rowsNormal;
 
-    // Rotated orientation
+    // Second orientation: item rotated 90 degrees
     const colsRotated = Math.floor(usableSheetW / itemH);
     const rowsRotated = Math.floor(usableSheetH / itemW);
     const itemsRotated = colsRotated * rowsRotated;
@@ -49,6 +49,8 @@ function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sh
     if (itemsNormal > itemsRotated) {
       return { items: itemsNormal, cols: colsNormal, rows: rowsNormal };
     } else {
+      // If items are equal, it doesn't matter which orientation, but we'll choose rotated.
+      // Or if rotated is better.
       return { items: itemsRotated, cols: colsRotated, rows: rowsRotated };
     }
 }
@@ -68,10 +70,10 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const [customWidth, setCustomWidth] = useState<number>(90);
   const [customHeight, setCustomHeight] = useState<number>(50);
   const [itemsPerSheet, setItemsPerSheet] = useState<number>(0);
-  const [sheetPrice, setSheetPrice] = useState<number>(0);
   const [customSheetFormat, setCustomSheetFormat] = useState<'A4' | 'A3' | 'SRA3_450x320' | 'SRA3_482x330'>('SRA3_482x330');
   const [cuts, setCuts] = useState(0);
-  const [cuttingPricePerSheet, setCuttingPricePerSheet] = useState(0);
+  const [customFinishing, setCustomFinishing] = useState<'none' | 'cutting' | 'scoring'>('none');
+  const [finishingPrice, setFinishingPrice] = useState<number>(0);
 
 
   const selectedPaper: PaperType | undefined = useMemo(() => printServices.papers.find(p => p.id === paperId), [paperId]);
@@ -114,8 +116,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         const priceTiers: PriceTier[] = customPrintPriceOption[side];
         const tier = priceTiers.find(t => t.kolicina.min === 1) || priceTiers[0];
         
-        let printPrice = tier.cena;
-        let paperPrice = 0;
+        let printPricePerSheet = tier.cena;
+        let paperPricePerSheet = 0;
         
         if (selectedPaper.price > 0) {
             let copiesPerSheet = 1;
@@ -128,34 +130,42 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                  else if (customSheetFormat === 'SRA3_482x330' || customSheetFormat === 'SRA3_450x320') copiesPerSheet = 0.5; // This case is less likely, should be SRA3 paper
                  else copiesPerSheet = 1;
             }
-             paperPrice = selectedPaper.price / copiesPerSheet;
+             paperPricePerSheet = selectedPaper.price / copiesPerSheet;
         }
 
-        const totalSheetPrintPrice = printPrice + paperPrice;
+        const totalSheetPrintPrice = printPricePerSheet + paperPricePerSheet;
         
         const sheetDims = SHEET_DIMENSIONS[customSheetFormat];
         const { items, cols, rows } = calculateItemsPerSheet(customWidth, customHeight, sheetDims.w, sheetDims.h);
         setItemsPerSheet(items);
         
         let currentCuts = 0;
-        let currentCuttingPrice = 0;
+        let currentFinishingPrice = 0;
         if (items > 0) {
             currentCuts = (cols + 1) + (rows + 1);
-            const cutPriceService = finishingServices.other.find(s => s.id === 'secenje-a4-a3');
-            if(cutPriceService) {
-                currentCuttingPrice = currentCuts * cutPriceService.price;
+
+            if (customFinishing === 'cutting') {
+                const cutPriceService = finishingServices.other.find(s => s.id === 'secenje-a4-a3');
+                if(cutPriceService) {
+                    currentFinishingPrice = currentCuts * cutPriceService.price;
+                }
+            } else if (customFinishing === 'scoring') {
+                 const scorePriceService = finishingServices.other.find(s => s.id === 'ricovanje');
+                 if(scorePriceService) {
+                    currentFinishingPrice = currentCuts * scorePriceService.price;
+                }
             }
         }
         
         setCuts(currentCuts);
-        setCuttingPricePerSheet(currentCuttingPrice);
+        setFinishingPrice(currentFinishingPrice);
         
-        const finalSheetPrice = totalSheetPrintPrice + currentCuttingPrice;
-        setSheetPrice(finalSheetPrice);
+        const totalPrintPriceForSheets = totalSheetPrintPrice * quantity;
+        const finalTotalPrice = totalPrintPriceForSheets + (currentFinishingPrice > 0 ? currentFinishingPrice : 0);
 
         if(items > 0) {
-            setTotalPrice(finalSheetPrice * quantity);
-            setUnitPrice((finalSheetPrice * quantity) / (items * quantity));
+            setTotalPrice(finalTotalPrice);
+            setUnitPrice(finalTotalPrice / (items * quantity));
         } else {
             setTotalPrice(0);
             setUnitPrice(0);
@@ -163,9 +173,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
 
     } else {
         setItemsPerSheet(0);
-        setSheetPrice(0);
         setCuts(0);
-        setCuttingPricePerSheet(0);
+        setFinishingPrice(0);
         const priceTiers: PriceTier[] = activePrintOption[side];
         const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
         setSifra(tier?.sifra);
@@ -190,7 +199,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         setTotalPrice(finalUnitPrice * quantity);
     }
 
-  }, [quantity, format, color, side, paperId, activePrintOption, selectedPaper, customWidth, customHeight, customSheetFormat]);
+  }, [quantity, format, color, side, paperId, activePrintOption, selectedPaper, customWidth, customHeight, customSheetFormat, customFinishing]);
   
 
   const handleAddToBasket = () => {
@@ -206,18 +215,25 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         naziv = `Štampa proizvoljnog formata`;
         finalQuantity = itemsPerSheet * quantity;
         const sheetDimLabel = customSheetFormat.replace('_', ' (').replace('x', 'x') + 'mm)';
-        opis = `${customWidth}x${customHeight}mm na ${sheetDimLabel}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka). Uračunato sečenje.`;
         
-        const totalJobPrice = sheetPrice * quantity;
-        finalUnitPrice = totalJobPrice / finalQuantity;
+        let finishingDesc = '';
+        if (customFinishing === 'cutting') {
+            finishingDesc = ` + Sečenje`;
+        } else if (customFinishing === 'scoring') {
+            finishingDesc = ` + Ricovanje`;
+        }
+
+        opis = `${customWidth}x${customHeight}mm na ${sheetDimLabel}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka).${finishingDesc}`;
+        
+        finalUnitPrice = totalPrice / finalQuantity;
 
         onAddToBasket({
-            serviceId: `stampa-custom-${color}-${side}-${paperId}-${customWidth}x${customHeight}`,
+            serviceId: `stampa-custom-${color}-${side}-${paperId}-${customWidth}x${customHeight}-${customFinishing}`,
             naziv: naziv,
             opis,
             kolicina: finalQuantity,
             cena_jedinice: finalUnitPrice,
-            cena_ukupno: totalJobPrice,
+            cena_ukupno: totalPrice,
             itemsPerSheet: itemsPerSheet,
             sifra: sifra,
         });
@@ -374,6 +390,19 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                             </SelectContent>
                         </Select>
                     </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="custom-finishing">Dorada</Label>
+                        <Select onValueChange={(v) => setCustomFinishing(v as any)} defaultValue={customFinishing}>
+                            <SelectTrigger id="custom-finishing">
+                                <SelectValue placeholder="Izaberite doradu" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">Ništa</SelectItem>
+                                <SelectItem value="cutting">Sečenje</SelectItem>
+                                <SelectItem value="scoring">Ricovanje</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <Alert>
                     <Calculator className="h-4 w-4" />
@@ -381,11 +410,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     <AlertDescription>
                         Na jedan {customSheetFormat.replace('_', ' (').replace('x','x') + 'mm)'} tabak staje: <span className="font-bold">{itemsPerSheet}</span> kom.
                         <br />
-                        Broj rezova po tabaku: <span className="font-bold">{cuts}</span>.
-                        <br />
-                        Cena sečenja po tabaku: <span className="font-bold">{cuttingPricePerSheet.toFixed(2)} RSD</span>.
-                        <br />
-                        Cena po tabaku (štampa + sečenje): <span className="font-bold">{sheetPrice.toFixed(2)} RSD</span>.
+                        {customFinishing !== 'none' && (
+                            <>
+                            Broj operacija ({customFinishing === 'cutting' ? 'rezova' : 'ricova'}) po tabaku: <span className="font-bold">{cuts}</span>.
+                            <br />
+                            Cena dorade ({customFinishing === 'cutting' ? 'sečenje' : 'ricovanje'}): <span className="font-bold">{finishingPrice.toFixed(2)} RSD</span>.
+                            </>
+                        )}
+                        
                     </AlertDescription>
                 </Alert>
             </div>
