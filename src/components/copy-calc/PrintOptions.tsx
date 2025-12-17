@@ -71,6 +71,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const [sheetPrice, setSheetPrice] = useState<number>(0);
   const [customSheetFormat, setCustomSheetFormat] = useState<'A4' | 'A3' | 'SRA3_450x320' | 'SRA3_482x330'>('SRA3_482x330');
   const [cuts, setCuts] = useState(0);
+  const [cuttingPricePerSheet, setCuttingPricePerSheet] = useState(0);
 
 
   const selectedPaper: PaperType | undefined = useMemo(() => printServices.papers.find(p => p.id === paperId), [paperId]);
@@ -130,24 +131,31 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
              paperPrice = selectedPaper.price / copiesPerSheet;
         }
 
-        const totalSheetPrice = printPrice + paperPrice;
-        setSheetPrice(totalSheetPrice);
+        const totalSheetPrintPrice = printPrice + paperPrice;
         
         const sheetDims = SHEET_DIMENSIONS[customSheetFormat];
         const { items, cols, rows } = calculateItemsPerSheet(customWidth, customHeight, sheetDims.w, sheetDims.h);
         setItemsPerSheet(items);
-
+        
+        let currentCuts = 0;
+        let currentCuttingPrice = 0;
         if (items > 0) {
-            // User's formula
-            const totalCuts = (cols + 1) + (rows + 1);
-            setCuts(totalCuts);
-        } else {
-            setCuts(0);
+            currentCuts = (cols + 1) + (rows + 1);
+            const cutPriceService = finishingServices.other.find(s => s.id === 'secenje-a4-a3');
+            if(cutPriceService) {
+                currentCuttingPrice = currentCuts * cutPriceService.price;
+            }
         }
         
+        setCuts(currentCuts);
+        setCuttingPricePerSheet(currentCuttingPrice);
+        
+        const finalSheetPrice = totalSheetPrintPrice + currentCuttingPrice;
+        setSheetPrice(finalSheetPrice);
+
         if(items > 0) {
-            setTotalPrice(totalSheetPrice * quantity);
-            setUnitPrice((totalSheetPrice * quantity) / (items * quantity));
+            setTotalPrice(finalSheetPrice * quantity);
+            setUnitPrice((finalSheetPrice * quantity) / (items * quantity));
         } else {
             setTotalPrice(0);
             setUnitPrice(0);
@@ -157,6 +165,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         setItemsPerSheet(0);
         setSheetPrice(0);
         setCuts(0);
+        setCuttingPricePerSheet(0);
         const priceTiers: PriceTier[] = activePrintOption[side];
         const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
         setSifra(tier?.sifra);
@@ -197,11 +206,10 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         naziv = `Štampa proizvoljnog formata`;
         finalQuantity = itemsPerSheet * quantity;
         const sheetDimLabel = customSheetFormat.replace('_', ' (').replace('x', 'x') + 'mm)';
-        opis = `${customWidth}x${customHeight}mm na ${sheetDimLabel}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka)`;
+        opis = `${customWidth}x${customHeight}mm na ${sheetDimLabel}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka). Uračunato sečenje.`;
         
-        const totalSheetPrice = sheetPrice * quantity;
-        const totalPrintPrice = totalSheetPrice;
-        finalUnitPrice = totalPrintPrice / finalQuantity;
+        const totalJobPrice = sheetPrice * quantity;
+        finalUnitPrice = totalJobPrice / finalQuantity;
 
         onAddToBasket({
             serviceId: `stampa-custom-${color}-${side}-${paperId}-${customWidth}x${customHeight}`,
@@ -209,7 +217,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             opis,
             kolicina: finalQuantity,
             cena_jedinice: finalUnitPrice,
-            cena_ukupno: totalPrintPrice,
+            cena_ukupno: totalJobPrice,
             itemsPerSheet: itemsPerSheet,
             sifra: sifra,
         });
@@ -373,9 +381,11 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     <AlertDescription>
                         Na jedan {customSheetFormat.replace('_', ' (').replace('x','x') + 'mm)'} tabak staje: <span className="font-bold">{itemsPerSheet}</span> kom.
                         <br />
-                        Cena po tabaku: <span className="font-bold">{sheetPrice.toFixed(2)} RSD</span>.
-                        <br />
                         Broj rezova po tabaku: <span className="font-bold">{cuts}</span>.
+                        <br />
+                        Cena sečenja po tabaku: <span className="font-bold">{cuttingPricePerSheet.toFixed(2)} RSD</span>.
+                        <br />
+                        Cena po tabaku (štampa + sečenje): <span className="font-bold">{sheetPrice.toFixed(2)} RSD</span>.
                     </AlertDescription>
                 </Alert>
             </div>
