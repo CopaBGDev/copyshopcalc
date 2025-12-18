@@ -8,79 +8,92 @@ export const appCategories: AppCategory[] = [
     id: 'stampa',
     naziv: 'Štampa i kopiranje',
     icon: Printer,
-    opis: 'A4/A3, C/B i kolor, razni papiri.'
+    opis: 'A4/A3, C/B i kolor, razni papiri.',
+    searchKeywords: "štampa, kopiranje, a4, a3, sra3, papir, kunzdruk, muflon, pvc folija, plastika"
   },
   {
     id: 'vizitke',
     naziv: 'Vizit Karte',
     icon: FileText,
-    opis: 'Standardne, lux, PVC, sa doradom.'
+    opis: 'Standardne, lux, PVC, sa doradom.',
+    searchKeywords: "vizitke, vizit karta, digitalna štampa, lux, pvc, plastifikacija, ćoškanje"
   },
   {
     id: 'flajeri',
     naziv: 'Flajeri',
     icon: Newspaper,
-    opis: 'Digitalna i ofset štampa flajera.'
+    opis: 'Digitalna i ofset štampa flajera.',
+    searchKeywords: "flajer, flajeri, letak, liflet, a6, a5, digitalna štampa, ofset"
   },
    {
     id: 'kancelarijski',
     naziv: 'Kancelarijski Materijal',
     icon: Briefcase,
-    opis: 'Memorandumi, koverte, brošure.'
+    opis: 'Memorandumi, koverte, brošure.',
+    searchKeywords: "kancelarijski, memorandum, koverta, ameriken, c4, brošura, buklet, katalog, liflet"
   },
   {
     id: 'veliki_formati',
     naziv: 'Veliki Formati',
     icon: Ruler,
-    opis: 'Plotovanje, posteri, baneri.'
+    opis: 'Plotovanje, posteri, baneri.',
+    searchKeywords: "veliki format, plotovanje, poster, baner, cirada, roll-up, rolna, crtež"
   },
    {
     id: 'kanvas',
     naziv: 'Kanvas Platno',
     icon: ImageIcon,
-    opis: 'Štampa i zatezanje na blind ram.'
+    opis: 'Štampa i zatezanje na blind ram.',
+    searchKeywords: "kanvas, platno, slika, blind ram"
   },
   {
     id: 'tekstil',
     naziv: 'Štampa na Tekstilu',
     icon: Shirt,
-    opis: 'Majice, duksevi, cegeri.'
+    opis: 'Majice, duksevi, cegeri.',
+    searchKeywords: "tekstil, majica, duks, ceger, štampa na majicama, dtg, flex, flok"
   },
   {
     id: 'pokloni',
     naziv: 'Foto Pokloni',
     icon: Gift,
-    opis: 'Šolje, puzzle, satovi, privesci...'
+    opis: 'Šolje, puzzle, satovi, privesci...',
+    searchKeywords: "poklon, foto pokloni, šolja, puzla, puzzle, sat, kugla, ram, maska za telefon"
   },
   {
     id: 'promo',
     naziv: 'Promo Materijal',
     icon: ShoppingBag,
-    opis: 'Kese, olovke, upaljači, rokovnici...'
+    opis: 'Kese, olovke, upaljači, rokovnici...',
+    searchKeywords: "promo, promotivni materijal, kese, olovke, upaljači, rokovnici, privesci"
   },
   {
     id: 'dorada',
     naziv: 'Dorada',
     icon: Scissors,
-    opis: 'Koričenje, sečenje, plastifikacija...'
+    opis: 'Koričenje, sečenje, plastifikacija...',
+    searchKeywords: "dorada, koričenje, sečenje, plastifikacija, bigovanje, ricovanje, bušenje rupa, heftanje, tvrdi povez"
   },
   {
     id: 'skeniranje',
     naziv: 'Skeniranje',
     icon: ScanLine,
-    opis: 'Digitalizacija dokumenata i planova.'
+    opis: 'Digitalizacija dokumenata i planova.',
+    searchKeywords: "skeniranje, digitalizacija, dokument, plan, a4, a3"
   },
   {
     id: 'kljucevi',
     naziv: 'Narezivanje Ključeva',
     icon: Key,
-    opis: 'Klasični, tačkasti, tagovi.'
+    opis: 'Klasični, tačkasti, tagovi.',
+    searchKeywords: "ključ, narezivanje ključeva, kopiranje ključa, tag, kasa ključ"
   },
   {
     id: 'dizajn',
     naziv: 'Usluge Dizajna',
     icon: Palette,
-    opis: 'Grafička priprema, dizajn i prelom.'
+    opis: 'Grafička priprema, dizajn i prelom.',
+    searchKeywords: "dizajn, usluge dizajna, priprema za štampu, logo, obrada fotografija, prelom, kucanje teksta"
   },
 ];
 
@@ -489,6 +502,7 @@ export const designServices: DesignServiceData = [
 
 
     
+
 
 
 

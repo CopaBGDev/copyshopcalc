@@ -32,18 +32,27 @@ export default function Home() {
     );
   };
 
-  const handleAddToBasket = (item: Omit<OrderItem, 'id'>) => {
-    const newItem: OrderItem = {
-      ...item,
-      id: `${item.serviceId}-${Date.now()}`,
-    };
-
-    setBasket(prev => [...prev, newItem]);
+  const handleAddToBasket = (item: Omit<OrderItem, 'id'> | Omit<OrderItem, 'id'>[]) => {
+     const itemsToAdd = Array.isArray(item) ? item : [item];
     
-    toast({
-      title: "Stavka dodata",
-      description: `${item.naziv} (x${item.kolicina}) je dodat u korpu.`,
-    });
+    const newItems: OrderItem[] = itemsToAdd.map(it => ({
+        ...it,
+        id: `${it.serviceId}-${Date.now()}-${Math.random()}`,
+    }));
+
+    setBasket(prev => [...prev, ...newItems]);
+    
+    if (newItems.length === 1) {
+       toast({
+          title: "Stavka dodata",
+          description: `${newItems[0].naziv} (x${newItems[0].kolicina}) je dodat u korpu.`,
+        });
+    } else {
+         toast({
+          title: "Stavke dodate",
+          description: `${newItems.length} stavki je dodato u korpu.`,
+        });
+    }
   };
 
   const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
@@ -53,30 +62,6 @@ export default function Home() {
 
       if (newQuantity <= 0) {
         return prevBasket.filter((item) => item.id !== itemId);
-      }
-
-      // Handle custom print items that are calculated per sheet
-      if (itemToUpdate.itemsPerSheet && itemToUpdate.itemsPerSheet > 0) {
-        const itemsPerSheet = itemToUpdate.itemsPerSheet;
-        
-        let newTotalItems = itemToUpdate.kolicina;
-        if(newQuantity > itemToUpdate.kolicina) {
-           newTotalItems += itemsPerSheet;
-        } else if (newQuantity < itemToUpdate.kolicina) {
-            newTotalItems = Math.max(itemsPerSheet, newTotalItems - itemsPerSheet);
-        }
-        
-        const numSheets = Math.ceil(newTotalItems / itemsPerSheet);
-        const pricePerSheet = (itemToUpdate.cena_jedinice * itemsPerSheet);
-        const newTotalPrice = pricePerSheet * numSheets;
-        newTotalItems = numSheets * itemsPerSheet;
-
-        return prevBasket.map(item => item.id === itemId ? {
-          ...item,
-          kolicina: newTotalItems,
-          cena_ukupno: newTotalPrice,
-          opis: item.opis.replace(/\(x\d+\)/, `(x${newTotalItems})`).replace(/\d+ tabak(a)?/, `${numSheets} tabaka`),
-        } : item);
       }
       
       // Handle regular items
@@ -129,10 +114,12 @@ export default function Home() {
     if (!searchQuery) {
       return [];
     }
+    const lowerCaseQuery = searchQuery.toLowerCase();
     return appCategories
       .filter(cat =>
-        cat.naziv.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cat.opis.toLowerCase().includes(searchQuery.toLowerCase())
+        cat.naziv.toLowerCase().includes(lowerCaseQuery) ||
+        cat.opis.toLowerCase().includes(lowerCaseQuery) ||
+        (cat.searchKeywords && cat.searchKeywords.toLowerCase().includes(lowerCaseQuery))
       )
       .map(cat => cat.id);
   }, [searchQuery]);

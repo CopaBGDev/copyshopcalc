@@ -17,6 +17,7 @@ export type AppCategory = {
   naziv: string;
   icon: any; // Lucide icon component
   opis: string;
+  searchKeywords?: string;
 };
 
 // --- START: Print Service Specific Types ---
@@ -372,5 +373,6 @@ export type OtherService = {
     kategorija: string;
     cena: number;
 }
+
 
 
