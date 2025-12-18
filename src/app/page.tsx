@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Accordion } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { OrderConfirmationDialog } from "@/components/copy-calc/OrderConfirmationDialog";
 
 
 export default function Home() {
@@ -24,6 +25,8 @@ export default function Home() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [confirmedOrder, setConfirmedOrder] = useState<{items: OrderItem[], total: number} | null>(null);
 
   const handleCategoryToggle = (categoryId: string) => {
     setActiveCategories(prev =>
@@ -92,25 +95,33 @@ export default function Home() {
         });
         return;
     }
-
-    startTransition(async () => {
-      const result = await createOrder(basket, total);
-      if (result.success) {
-        toast({
-          title: "Uspeh!",
-          description: result.message,
-        });
-        setBasket([]);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Greška",
-          description: result.message,
-        });
-      }
-    });
+    setConfirmedOrder({ items: basket, total });
   };
   
+  const handleDialogClose = (shouldSubmit: boolean) => {
+     if (shouldSubmit && confirmedOrder) {
+        startTransition(async () => {
+          const result = await createOrder(confirmedOrder.items, confirmedOrder.total);
+          if (result.success) {
+            toast({
+              title: "Uspeh!",
+              description: result.message,
+            });
+            setBasket([]);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Greška",
+              description: result.message,
+            });
+          }
+           setConfirmedOrder(null);
+        });
+     } else {
+        setConfirmedOrder(null);
+     }
+  }
+
   const filteredCategories = useMemo(() => {
     if (!searchQuery) {
       return [];
@@ -203,6 +214,14 @@ export default function Home() {
           </aside>
         </div>
       </main>
+      {confirmedOrder && (
+        <OrderConfirmationDialog
+            isOpen={!!confirmedOrder}
+            onClose={handleDialogClose}
+            order={confirmedOrder}
+            isFinalizing={isPending}
+        />
+      )}
     </div>
   );
 }

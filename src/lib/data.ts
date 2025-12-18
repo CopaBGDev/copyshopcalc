@@ -312,7 +312,7 @@ export const businessCardServices: BusinessCardData = {
     digital: {
         oneSided: [
             { kolicina: 50, cena: 750.00, sifra: 500 },
-            { kolicina: 100, cena: 837.00, sifra: 501 },
+            { kolicina: 100, cena: 830.00, sifra: 501 },
             { kolicina: 200, cena: 1155.00, sifra: 503 },
             { kolicina: 300, cena: 1390.00, sifra: 504 },
             { kolicina: 500, cena: 2130.00, sifra: 509 },
@@ -519,6 +519,7 @@ export const designServices: DesignServiceData = [
 
 
     
+
 
 
 
