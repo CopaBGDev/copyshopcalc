@@ -72,7 +72,7 @@ export const appCategories: AppCategory[] = [
     naziv: 'Dorada',
     icon: Scissors,
     opis: 'Koričenje, sečenje, plastifikacija...',
-    searchKeywords: "dorada, koričenje, sečenje, plastifikacija, bigovanje, ricovanje, bušenje rupa, heftanje, tvrdi povez"
+    searchKeywords: "dorada, koričenje, sečenje, plastifikacija, bigovanje, ricovanje, bušenje rupa, heftanje, tvrdi povez, ćoškanje"
   },
   {
     id: 'skeniranje',
@@ -226,12 +226,13 @@ export const finishingServices: FinishingServiceData = {
             { id: 'a5', name: 'A5 plastifikacija 125mic', price: 90.00 },
         ],
         roll: [
-            { id: 'roll-32', name: 'Plastifikacija iz rolne (mat/sjaj)', priceA4: 40.00, priceA3: 300.00 },
+            { id: 'roll-32', name: 'Plastifikacija iz rolne (mat/sjaj)', priceA4: 40.00, priceA3: 80.00, sifra: 32 },
         ]
     },
     other: [
         { id: 'secenje-a4-a3', name: 'Sečenje A4-A3 formata', price: 7.00, unit: 'rez/list', sifra: 805 },
         { id: 'ricovanje', name: 'Ricovanje', price: 6.00, unit: 'ric', sifra: 806 },
+        { id: 'coskanje', name: 'Ćoškanje', price: 3.60, unit: 'kom', sifra: 807 },
         { id: 'secenje-tabak', name: 'Sečenje više tabaka', price: 100.00, unit: 'rez', sifra: 802 },
         { id: 'bigovanje', name: 'Bigovanje', price: 250.00, price_over_50: 6.00, unit: 'big', sifra: 337 },
         { id: 'busenje-rupa', name: 'Bušenje rupa za registrator', price: 3.00, unit: 'list', sifra: 511 },
@@ -502,6 +503,7 @@ export const designServices: DesignServiceData = [
 
 
     
+
 
 
 

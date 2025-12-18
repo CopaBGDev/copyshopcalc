@@ -17,7 +17,7 @@ import { DesignOptions } from "./DesignOptions";
 
 type ServiceOptionsProps = {
   category: AppCategory;
-  onAddToBasket: (item: Omit<OrderItem, 'id'>) => void;
+  onAddToBasket: (item: Omit<OrderItem, 'id'> | Omit<OrderItem, 'id'>[]) => void;
 };
 
 
