@@ -156,10 +156,18 @@ export type BroughtInTextileService = {
     sifra: number;
 }
 
+export type CegerService = {
+  id: 'ceger-flex-a4' | 'ceger-dtg-a4';
+  name: string;
+  price: number;
+  sifra: number;
+}
+
 export type TextileServiceData = {
     directPrint: TextileService;
     flexFoil: TextileService;
     broughtIn: BroughtInTextileService[];
+    ceger: CegerService[];
 }
 
 // --- END: Textile Service Specific Types ---

@@ -1,8 +1,9 @@
 
+
 "use client";
 
 import { useState, useMemo } from 'react';
-import type { OrderItem } from '@/lib/types';
+import type { OrderItem, CegerService } from '@/lib/types';
 import { textileServices } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { PlusCircle, Shirt } from 'lucide-react';
+import { PlusCircle, Shirt, ShoppingBag } from 'lucide-react';
 import { Switch } from '../ui/switch';
 import { Card, CardContent } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
@@ -24,6 +25,10 @@ const DigitalPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<
 
     const { unitPrice, description, serviceName, sifra } = useMemo(() => {
         let service;
+        const originalService = services.find(s => s.sifra.toString() === serviceId);
+        if (!originalService) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
+
+
         if(isBroughtIn){
             const broughtInMap: {[key: string]: number | undefined} = {
                 '317': 325, // A4 White -> Brought in white
@@ -34,17 +39,15 @@ const DigitalPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<
             const broughtInSifra = broughtInMap[serviceId];
             service = textileServices.broughtIn.find(s => s.sifra === broughtInSifra);
         } else {
-            service = services.find(s => s.sifra.toString() === serviceId);
+            service = originalService;
         }
 
         if (!service) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
-
-        const originalServiceName = services.find(s => s.sifra.toString() === serviceId)?.naziv || '';
         
         return { 
             unitPrice: service.cena, 
-            description: `${originalServiceName}${isBroughtIn ? ' (doneta majica)' : ''}`,
-            serviceName: originalServiceName.split(' direktna')[0],
+            description: `${originalService.naziv}${isBroughtIn ? ' (doneta majica)' : ''}`,
+            serviceName: originalService.naziv.split(' direktna')[0],
             sifra: service.sifra,
         };
     }, [serviceId, isBroughtIn, services]);
@@ -129,57 +132,30 @@ const FlexPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Ord
 
     const { unitPrice, description, serviceName, sifra } = useMemo(() => {
         let service;
-        const selectedFlexService = services.find(s => s.sifra.toString() === serviceId);
+        const originalService = services.find(s => s.sifra.toString() === serviceId);
 
-        if(!selectedFlexService) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
+        if(!originalService) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
 
 
         if(isBroughtIn){
             const broughtInMap: {[key: string]: number | undefined} = {
                 '321': 330, // flex A4 -> brought in flex A4
-                '322': 330, // flex A3 -> brought in flex A4 (Note: There is only one price for brought in flex)
+                '322': 332, // flex A3 -> brought in flex A3
                 '323': 331, // flex gold/silver A4 -> brought in gold/silver A4
-                '324': 331, // flex gold/silver A3 -> brought in gold/silver A4 (Note: There is only one price for brought in gold/silver flex)
+                '324': 333, // flex gold/silver A3 -> brought in gold/silver A3
             };
             const broughtInSifra = broughtInMap[serviceId];
             service = textileServices.broughtIn.find(s => s.sifra === broughtInSifra);
             
-            if (service) {
-                // We need to determine if it's A3 to add the price difference
-                const isA3 = serviceId === '322' || serviceId === '324';
-                const originalPrice = selectedFlexService.cena;
-                const basePriceWithShirt = serviceId === '321' ? 1300 : serviceId === '322' ? 1800 : serviceId === '323' ? 1600 : 2100;
-                const printOnlyPrice = originalPrice - (basePriceWithShirt - service.cena);
-
-
-                let price = service.cena;
-                let desc = selectedFlexService.naziv;
-
-                if (serviceId === '322') { // A3 Standard
-                    price = 1500; // 1800 - 300 (shirt approx)
-                    desc = "Flex folija A3 (doneta majica)";
-                } else if (serviceId === '324') { // A3 Gold/Silver
-                    price = 1800; // 2100 - 300 (shirt approx)
-                    desc = "Flex folija A3 srebrna i zlatna (doneta majica)";
-                }
-
-
-                return {
-                    unitPrice: price,
-                    description: desc,
-                    serviceName: `Flex folija`,
-                    sifra: service.sifra
-                }
-            }
         } else {
-            service = selectedFlexService;
+            service = originalService;
         }
 
         if (!service) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
         
         return { 
             unitPrice: service.cena, 
-            description: service.naziv,
+            description: `${originalService.naziv}${isBroughtIn ? ' (doneta majica)' : ''}`,
             serviceName: `Flex folija`,
             sifra: service.sifra
         };
@@ -257,6 +233,92 @@ const FlexPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Ord
     )
 }
 
+const CegerCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
+    const services = textileServices.ceger;
+    const [serviceId, setServiceId] = useState<CegerService['id']>('ceger-dtg-a4');
+    const [quantity, setQuantity] = useState(1);
+
+    const { unitPrice, description, serviceName, sifra } = useMemo(() => {
+        const service = services.find(s => s.id === serviceId);
+        if (!service) return { unitPrice: 0, description: '', serviceName: '', sifra: undefined };
+        
+        return { 
+            unitPrice: service.price, 
+            description: service.name,
+            serviceName: "Štampa na cegeru",
+            sifra: service.sifra,
+        };
+    }, [serviceId]);
+    
+    const totalPrice = unitPrice * quantity;
+
+    const handleAddToBasket = () => {
+        if (totalPrice <= 0) return;
+        onAddToBasket({
+            serviceId: `tekstil-ceger-${serviceId}`,
+            naziv: serviceName,
+            opis: `${description} (x${quantity})`,
+            kolicina: quantity,
+            cena_jedinice: unitPrice,
+            cena_ukupno: totalPrice,
+            sifra: sifra,
+        });
+    };
+
+    return (
+        <Card className="border-none shadow-none">
+            <CardContent className="p-4 space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="ceger-print-type">Tip štampe na cegeru</Label>
+                     <Select onValueChange={(v) => setServiceId(v as CegerService['id'])} defaultValue={serviceId}>
+                        <SelectTrigger id="ceger-print-type">
+                            <SelectValue placeholder="Izaberite tip štampe" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {services.map(s => (
+                                <SelectItem key={s.id} value={s.id}>
+                                    {s.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                    <div className="space-y-2">
+                        <Label htmlFor="ceger-quantity">Količina</Label>
+                        <Input
+                            id="ceger-quantity"
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                            min="1"
+                            className="max-w-xs"
+                        />
+                         <p className="text-xs text-muted-foreground">Cene za 5+ komada su na upit.</p>
+                    </div>
+                     <div className="flex flex-col items-start md:items-end bg-primary/5 p-4 rounded-lg">
+                        <Label className="text-sm text-muted-foreground">Ukupna cena</Label>
+                        <p className="text-3xl font-bold font-mono tracking-tight text-primary">
+                            {totalPrice.toFixed(2)} <span className="text-xl font-semibold">RSD</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground h-4">
+                           {quantity > 0 && `(${unitPrice.toFixed(2)} RSD / kom)`}
+                        </p>
+                    </div>
+                </div>
+                 <Separator />
+                <div className="flex justify-end">
+                    <Button size="lg" onClick={handleAddToBasket} disabled={totalPrice <= 0}>
+                        <PlusCircle className="mr-2" />
+                        Dodaj u korpu
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
 export function TextileOptions({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void; }) {
     return (
         <div className="space-y-6">
@@ -265,12 +327,16 @@ export function TextileOptions({ onAddToBasket }: { onAddToBasket: (item: Omit<O
                 Opcije štampe na tekstilu
             </h3>
             <Tabs defaultValue="digital" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="digital">
                         Direktna štampa (DTG)
                     </TabsTrigger>
                     <TabsTrigger value="flex">
                         Flex i Flok folije
+                    </TabsTrigger>
+                     <TabsTrigger value="ceger">
+                        <ShoppingBag className="mr-2 h-4 w-4" />
+                        Cegeri
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="digital">
@@ -278,6 +344,9 @@ export function TextileOptions({ onAddToBasket }: { onAddToBasket: (item: Omit<O
                 </TabsContent>
                 <TabsContent value="flex">
                     <FlexPrintCalculator onAddToBasket={onAddToBasket} />
+                </TabsContent>
+                 <TabsContent value="ceger">
+                    <CegerCalculator onAddToBasket={onAddToBasket} />
                 </TabsContent>
             </Tabs>
         </div>

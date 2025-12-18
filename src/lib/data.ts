@@ -226,8 +226,8 @@ export const finishingServices: FinishingServiceData = {
             { id: 'a5', name: 'A5 plastifikacija 125mic', price: 90.00, sifra: 31 },
         ],
         roll: [
-            { id: 'roll-32', name: 'Plastifikacija iz rolne obostrana (mat/sjaj)', priceA4: 40.00, priceA3: 80.00, sifra: 32 },
-            { id: 'roll-33', name: 'Plastifikacija iz rolne jednostrana (mat/sjaj)', priceA4: 20.00, priceA3: 40.00, sifra: 33 },
+            { id: 'roll-32', name: 'Plastifikacija iz rolne obostrana (mat/sjaj)', priceA4: 80.00, priceA3: 160.00, sifra: 32 },
+            { id: 'roll-33', name: 'Plastifikacija iz rolne jednostrana (mat/sjaj)', priceA4: 40.00, priceA3: 80.00, sifra: 33 },
         ]
     },
     other: [
@@ -278,12 +278,18 @@ export const textileServices: TextileServiceData = {
         ]
     },
     broughtIn: [
-        { naziv: "Flex folija A4 (za donete majice)", cena: 1000.00, sifra: 330 },
-        { naziv: "Flex folija A4 srebrna i zlatna (za donete majice)", cena: 1200.00, sifra: 331 },
-        { naziv: "Cena štampe A4 aplikacije na BELOJ majici DONETE", cena: 1300.00, sifra: 325 },
-        { naziv: "Cena štampe A3 aplikacije na BELOJ majici DONETE", cena: 1900.00, sifra: 327 },
-        { naziv: "Cena štampe A4 aplikacije na CRNOJ majici DONETE", cena: 1600.00, sifra: 326 },
-        { naziv: "Cena štampe A3 aplikacije na CRNOJ majici DONETE", cena: 2100.00, sifra: 328 }
+        { naziv: "Cena štampe A4 aplikacije na BELOJ majici DONETE", cena: 850.00, sifra: 325 },
+        { naziv: "Cena štampe A3 aplikacije na BELOJ majici DONETE", cena: 1150.00, sifra: 327 },
+        { naziv: "Cena štampe A4 aplikacije na CRNOJ majici DONETE", cena: 1150.00, sifra: 326 },
+        { naziv: "Cena štampe A3 aplikacije na CRNOJ majici DONETE", cena: 1550.00, sifra: 328 },
+        { naziv: "Flex folija A4 (za donete majice)", cena: 750.00, sifra: 330 },
+        { naziv: "Flex folija A3 (za donete majice)", cena: 1250.00, sifra: 332 },
+        { naziv: "Flex folija A4 srebrna i zlatna (za donete majice)", cena: 1050.00, sifra: 331 },
+        { naziv: "Flex folija A3 srebrna i zlatna (za donete majice)", cena: 1550.00, sifra: 333 }
+    ],
+    ceger: [
+        { id: 'ceger-dtg-a4', name: "Ceger sa direktnom štampom A4", price: 1350.00, sifra: 329 },
+        { id: 'ceger-flex-a4', name: "Ceger sa flex folijom A4", price: 1250.00, sifra: 334 },
     ]
 };
 
@@ -509,6 +515,7 @@ export const designServices: DesignServiceData = [
 
 
     
+
 
 
 
