@@ -9,7 +9,7 @@ export const appCategories: AppCategory[] = [
     naziv: 'Štampa i kopiranje',
     icon: Printer,
     opis: 'A4/A3, C/B i kolor, razni papiri.',
-    searchKeywords: "štampa, kopiranje, a4, a3, sra3, papir, kunzdruk, muflon, pvc folija, plastika"
+    searchKeywords: "štampa, kopiranje, a4, a3, sra3, papir, kunzdruk, muflon, pvc folija, plastika, proizvoljno, custom, sečenje, ricovanje, ćoškanje, plastifikacija"
   },
   {
     id: 'vizitke',
@@ -226,7 +226,8 @@ export const finishingServices: FinishingServiceData = {
             { id: 'a5', name: 'A5 plastifikacija 125mic', price: 90.00 },
         ],
         roll: [
-            { id: 'roll-32', name: 'Plastifikacija iz rolne (mat/sjaj)', priceA4: 40.00, priceA3: 80.00, sifra: 32 },
+            { id: 'roll-32', name: 'Plastifikacija iz rolne obostrana (mat/sjaj)', priceA4: 40.00, priceA3: 80.00, sifra: 32 },
+            { id: 'roll-33', name: 'Plastifikacija iz rolne jednostrana (mat/sjaj)', priceA4: 20.00, priceA3: 40.00, sifra: 33 },
         ]
     },
     other: [
@@ -235,6 +236,7 @@ export const finishingServices: FinishingServiceData = {
         { id: 'coskanje', name: 'Ćoškanje', price: 3.60, unit: 'kom', sifra: 807 },
         { id: 'secenje-tabak', name: 'Sečenje više tabaka', price: 100.00, unit: 'rez', sifra: 802 },
         { id: 'bigovanje', name: 'Bigovanje', price: 250.00, price_over_50: 6.00, unit: 'big', sifra: 337 },
+        { id: 'startovanje-noza', name: 'Startovanje noža', price: 300.00, unit: 'kom', sifra: 803 },
         { id: 'busenje-rupa', name: 'Bušenje rupa za registrator', price: 3.00, unit: 'list', sifra: 511 },
         { id: 'heftanje', name: 'Hefanje', price: 5.00, unit: 'mesto', sifra: 520 },
         { id: 'termo', name: 'Termo koričenje', price: 410.00, unit: 'kom', sifra: 700 },
@@ -503,6 +505,7 @@ export const designServices: DesignServiceData = [
 
 
     
+
 
 
 

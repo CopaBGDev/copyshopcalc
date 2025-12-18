@@ -373,6 +373,3 @@ export type OtherService = {
     kategorija: string;
     cena: number;
 }
-
-
-

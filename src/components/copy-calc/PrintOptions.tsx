@@ -72,8 +72,9 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const [customSheetFormat, setCustomSheetFormat] = useState<'A4' | 'A3' | 'SRA3_450x320' | 'SRA3_482x330'>('SRA3_482x330');
   const [cuts, setCuts] = useState(0);
   const [customFinishing, setCustomFinishing] = useState<'none' | 'cutting' | 'scoring'>('none');
-  const [lamination, setLamination] = useState<'none' | 'matte' | 'glossy'>('none');
+  const [lamination, setLamination] = useState<'none' | 'jednostrana' | 'obostrana'>('none');
   const [cornerRounding, setCornerRounding] = useState(false);
+  const [knifeStart, setKnifeStart] = useState(false);
   
   const [finishingPrice, setFinishingPrice] = useState<number>(0);
 
@@ -149,38 +150,44 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         setCuts(currentCuts);
         
         let currentFinishingPrice = 0;
-        if (customFinishing === 'cutting') {
-            const cutPriceService = finishingServices.other.find(s => s.id === 'secenje-a4-a3');
-            if(cutPriceService) {
-                currentFinishingPrice += currentCuts * cutPriceService.price;
+        if (customFinishing !== 'none' && items > 0) {
+            const isCutting = customFinishing === 'cutting';
+            const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
+            if(finishingService) {
+                currentFinishingPrice += currentCuts * finishingService.price;
             }
-        } else if (customFinishing === 'scoring') {
-             const scorePriceService = finishingServices.other.find(s => s.id === 'ricovanje');
-             if(scorePriceService) {
-                currentFinishingPrice += currentCuts * scorePriceService.price;
+        }
+        
+        let knifeStartPrice = 0;
+        if (customFinishing === 'cutting' && knifeStart) {
+            const knifeStartService = finishingServices.other.find(s => s.id === 'startovanje-noza');
+            if (knifeStartService) {
+                knifeStartPrice = knifeStartService.price;
             }
         }
 
         let laminationPrice = 0;
         if (lamination !== 'none') {
-            const laminationService = finishingServices.lamination.roll[0];
-            const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
-            laminationPrice = price * quantity;
+            const laminationService = finishingServices.lamination.roll.find(s => s.id === (lamination === 'obostrana' ? 'roll-32' : 'roll-33'));
+            if (laminationService) {
+                const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
+                laminationPrice = price * quantity;
+            }
         }
         
         let roundingPrice = 0;
         if (cornerRounding && items > 0) {
             const roundingService = finishingServices.other.find(s => s.id === 'coskanje');
             if (roundingService) {
-                roundingPrice = roundingService.price * items;
+                roundingPrice = roundingService.price * items; // Price is per item, applied only once for all sheets
             }
         }
 
-        const finalFinishingPrice = (currentFinishingPrice > 0 ? currentFinishingPrice : 0) + roundingPrice;
+        const finalFinishingPrice = currentFinishingPrice > 0 ? (currentFinishingPrice * quantity) : 0;
         setFinishingPrice(finalFinishingPrice);
         
         const totalPrintPriceForSheets = totalSheetPrintPrice * quantity;
-        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice + laminationPrice;
+        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice + laminationPrice + roundingPrice + knifeStartPrice;
 
         if(items > 0) {
             setTotalPrice(finalTotalPrice);
@@ -221,7 +228,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         setTotalPrice(finalUnitPrice * quantity);
     }
 
-  }, [quantity, format, color, side, paperId, activePrintOption, selectedPaper, customWidth, customHeight, customSheetFormat, customFinishing, lamination, cornerRounding]);
+  }, [quantity, format, color, side, paperId, activePrintOption, selectedPaper, customWidth, customHeight, customSheetFormat, customFinishing, lamination, cornerRounding, knifeStart]);
   
 
   const handleAddToBasket = () => {
@@ -234,19 +241,22 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (itemsPerSheet <= 0) return;
         const sheetDimLabel = customSheetFormat.replace('_', ' (').replace('x', 'x') + 'mm)';
         
-        // Print Item
-        const printOnlyPrice = (activePrintOption[side].find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || activePrintOption[side][activePrintOption[side].length -1]).cena;
+        const priceTiers: PriceTier[] = activePrintOption[side];
+        const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
+        
+        // --- 1. Print Item ---
+        const printPricePerSheet = tier.cena;
         itemsToAdd.push({
           serviceId: `stampa-custom-print-${uniqueId}`,
           naziv: `Štampa ${color === 'cb' ? 'C/B' : 'Kolor'} ${side === 'oneSided' ? '1/0' : '4/4'}`,
           opis: `Proizvoljni format ${customWidth}x${customHeight}mm na ${sheetDimLabel}`,
           kolicina: quantity,
-          cena_jedinice: printOnlyPrice, 
-          cena_ukupno: printOnlyPrice * quantity,
+          cena_jedinice: printPricePerSheet, 
+          cena_ukupno: printPricePerSheet * quantity,
           sifra: sifra,
         });
 
-        // Paper Item
+        // --- 2. Paper Item ---
         if (selectedPaper.price > 0 && selectedPaper.sifra) {
             let paperPricePerSheet = 0;
              if (selectedPaper.format === 'SRA3') {
@@ -267,40 +277,57 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             });
         }
         
-        // Finishing Item (Cutting/Scoring)
+        // --- 3. Finishing Item (Cutting/Scoring) ---
         if (customFinishing !== 'none') {
             const isCutting = customFinishing === 'cutting';
             const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
             if (finishingService) {
-                const finishingTotalPrice = finishingService.price * cuts;
+                const finishingTotalPrice = finishingService.price * cuts * quantity;
                 itemsToAdd.push({
                     serviceId: `stampa-custom-finishing-${uniqueId}`,
                     naziv: isCutting ? 'Sečenje' : 'Ricovanje',
-                    opis: `Broj operacija: ${cuts}. Obračunato samo jednom.`,
-                    kolicina: 1,
-                    cena_jedinice: finishingTotalPrice,
+                    opis: `Broj operacija: ${cuts} po tabaku`,
+                    kolicina: quantity,
+                    cena_jedinice: finishingService.price * cuts,
                     cena_ukupno: finishingTotalPrice,
                     sifra: finishingService.sifra
                 });
             }
+             // --- 3a. Knife Start Item ---
+            if(isCutting && knifeStart) {
+                const knifeStartService = finishingServices.other.find(s => s.id === 'startovanje-noza');
+                if (knifeStartService) {
+                    itemsToAdd.push({
+                        serviceId: `stampa-custom-knifestart-${uniqueId}`,
+                        naziv: 'Startovanje noža',
+                        opis: `Jednokratni trošak`,
+                        kolicina: 1,
+                        cena_jedinice: knifeStartService.price,
+                        cena_ukupno: knifeStartService.price,
+                        sifra: knifeStartService.sifra
+                    });
+                }
+            }
         }
         
-        // Lamination Item
+        // --- 4. Lamination Item ---
         if (lamination !== 'none') {
-            const laminationService = finishingServices.lamination.roll[0];
-            const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
-             itemsToAdd.push({
-                serviceId: `stampa-custom-lamination-${uniqueId}`,
-                naziv: `Plastifikacija ${lamination === 'matte' ? 'Mat' : 'Sjaj'}`,
-                opis: `Za format tabaka: ${sheetDimLabel}`,
-                kolicina: quantity,
-                cena_jedinice: price,
-                cena_ukupno: price * quantity,
-                sifra: laminationService.sifra,
-            });
+            const laminationService = finishingServices.lamination.roll.find(s => s.id === (lamination === 'obostrana' ? 'roll-32' : 'roll-33'));
+            if (laminationService) {
+                const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
+                itemsToAdd.push({
+                    serviceId: `stampa-custom-lamination-${uniqueId}`,
+                    naziv: `Plastifikacija ${lamination === 'jednostrana' ? 'Jednostrana (Mat/Sjaj)' : 'Obostrana (Mat/Sjaj)'}`,
+                    opis: `Za format tabaka: ${sheetDimLabel}`,
+                    kolicina: quantity,
+                    cena_jedinice: price,
+                    cena_ukupno: price * quantity,
+                    sifra: laminationService.sifra,
+                });
+            }
         }
         
-        // Corner Rounding Item
+        // --- 5. Corner Rounding Item ---
         if (cornerRounding) {
             const roundingService = finishingServices.other.find(s => s.id === 'coskanje');
             if (roundingService) {
@@ -308,7 +335,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                  itemsToAdd.push({
                     serviceId: `stampa-custom-rounding-${uniqueId}`,
                     naziv: 'Ćoškanje',
-                    opis: `Obračunato za komade sa jednog tabaka: ${itemsPerSheet}`,
+                    opis: `Obračunato za sve komade: ${itemsPerSheet}`,
                     kolicina: 1,
                     cena_jedinice: roundingTotalPrice,
                     cena_ukupno: roundingTotalPrice,
@@ -503,6 +530,12 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                             </SelectContent>
                         </Select>
                     </div>
+                    {customFinishing === 'cutting' && (
+                        <div className="flex items-center space-x-2 pl-2 animate-in fade-in duration-300">
+                             <Checkbox id="knife-start" checked={knifeStart} onCheckedChange={(checked) => setKnifeStart(!!checked)} />
+                             <Label htmlFor="knife-start">Startovanje noža (300 RSD)</Label>
+                        </div>
+                    )}
                     <div className="space-y-2">
                         <Label htmlFor="lamination">Plastifikacija</Label>
                         <Select onValueChange={(v) => setLamination(v as any)} defaultValue={lamination}>
@@ -511,8 +544,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="none">Bez plastifikacije</SelectItem>
-                                <SelectItem value="matte">Mat plastifikacija</SelectItem>
-                                <SelectItem value="glossy">Sjajna plastifikacija</SelectItem>
+                                <SelectItem value="jednostrana">Jednostrana (Mat/Sjaj)</SelectItem>
+                                <SelectItem value="obostrana">Obostrana (Mat/Sjaj)</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
