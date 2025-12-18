@@ -135,16 +135,38 @@ const FlexPrintCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Ord
 
 
         if(isBroughtIn){
-            // Logic for brought in items with flex foil
-            if(serviceId === '323' || serviceId === '324') { // Gold/Silver
-                service = textileServices.broughtIn.find(s => s.sifra === 331);
-            } else { // Standard
-                service = textileServices.broughtIn.find(s => s.sifra === 330);
-            }
-             if (service) {
+            const broughtInMap: {[key: string]: number | undefined} = {
+                '321': 330, // flex A4 -> brought in flex A4
+                '322': 330, // flex A3 -> brought in flex A4 (Note: There is only one price for brought in flex)
+                '323': 331, // flex gold/silver A4 -> brought in gold/silver A4
+                '324': 331, // flex gold/silver A3 -> brought in gold/silver A4 (Note: There is only one price for brought in gold/silver flex)
+            };
+            const broughtInSifra = broughtInMap[serviceId];
+            service = textileServices.broughtIn.find(s => s.sifra === broughtInSifra);
+            
+            if (service) {
+                // We need to determine if it's A3 to add the price difference
+                const isA3 = serviceId === '322' || serviceId === '324';
+                const originalPrice = selectedFlexService.cena;
+                const basePriceWithShirt = serviceId === '321' ? 1300 : serviceId === '322' ? 1800 : serviceId === '323' ? 1600 : 2100;
+                const printOnlyPrice = originalPrice - (basePriceWithShirt - service.cena);
+
+
+                let price = service.cena;
+                let desc = selectedFlexService.naziv;
+
+                if (serviceId === '322') { // A3 Standard
+                    price = 1500; // 1800 - 300 (shirt approx)
+                    desc = "Flex folija A3 (doneta majica)";
+                } else if (serviceId === '324') { // A3 Gold/Silver
+                    price = 1800; // 2100 - 300 (shirt approx)
+                    desc = "Flex folija A3 srebrna i zlatna (doneta majica)";
+                }
+
+
                 return {
-                    unitPrice: service.cena,
-                    description: `${selectedFlexService.naziv.replace('Bela i crna majica sa ', '')} (doneta majica)`,
+                    unitPrice: price,
+                    description: desc,
                     serviceName: `Flex folija`,
                     sifra: service.sifra
                 }
@@ -261,5 +283,3 @@ export function TextileOptions({ onAddToBasket }: { onAddToBasket: (item: Omit<O
         </div>
     );
 }
-
-    
