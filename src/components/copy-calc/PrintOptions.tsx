@@ -306,13 +306,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                 const finishingPricePerSheet = finishingService.price * cuts;
                 const finishingKolicina = isCutting ? 1 : quantity;
                 const finishingUkupno = isCutting ? finishingPricePerSheet : finishingPricePerSheet * quantity;
+                const jedinicnaCena = isCutting ? finishingUkupno : finishingPricePerSheet;
 
                 itemsToAdd.push({
                     serviceId: `stampa-custom-finishing-${uniqueId}`,
                     naziv: isCutting ? 'Sečenje' : 'Ricovanje',
                     opis: `Broj operacija: ${cuts}${isCutting ? ' (jednokratno)' : ' po tabaku'}`,
                     kolicina: finishingKolicina,
-                    cena_jedinice: isCutting ? finishingUkupno : finishingPricePerSheet,
+                    cena_jedinice: jedinicnaCena,
                     cena_ukupno: finishingUkupno,
                     sifra: finishingService.sifra
                 });
@@ -430,25 +431,29 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             <div className="space-y-2">
                 <Label>Format papira</Label>
                 <RadioGroup defaultValue="A4" value={format} onValueChange={(v) => setFormat(v as PrintFormat | 'custom')} className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="A4" id="format-a4" />
-                        <Label htmlFor="format-a4">A4</Label>
+                    <div className="flex flex-col space-y-2">
+                         <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="A4" id="format-a4" />
+                            <Label htmlFor="format-a4">A4</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="A3" id="format-a3" />
+                            <Label htmlFor="format-a3">A3</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="custom" id="format-custom" />
+                            <Label htmlFor="format-custom">Proizvoljni</Label>
+                        </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="A3" id="format-a3" />
-                        <Label htmlFor="format-a3">A3</Label>
-                    </div>
-                     <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="SRA3_450x320" id="format-sra3-450" />
-                        <Label htmlFor="format-sra3-450">SRA3 450x320mm</Label>
-                    </div>
-                     <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="SRA3_482x330" id="format-sra3-482" />
-                        <Label htmlFor="format-sra3-482">SRA3 482x330mm</Label>
-                    </div>
-                     <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="custom" id="format-custom" />
-                        <Label htmlFor="format-custom">Proizvoljni</Label>
+                     <div className="flex flex-col space-y-2">
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="SRA3_450x320" id="format-sra3-450" />
+                            <Label htmlFor="format-sra3-450">SRA3 450x320mm</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="SRA3_482x330" id="format-sra3-482" />
+                            <Label htmlFor="format-sra3-482">SRA3 482x330mm</Label>
+                        </div>
                     </div>
                 </RadioGroup>
             </div>
@@ -568,7 +573,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     )}
                     <div className="space-y-2">
                         <Label htmlFor="lamination">Plastifikacija</Label>
-                        <Select onValueChange={(v) => setLamination(v as any)} defaultValue={lamination}>
+                        <Select onValueChange={(v) => setLamination(v as any)} value={lamination}>
                             <SelectTrigger id="lamination">
                                 <SelectValue placeholder="Izaberite plastifikaciju" />
                             </SelectTrigger>
