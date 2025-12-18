@@ -1,13 +1,15 @@
-# Uputstvo za Postavljanje (Deployment) na Git
+# Uputstvo i Komande za Postavljanje (Deployment) na Git
 
 Ove komande će vam pomoći da postavite vaš projekat na Git repozitorijum kao što je GitHub, GitLab, ili Bitbucket.
+
+**Važno:** Ove komande treba da kopirate i izvršite u vašem lokalnom terminalu, unutar direktorijuma projekta.
 
 ## Preduslovi
 
 1.  **Git:** Potrebno je da imate instaliran Git na vašem računaru.
 2.  **Git Repozitorijum:** Potrebno je da imate kreiran prazan repozitorijum na nekoj od platformi (npr. GitHub). Prilikom kreiranja, dobićete URL adresu repozitorijuma (npr. `https://github.com/vase-ime/ime-projekta.git`).
 
-## Koraci za Postavljanje (Push)
+## Koraci i Komande
 
 Pretpostavljamo da se nalazite u glavnom direktorijumu vašeg projekta.
 
@@ -18,7 +20,7 @@ Pretpostavljamo da se nalazite u glavnom direktorijumu vašeg projekta.
     ```
 
 2.  **Povežite lokalni repozitorijum sa udaljenim (remote):**
-    Ova komanda govori vašem lokalnom Gitu gde da šalje izmene. Zamenite `<URL_REPOZITORIJUMA>` sa URL-om koji ste dobili prilikom kreiranja repozitorijuma.
+    Ova komanda govori vašem lokalnom Gitu gde da šalje izmene. **Zamenite `<URL_REPOZITORIJUMA>`** sa URL-om koji ste dobili prilikom kreiranja repozitorijuma.
     ```bash
     git remote add origin <URL_REPOZITORIJUMA>
     ```
