@@ -189,6 +189,11 @@ export type BusinessCardPriceTier = {
     sifra: number;
 }
 
+export type CornerRoundingTier = {
+    kolicina: number;
+    cena: number;
+}
+
 export type BusinessCardDoplate = {
     plastifikacija: {
         jednostrano: number;
@@ -196,7 +201,7 @@ export type BusinessCardDoplate = {
         sifra: number;
     };
     coskanje: {
-        cena: number;
+        tiers: CornerRoundingTier[];
         sifra: number;
     };
     uv_doplata: string;

@@ -51,7 +51,10 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
         }
 
         if (rounding) {
-            basePrice += businessCardServices.doplate.coskanje.cena * quantityNum;
+            const roundingTier = businessCardServices.doplate.coskanje.tiers.find(t => t.kolicina === quantityNum);
+            if (roundingTier) {
+                basePrice += roundingTier.cena;
+            }
             finishingDesc.push('ćoškanje');
         }
 
@@ -78,6 +81,12 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
             sifra: sifra,
         });
     };
+    
+    const isRoundingAvailable = useMemo(() => {
+        const quantityNum = parseInt(quantity, 10);
+        return businessCardServices.doplate.coskanje.tiers.some(t => t.kolicina === quantityNum);
+    }, [quantity]);
+
 
     return (
         <Card className="border-none shadow-none">
@@ -132,10 +141,15 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
                             </Select>
                         </div>
                         <div className="flex items-center space-x-2 pt-8">
-                            <Checkbox id="rounding" checked={rounding} onCheckedChange={(checked) => setRounding(!!checked)} />
-                            <Label htmlFor="rounding" className="font-normal">Ćoškanje (zaobljene ivice)</Label>
+                            <Checkbox id="rounding" checked={rounding} onCheckedChange={(checked) => setRounding(!!checked)} disabled={!isRoundingAvailable}/>
+                            <Label htmlFor="rounding" className={cn("font-normal", !isRoundingAvailable && "text-muted-foreground")}>
+                                Ćoškanje (zaobljene ivice)
+                            </Label>
                         </div>
                     </div>
+                    {!isRoundingAvailable && rounding &&
+                        <p className="text-xs text-destructive">Ćoškanje je dostupno samo za količine od 100, 200, i 300 kom.</p>
+                    }
                 </div>
 
                 <div className="flex flex-col items-end bg-primary/5 p-4 rounded-lg">
@@ -340,5 +354,3 @@ export function BusinessCardOptions({ onAddToBasket }: BusinessCardOptionsProps)
         </div>
     );
 }
-
-    
