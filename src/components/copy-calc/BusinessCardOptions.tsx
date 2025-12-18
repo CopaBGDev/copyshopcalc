@@ -25,10 +25,9 @@ type BusinessCardOptionsProps = {
 const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
     const [side, setSide] = useState<'oneSided' | 'twoSided'>('oneSided');
     const [quantity, setQuantity] = useState<string>('100');
-    const [finishing, setFinishing] = useState({
-        lamination: false,
-        rounding: false,
-    });
+    const [lamination, setLamination] = useState<'none' | 'jednostrana-mat' | 'jednostrana-sjaj' | 'obostrana-mat' | 'obostrana-sjaj'>('none');
+    const [rounding, setRounding] = useState(false);
+
 
     const { totalPrice, description, sifra } = useMemo(() => {
         const quantityNum = parseInt(quantity, 10);
@@ -40,15 +39,18 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
         let basePrice = tier.cena;
         let finishingDesc: string[] = [];
         
-        if (finishing.lamination) {
-            const laminationPrice = side === 'oneSided' 
-                ? businessCardServices.doplate.plastifikacija.jednostrano * quantityNum
-                : businessCardServices.doplate.plastifikacija.dvostrano * quantityNum;
+        if (lamination !== 'none') {
+            const isTwoSidedLamination = lamination.startsWith('obostrana');
+            const laminationPrice = (isTwoSidedLamination 
+                ? businessCardServices.doplate.plastifikacija.dvostrano 
+                : businessCardServices.doplate.plastifikacija.jednostrano) * quantityNum;
             basePrice += laminationPrice;
-            finishingDesc.push('plastifikacija');
+
+            const laminationType = lamination.endsWith('mat') ? 'mat' : 'sjaj';
+            finishingDesc.push(`plastifikacija ${isTwoSidedLamination ? 'obostrana' : 'jednostrana'} ${laminationType}`);
         }
 
-        if (finishing.rounding) {
+        if (rounding) {
             basePrice += businessCardServices.doplate.coskanje.cena * quantityNum;
             finishingDesc.push('ćoškanje');
         }
@@ -60,7 +62,7 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
 
         return { totalPrice: basePrice, description: desc, sifra: tier.sifra };
 
-    }, [side, quantity, finishing]);
+    }, [side, quantity, lamination, rounding]);
 
     const handleAddToBasket = () => {
         if (totalPrice <= 0) return;
@@ -113,13 +115,24 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
 
                 <div className="space-y-4">
                     <Label>Dorada</Label>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex items-center space-x-2">
-                            <Checkbox id="lamination" checked={finishing.lamination} onCheckedChange={(checked) => setFinishing(f => ({ ...f, lamination: !!checked }))} />
-                            <Label htmlFor="lamination" className="font-normal">Plastifikacija (mat/sjaj)</Label>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="lamination">Plastifikacija</Label>
+                            <Select onValueChange={(v) => setLamination(v as any)} value={lamination}>
+                                <SelectTrigger id="lamination">
+                                    <SelectValue placeholder="Izaberite plastifikaciju" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">Bez plastifikacije</SelectItem>
+                                    <SelectItem value="jednostrana-mat">Jednostrana Mat</SelectItem>
+                                    <SelectItem value="jednostrana-sjaj">Jednostrana Sjaj</SelectItem>
+                                    <SelectItem value="obostrana-mat">Obostrana Mat</SelectItem>
+                                    <SelectItem value="obostrana-sjaj">Obostrana Sjaj</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox id="rounding" checked={finishing.rounding} onCheckedChange={(checked) => setFinishing(f => ({ ...f, rounding: !!checked }))} />
+                        <div className="flex items-center space-x-2 pt-8">
+                            <Checkbox id="rounding" checked={rounding} onCheckedChange={(checked) => setRounding(!!checked)} />
                             <Label htmlFor="rounding" className="font-normal">Ćoškanje (zaobljene ivice)</Label>
                         </div>
                     </div>
