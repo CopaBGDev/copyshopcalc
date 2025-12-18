@@ -107,6 +107,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     }
   }, [paperId, isOneSidedOnlyPaper]);
 
+  // Reset finishing if paper is not compatible with scoring
+  useEffect(() => {
+    const isScoringCompatible = paperId === 'muflon' || paperId === 'pvc-folija';
+    if (customFinishing === 'scoring' && !isScoringCompatible) {
+        setCustomFinishing('none');
+    }
+  }, [paperId, customFinishing]);
+
 
   useEffect(() => {
     if (!activePrintOption || quantity <= 0 || !selectedPaper) {
@@ -160,9 +168,12 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const isCutting = customFinishing === 'cutting';
             const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
             if(finishingService) {
-                // Ricovanje is per sheet, secenje is one-time
                 const finishingPricePerSheet = (currentCuts * finishingService.price);
-                currentFinishingPrice = isCutting ? finishingPricePerSheet : finishingPricePerSheet * quantity;
+                 if (isCutting) {
+                    currentFinishingPrice = finishingPricePerSheet;
+                 } else { // Scoring is per sheet
+                    currentFinishingPrice = finishingPricePerSheet * quantity;
+                 }
             }
         }
         
@@ -177,13 +188,11 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         let laminationPrice = 0;
         if (lamination !== 'none') {
             const isTwoSided = lamination.startsWith('obostrana');
-            const laminationService = finishingServices.lamination.roll.find(s => s.id === 'roll-32' || s.id === 'roll-33');
+            // Assuming roll-32 is obostrana and roll-33 is jednostrana base price in data
+            const laminationService = finishingServices.lamination.roll.find(s => s.id === (isTwoSided ? 'roll-32' : 'roll-33'));
             if (laminationService) {
                 let pricePerSheet = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
-                if(!isTwoSided) {
-                    pricePerSheet = pricePerSheet / 2;
-                }
-                laminationPrice = pricePerSheet;
+                laminationPrice = pricePerSheet * quantity;
             }
         }
         
@@ -191,15 +200,15 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (cornerRounding && items > 0) {
             const roundingService = finishingServices.other.find(s => s.id === 'coskanje');
             if (roundingService) {
-                roundingPrice = roundingService.price * items; 
+                roundingPrice = roundingService.price * items;
             }
         }
 
         const finalFinishingPrice = currentFinishingPrice;
         setFinishingPrice(finalFinishingPrice);
         
-        const totalPrintPriceForSheets = (totalSheetPrintPrice + laminationPrice) * quantity;
-        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice + roundingPrice + knifeStartPrice;
+        const totalPrintPriceForSheets = (totalSheetPrintPrice) * quantity;
+        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice + roundingPrice + knifeStartPrice + laminationPrice;
 
         if(items > 0) {
             setTotalPrice(finalTotalPrice);
@@ -303,7 +312,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     naziv: isCutting ? 'Sečenje' : 'Ricovanje',
                     opis: `Broj operacija: ${cuts}${isCutting ? ' (jednokratno)' : ' po tabaku'}`,
                     kolicina: finishingKolicina,
-                    cena_jedinice: finishingPricePerSheet,
+                    cena_jedinice: isCutting ? finishingUkupno : finishingPricePerSheet,
                     cena_ukupno: finishingUkupno,
                     sifra: finishingService.sifra
                 });
@@ -329,14 +338,10 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (lamination !== 'none') {
             const isTwoSided = lamination.startsWith('obostrana');
             const laminationType = lamination.endsWith('mat') ? 'Mat' : 'Sjaj';
-            // Assuming roll-32 is obostrana and roll-33 is jednostrana base price in data
-            const laminationService = finishingServices.lamination.roll.find(s => s.id === 'roll-32');
+            const laminationService = finishingServices.lamination.roll.find(s => s.id === (isTwoSided ? 'roll-32' : 'roll-33'));
             
             if (laminationService) {
                 let pricePerSheet = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
-                if(!isTwoSided) {
-                    pricePerSheet = pricePerSheet / 2;
-                }
                 const naziv = `Plastifikacija ${isTwoSided ? 'Obostrana' : 'Jednostrana'} ${laminationType}`;
 
                 itemsToAdd.push({
@@ -346,7 +351,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     kolicina: quantity,
                     cena_jedinice: pricePerSheet,
                     cena_ukupno: pricePerSheet * quantity,
-                    sifra: isTwoSided ? laminationService.sifra : finishingServices.lamination.roll.find(s => s.id === 'roll-33')?.sifra,
+                    sifra: laminationService.sifra,
                 });
             }
         }
@@ -413,6 +418,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   };
 
   const sheetDims = SHEET_DIMENSIONS[customSheetFormat];
+  const isScoringCompatible = paperId === 'muflon' || paperId === 'pvc-folija';
 
   return (
     <div className="space-y-6">
@@ -543,14 +549,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="custom-finishing">Sečenje / Ricovanje</Label>
-                        <Select onValueChange={(v) => setCustomFinishing(v as any)} defaultValue={customFinishing}>
+                        <Select onValueChange={(v) => setCustomFinishing(v as any)} value={customFinishing}>
                             <SelectTrigger id="custom-finishing">
                                 <SelectValue placeholder="Izaberite doradu" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="none">Ništa</SelectItem>
                                 <SelectItem value="cutting">Sečenje</SelectItem>
-                                <SelectItem value="scoring">Ricovanje</SelectItem>
+                                {isScoringCompatible && <SelectItem value="scoring">Ricovanje</SelectItem>}
                             </SelectContent>
                         </Select>
                     </div>

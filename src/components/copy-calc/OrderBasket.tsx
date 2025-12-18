@@ -28,7 +28,7 @@ export function OrderBasket({ items, onUpdateQuantity, onFinalizeOrder, isFinali
         </CardTitle>
         <CardDescription>Pregled i izmena stavki pre zaključenja.</CardDescription>
       </CardHeader>
-      <CardContent className="max-h-[45vh] overflow-y-auto pr-3">
+      <CardContent className="max-h-[65vh] overflow-y-auto pr-3">
         {items.length === 0 ? (
           <div className="text-center text-muted-foreground py-10 flex flex-col items-center gap-4">
             <ShoppingCart className="w-16 h-16 text-muted-foreground/50" />
