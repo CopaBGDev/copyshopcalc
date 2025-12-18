@@ -72,7 +72,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const [customSheetFormat, setCustomSheetFormat] = useState<'A4' | 'A3' | 'SRA3_450x320' | 'SRA3_482x330'>('SRA3_482x330');
   const [cuts, setCuts] = useState(0);
   const [customFinishing, setCustomFinishing] = useState<'none' | 'cutting' | 'scoring'>('none');
-  const [lamination, setLamination] = useState<'none' | 'jednostrana' | 'obostrana'>('none');
+  const [lamination, setLamination] = useState<'none' | 'jednostrana-mat' | 'jednostrana-sjaj' | 'obostrana-mat' | 'obostrana-sjaj'>('none');
   const [cornerRounding, setCornerRounding] = useState(false);
   const [knifeStart, setKnifeStart] = useState(false);
   
@@ -154,7 +154,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const isCutting = customFinishing === 'cutting';
             const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
             if(finishingService) {
-                currentFinishingPrice += currentCuts * finishingService.price;
+                currentFinishingPrice += (currentCuts * finishingService.price);
             }
         }
         
@@ -168,7 +168,8 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
 
         let laminationPrice = 0;
         if (lamination !== 'none') {
-            const laminationService = finishingServices.lamination.roll.find(s => s.id === (lamination === 'obostrana' ? 'roll-32' : 'roll-33'));
+            const isTwoSided = lamination.startsWith('obostrana');
+            const laminationService = finishingServices.lamination.roll.find(s => s.id === (isTwoSided ? 'roll-32' : 'roll-33'));
             if (laminationService) {
                 const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
                 laminationPrice = price * quantity;
@@ -179,11 +180,11 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (cornerRounding && items > 0) {
             const roundingService = finishingServices.other.find(s => s.id === 'coskanje');
             if (roundingService) {
-                roundingPrice = roundingService.price * items; // Price is per item, applied only once for all sheets
+                roundingPrice = roundingService.price * items; 
             }
         }
 
-        const finalFinishingPrice = currentFinishingPrice > 0 ? (currentFinishingPrice * quantity) : 0;
+        const finalFinishingPrice = (currentFinishingPrice > 0) ? (currentFinishingPrice * quantity) : 0;
         setFinishingPrice(finalFinishingPrice);
         
         const totalPrintPriceForSheets = totalSheetPrintPrice * quantity;
@@ -312,12 +313,17 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         
         // --- 4. Lamination Item ---
         if (lamination !== 'none') {
-            const laminationService = finishingServices.lamination.roll.find(s => s.id === (lamination === 'obostrana' ? 'roll-32' : 'roll-33'));
+            const isTwoSided = lamination.startsWith('obostrana');
+            const laminationType = lamination.endsWith('mat') ? 'Mat' : 'Sjaj';
+            const laminationService = finishingServices.lamination.roll.find(s => s.id === (isTwoSided ? 'roll-32' : 'roll-33'));
+            
             if (laminationService) {
                 const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
+                const naziv = `Plastifikacija ${isTwoSided ? 'Obostrana' : 'Jednostrana'} ${laminationType}`;
+
                 itemsToAdd.push({
                     serviceId: `stampa-custom-lamination-${uniqueId}`,
-                    naziv: `Plastifikacija ${lamination === 'jednostrana' ? 'Jednostrana (Mat/Sjaj)' : 'Obostrana (Mat/Sjaj)'}`,
+                    naziv: naziv,
                     opis: `Za format tabaka: ${sheetDimLabel}`,
                     kolicina: quantity,
                     cena_jedinice: price,
@@ -335,7 +341,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                  itemsToAdd.push({
                     serviceId: `stampa-custom-rounding-${uniqueId}`,
                     naziv: 'Ćoškanje',
-                    opis: `Obračunato za sve komade: ${itemsPerSheet}`,
+                    opis: `Obračunato za ${itemsPerSheet} komada`,
                     kolicina: 1,
                     cena_jedinice: roundingTotalPrice,
                     cena_ukupno: roundingTotalPrice,
@@ -544,8 +550,10 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="none">Bez plastifikacije</SelectItem>
-                                <SelectItem value="jednostrana">Jednostrana (Mat/Sjaj)</SelectItem>
-                                <SelectItem value="obostrana">Obostrana (Mat/Sjaj)</SelectItem>
+                                <SelectItem value="jednostrana-mat">Jednostrana Mat</SelectItem>
+                                <SelectItem value="jednostrana-sjaj">Jednostrana Sjaj</SelectItem>
+                                <SelectItem value="obostrana-mat">Obostrana Mat</SelectItem>
+                                <SelectItem value="obostrana-sjaj">Obostrana Sjaj</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
