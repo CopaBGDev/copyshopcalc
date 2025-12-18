@@ -160,7 +160,9 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const isCutting = customFinishing === 'cutting';
             const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
             if(finishingService) {
-                currentFinishingPrice = (currentCuts * finishingService.price);
+                // Ricovanje is per sheet, secenje is one-time
+                const finishingPricePerSheet = (currentCuts * finishingService.price);
+                currentFinishingPrice = isCutting ? finishingPricePerSheet : finishingPricePerSheet * quantity;
             }
         }
         
@@ -175,10 +177,13 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         let laminationPrice = 0;
         if (lamination !== 'none') {
             const isTwoSided = lamination.startsWith('obostrana');
-            const laminationService = finishingServices.lamination.roll.find(s => s.id === (isTwoSided ? 'roll-32' : 'roll-33'));
+            const laminationService = finishingServices.lamination.roll.find(s => s.id === 'roll-32' || s.id === 'roll-33');
             if (laminationService) {
-                const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
-                laminationPrice = price;
+                let pricePerSheet = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
+                if(!isTwoSided) {
+                    pricePerSheet = pricePerSheet / 2;
+                }
+                laminationPrice = pricePerSheet;
             }
         }
         
@@ -289,14 +294,17 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const isCutting = customFinishing === 'cutting';
             const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
             if (finishingService) {
-                const finishingTotalPrice = finishingService.price * cuts;
+                const finishingPricePerSheet = finishingService.price * cuts;
+                const finishingKolicina = isCutting ? 1 : quantity;
+                const finishingUkupno = isCutting ? finishingPricePerSheet : finishingPricePerSheet * quantity;
+
                 itemsToAdd.push({
                     serviceId: `stampa-custom-finishing-${uniqueId}`,
                     naziv: isCutting ? 'Sečenje' : 'Ricovanje',
-                    opis: `Broj operacija: ${cuts}`,
-                    kolicina: 1,
-                    cena_jedinice: finishingTotalPrice,
-                    cena_ukupno: finishingTotalPrice,
+                    opis: `Broj operacija: ${cuts}${isCutting ? ' (jednokratno)' : ' po tabaku'}`,
+                    kolicina: finishingKolicina,
+                    cena_jedinice: finishingPricePerSheet,
+                    cena_ukupno: finishingUkupno,
                     sifra: finishingService.sifra
                 });
             }
@@ -321,10 +329,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (lamination !== 'none') {
             const isTwoSided = lamination.startsWith('obostrana');
             const laminationType = lamination.endsWith('mat') ? 'Mat' : 'Sjaj';
-            const laminationService = finishingServices.lamination.roll.find(s => s.id === (isTwoSided ? 'roll-32' : 'roll-33'));
+            // Assuming roll-32 is obostrana and roll-33 is jednostrana base price in data
+            const laminationService = finishingServices.lamination.roll.find(s => s.id === 'roll-32');
             
             if (laminationService) {
-                const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
+                let pricePerSheet = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
+                if(!isTwoSided) {
+                    pricePerSheet = pricePerSheet / 2;
+                }
                 const naziv = `Plastifikacija ${isTwoSided ? 'Obostrana' : 'Jednostrana'} ${laminationType}`;
 
                 itemsToAdd.push({
@@ -332,9 +344,9 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                     naziv: naziv,
                     opis: `Za format tabaka: ${sheetDimLabel}`,
                     kolicina: quantity,
-                    cena_jedinice: price,
-                    cena_ukupno: price * quantity,
-                    sifra: laminationService.sifra,
+                    cena_jedinice: pricePerSheet,
+                    cena_ukupno: pricePerSheet * quantity,
+                    sifra: isTwoSided ? laminationService.sifra : finishingServices.lamination.roll.find(s => s.id === 'roll-33')?.sifra,
                 });
             }
         }
@@ -347,7 +359,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                  itemsToAdd.push({
                     serviceId: `stampa-custom-rounding-${uniqueId}`,
                     naziv: 'Ćoškanje',
-                    opis: `Obračunato za ${itemsPerSheet} komada`,
+                    opis: `Obračunato za ${itemsPerSheet} komada (jednokratno za sve tabake)`,
                     kolicina: 1,
                     cena_jedinice: roundingTotalPrice,
                     cena_ukupno: roundingTotalPrice,
