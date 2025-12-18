@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -20,11 +21,11 @@ type OfficeOptionsProps = {
 const MemorandumCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderItem, 'id'>) => void }) => {
     const [quantity, setQuantity] = useState('100');
 
-    const { totalPrice, unitPrice } = useMemo(() => {
+    const { totalPrice, unitPrice, sifra } = useMemo(() => {
         const qtyNum = parseInt(quantity);
         const tier = officeSuppliesData.memorandums.find(m => m.kolicina === qtyNum);
-        if (!tier) return { totalPrice: 0, unitPrice: 0 };
-        return { totalPrice: tier.cena, unitPrice: tier.cena / qtyNum };
+        if (!tier) return { totalPrice: 0, unitPrice: 0, sifra: undefined };
+        return { totalPrice: tier.cena, unitPrice: tier.cena / qtyNum, sifra: tier.sifra };
     }, [quantity]);
 
     const handleAddToBasket = () => {
@@ -37,6 +38,7 @@ const MemorandumCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Or
             kolicina: qtyNum,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 
@@ -82,12 +84,12 @@ const EnvelopeCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
     const [type, setType] = useState<'ameriken' | 'c4'>('ameriken');
     const [quantity, setQuantity] = useState('50');
 
-    const { totalPrice, unitPrice, description } = useMemo(() => {
+    const { totalPrice, unitPrice, description, sifra } = useMemo(() => {
         const qtyNum = parseInt(quantity);
         const tier = officeSuppliesData.envelopes.find(e => e.type === type && e.kolicina === qtyNum);
-        if (!tier) return { totalPrice: 0, unitPrice: 0, description: '' };
+        if (!tier) return { totalPrice: 0, unitPrice: 0, description: '', sifra: undefined };
         const desc = `Koverte sa štampom, ${type === 'ameriken' ? 'Ameriken' : 'C4'}, ${qtyNum} kom`;
-        return { totalPrice: tier.cena, unitPrice: tier.cena / qtyNum, description: desc };
+        return { totalPrice: tier.cena, unitPrice: tier.cena / qtyNum, description: desc, sifra: tier.sifra };
     }, [type, quantity]);
 
     const handleAddToBasket = () => {
@@ -100,6 +102,7 @@ const EnvelopeCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
             kolicina: qtyNum,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
     
@@ -176,22 +179,24 @@ const BrochureCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
         return officeSuppliesData.brochures.find(b => b.id === serviceId);
     }, [serviceId]);
 
-    const { totalPrice, unitPrice, description } = useMemo(() => {
-        if (!selectedService) return { totalPrice: 0, unitPrice: 0, description: '' };
+    const { totalPrice, unitPrice, description, sifra } = useMemo(() => {
+        if (!selectedService) return { totalPrice: 0, unitPrice: 0, description: '', sifra: undefined };
         
         if (selectedService.unit === 'po strani') {
             const price = selectedService.pricePerPage! * pages;
             return {
                 totalPrice: price,
                 unitPrice: selectedService.pricePerPage!,
-                description: `${selectedService.name}, ${pages} str.`
+                description: `${selectedService.name}, ${pages} str.`,
+                sifra: selectedService.sifra,
             };
         }
         
         return {
             totalPrice: selectedService.price,
             unitPrice: selectedService.price,
-            description: selectedService.name
+            description: selectedService.name,
+            sifra: selectedService.sifra,
         };
 
     }, [selectedService, pages]);
@@ -209,6 +214,7 @@ const BrochureCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
             kolicina: kolicina,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 

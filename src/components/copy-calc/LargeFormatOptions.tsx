@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -25,9 +26,9 @@ const PlottingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
     const [length, setLength] = useState<number>(1);
     const [finishing, setFinishing] = useState({ cut: false, foldA4: false, foldA3: false });
 
-    const { unitPrice, plotPrice, finishingPrice, description } = useMemo(() => {
+    const { unitPrice, plotPrice, finishingPrice, description, sifra } = useMemo(() => {
         const selectedRoll = largeFormatServices.plotting.paper80g.find(r => r.rollWidth === rollWidth);
-        if (!selectedRoll || length <= 0) return { unitPrice: 0, plotPrice: 0, finishingPrice: 0, description: '' };
+        if (!selectedRoll || length <= 0) return { unitPrice: 0, plotPrice: 0, finishingPrice: 0, description: '', sifra: undefined };
 
         let pricePerMeter = 0;
         let typeDesc = '';
@@ -66,7 +67,7 @@ const PlottingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
         const total = currentPlotPrice + currentFinishingPrice;
         const desc = `Plotovanje ${length.toFixed(2)}m, ${rollWidth}, ${typeDesc}${finishingDesc.length > 0 ? `, ${finishingDesc.join(', ')}` : ''}`;
 
-        return { unitPrice: total, plotPrice: currentPlotPrice, finishingPrice: currentFinishingPrice, description: desc };
+        return { unitPrice: total, plotPrice: currentPlotPrice, finishingPrice: currentFinishingPrice, description: desc, sifra: selectedRoll.sifra };
     }, [rollWidth, printType, length, finishing]);
 
     const handleAddToBasket = () => {
@@ -78,6 +79,7 @@ const PlottingCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Orde
             kolicina: 1,
             cena_jedinice: unitPrice,
             cena_ukupno: unitPrice,
+            sifra: sifra,
         });
     };
     
@@ -182,27 +184,27 @@ const PosterCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderI
     const [width, setWidth] = useState(1);
     const [height, setHeight] = useState(1);
 
-    const { fixedPrice, fixedDescription } = useMemo(() => {
+    const { fixedPrice, fixedDescription, fixedSifra } = useMemo(() => {
         const paperOptions = largeFormatServices.posters.fixedFormat[fixedFormat];
         const selected = paperOptions.find(p => p.paper === fixedPaper);
-        if (!selected) return { fixedPrice: 0, fixedDescription: '' };
+        if (!selected) return { fixedPrice: 0, fixedDescription: '', fixedSifra: undefined };
         
         const price = selected.price * fixedQuantity;
         const desc = `Poster ${fixedFormat}cm, ${fixedPaper}`;
 
-        return { fixedPrice: price, fixedDescription: desc };
+        return { fixedPrice: price, fixedDescription: desc, fixedSifra: selected.sifra };
     }, [fixedFormat, fixedPaper, fixedQuantity]);
 
 
-    const { byMeterPrice, byMeterDescription } = useMemo(() => {
+    const { byMeterPrice, byMeterDescription, byMeterSifra } = useMemo(() => {
         const selected = largeFormatServices.posters.byMeter[byMeterPaperId];
-        if (!selected || width <=0 || height <= 0) return { byMeterPrice: 0, byMeterDescription: '' };
+        if (!selected || width <=0 || height <= 0) return { byMeterPrice: 0, byMeterDescription: '', byMeterSifra: undefined };
 
         const area = width * height;
         const price = area * selected.priceM2;
         const desc = `Poster ${width.toFixed(2)}x${height.toFixed(2)}m (${area.toFixed(2)}m²), ${selected.paper}`;
 
-        return { byMeterPrice: price, byMeterDescription: desc };
+        return { byMeterPrice: price, byMeterDescription: desc, byMeterSifra: selected.sifra };
     }, [byMeterPaperId, width, height]);
 
 
@@ -218,12 +220,13 @@ const PosterCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderI
             kolicina: fixedQuantity,
             cena_jedinice: selected?.price || 0,
             cena_ukupno: fixedPrice,
+            sifra: fixedSifra,
         });
     }
 
     const handleByMeterAddToBasket = () => {
         if (byMeterPrice <= 0) return;
-        const selected = largeFormatServices.posters.byMeter[byMeterPaperId];
+        
         onAddToBasket({
             serviceId: `poster-bymeter-${byMeterPaperId}-${width}x${height}`,
             naziv: 'Štampa postera po meri',
@@ -231,6 +234,7 @@ const PosterCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<OrderI
             kolicina: 1,
             cena_jedinice: byMeterPrice,
             cena_ukupno: byMeterPrice,
+            sifra: byMeterSifra,
         });
     }
 

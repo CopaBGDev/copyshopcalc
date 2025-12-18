@@ -49,7 +49,7 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
         }
 
         if (finishing.rounding) {
-            basePrice += businessCardServices.doplate.coskanje * quantityNum;
+            basePrice += businessCardServices.doplate.coskanje.cena * quantityNum;
             finishingDesc.push('ćoškanje');
         }
 
@@ -157,24 +157,28 @@ const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
         return luxType.startsWith('pvc') ? businessCardServices.lux.pvc.standard.min_kom : 1;
     }, [luxType]);
 
-    const { totalPrice, description, unitPrice } = useMemo(() => {
+    const { totalPrice, description, unitPrice, sifra } = useMemo(() => {
         let price = 0;
         let desc = '';
         let uPrice = 0;
+        let finalSifra: number | undefined = undefined;
 
         const sideKey = side === 'oneSided' ? 'jednostrane' : 'dvostrane';
 
         switch (luxType) {
             case 'pvc-standard':
                 price = businessCardServices.lux.pvc.standard[sideKey];
+                finalSifra = side === 'oneSided' ? businessCardServices.lux.pvc.standard.sifra_jednostrano : businessCardServices.lux.pvc.standard.sifra_dvostrano;
                 desc = `Lux PVC vizit karte, ${side === 'oneSided' ? 'jednostrane' : 'dvostrane'}`;
                 break;
             case 'pvc-special':
                 price = businessCardServices.lux.pvc.special[sideKey];
+                finalSifra = side === 'oneSided' ? businessCardServices.lux.pvc.special.sifra_jednostrano : businessCardServices.lux.pvc.special.sifra_dvostrano;
                 desc = `Lux PVC vizit karte (crne/zlatne/srebrne), ${side === 'oneSided' ? 'jednostrane' : 'dvostrane'}`;
                 break;
             case 'paper350g':
                 price = businessCardServices.lux.paper350g[sideKey];
+                finalSifra = side === 'oneSided' ? businessCardServices.lux.paper350g.sifra_jednostrano : businessCardServices.lux.paper350g.sifra_dvostrano;
                 desc = `Lux vizit karte 350g+ papir, ${side === 'oneSided' ? 'jednostrane' : 'dvostrane'}`;
                 break;
         }
@@ -185,7 +189,7 @@ const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
         
         desc += `, ${validQuantity} kom`;
 
-        return { totalPrice: price, description: desc, unitPrice: uPrice };
+        return { totalPrice: price, description: desc, unitPrice: uPrice, sifra: finalSifra };
     }, [luxType, side, quantity, minQuantity]);
 
     const handleAddToBasket = () => {
@@ -198,6 +202,7 @@ const LuxCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<Order
             kolicina: quantity,
             cena_jedinice: totalPrice / quantity,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
     

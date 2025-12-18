@@ -192,20 +192,20 @@ export const finishingServices: FinishingServiceData = {
         plasticSpiral: {
             name: 'Plastična spirala A4',
             tiers: [
-                { sheets: { min: 1, max: 80 }, diameter: '6, 8, 10, 12', priceSpiralOnly: 140.00, priceWithCovers: 180.00 },
-                { sheets: { min: 81, max: 150 }, diameter: '14, 16, 19', priceSpiralOnly: 160.00, priceWithCovers: 200.00 },
-                { sheets: { min: 151, max: 210 }, diameter: '22, 25', priceSpiralOnly: 180.00, priceWithCovers: 220.00 },
-                { sheets: { min: 211, max: 300 }, diameter: '28, 32, 45', priceSpiralOnly: 200.00, priceWithCovers: 250.00 },
-                { sheets: { min: 301, max: 450 }, diameter: '52', priceSpiralOnly: 250.00, priceWithCovers: 320.00 }
+                { sheets: { min: 1, max: 80 }, diameter: '6, 8, 10, 12', priceSpiralOnly: 140.00, priceWithCovers: 180.00, sifra: 10 },
+                { sheets: { min: 81, max: 150 }, diameter: '14, 16, 19', priceSpiralOnly: 160.00, priceWithCovers: 200.00, sifra: 11 },
+                { sheets: { min: 151, max: 210 }, diameter: '22, 25', priceSpiralOnly: 180.00, priceWithCovers: 220.00, sifra: 12 },
+                { sheets: { min: 211, max: 300 }, diameter: '28, 32, 45', priceSpiralOnly: 200.00, priceWithCovers: 250.00, sifra: 13 },
+                { sheets: { min: 301, max: 450 }, diameter: '52', priceSpiralOnly: 250.00, priceWithCovers: 320.00, sifra: 14 }
             ]
         },
         wireSpiral: {
             name: 'Žičana spirala A4',
             tiers: [
-                { sheets: { min: 1, max: 80 }, diameter: '6.9/8/9.5/11', priceSpiralOnly: 160.00, priceWithCovers: 200.00 },
-                { sheets: { min: 81, max: 150 }, diameter: '12.7/14.3/16/19', priceSpiralOnly: 200.00, priceWithCovers: 230.00 },
-                { sheets: { min: 151, max: 210 }, diameter: '22 / 25,4', priceSpiralOnly: 220.00, priceWithCovers: 280.00 },
-                { sheets: { min: 211, max: 300 }, diameter: '28.5 / 32', priceSpiralOnly: 270.00, priceWithCovers: 330.00 }
+                { sheets: { min: 1, max: 80 }, diameter: '6.9/8/9.5/11', priceSpiralOnly: 160.00, priceWithCovers: 200.00, sifra: 15 },
+                { sheets: { min: 81, max: 150 }, diameter: '12.7/14.3/16/19', priceSpiralOnly: 200.00, priceWithCovers: 230.00, sifra: 16 },
+                { sheets: { min: 151, max: 210 }, diameter: '22 / 25,4', priceSpiralOnly: 220.00, priceWithCovers: 280.00, sifra: 17 },
+                { sheets: { min: 211, max: 300 }, diameter: '28.5 / 32', priceSpiralOnly: 270.00, priceWithCovers: 330.00, sifra: 18 }
             ]
         }
     },
@@ -220,10 +220,10 @@ export const finishingServices: FinishingServiceData = {
     },
     lamination: {
         pocket: [
-            { id: 'id-60x95', name: 'ID plastifikacija 60x95 mm', price: 58.00 },
-            { id: 'id-75x105', name: 'ID plastifikacija 75x105 mm', price: 74.00 },
-            { id: 'a6', name: 'A6 plastifikacija 125mic', price: 80.00 },
-            { id: 'a5', name: 'A5 plastifikacija 125mic', price: 90.00 },
+            { id: 'id-60x95', name: 'ID plastifikacija 60x95 mm', price: 58.00, sifra: 28 },
+            { id: 'id-75x105', name: 'ID plastifikacija 75x105 mm', price: 74.00, sifra: 29 },
+            { id: 'a6', name: 'A6 plastifikacija 125mic', price: 80.00, sifra: 30 },
+            { id: 'a5', name: 'A5 plastifikacija 125mic', price: 90.00, sifra: 31 },
         ],
         roll: [
             { id: 'roll-32', name: 'Plastifikacija iz rolne obostrana (mat/sjaj)', priceA4: 40.00, priceA3: 80.00, sifra: 32 },
@@ -247,14 +247,14 @@ export const finishingServices: FinishingServiceData = {
 
 export const scanServices: ScanServiceData = {
     manual: [
-        { kolicina: { min: 1, max: 10 }, priceA4: 41.00, priceA3: 73.00 },
-        { kolicina: { min: 11, max: 50 }, priceA4: 30.00, priceA3: 41.00 },
-        { kolicina: { min: 51, max: Infinity }, priceA4: 13.00, priceA3: 25.00 },
+        { kolicina: { min: 1, max: 10 }, priceA4: 41.00, priceA3: 73.00, sifra: 401 },
+        { kolicina: { min: 11, max: 50 }, priceA4: 30.00, priceA3: 41.00, sifra: 402 },
+        { kolicina: { min: 51, max: Infinity }, priceA4: 13.00, priceA3: 25.00, sifra: 403 },
     ],
     auto: [
-        { kolicina: { min: 1, max: 50 }, priceA4: 13.00, priceA3: 25.00 }, // Assuming auto scan for small quantities is same as manual 51+
-        { kolicina: { min: 51, max: 100 }, priceA4: 7.00, priceA3: 13.00 },
-        { kolicina: { min: 101, max: Infinity }, priceA4: 4.50, priceA3: 7.50 },
+        { kolicina: { min: 1, max: 50 }, priceA4: 13.00, priceA3: 25.00, sifra: 411 },
+        { kolicina: { min: 51, max: 100 }, priceA4: 7.00, priceA3: 13.00, sifra: 412 },
+        { kolicina: { min: 101, max: Infinity }, priceA4: 4.50, priceA3: 7.50, sifra: 413 },
     ]
 };
 
@@ -323,19 +323,23 @@ export const businessCardServices: BusinessCardData = {
     },
     lux: {
         pvc: {
-            standard: { kolicina: 100, jednostrane: 6500.00, dvostrane: 8500.00, min_kom: 20 },
-            special: { kolicina: 100, jednostrane: 13000.00, dvostrane: 16000.00, min_kom: 20 },
+            standard: { kolicina: 100, jednostrane: 6500.00, dvostrane: 8500.00, min_kom: 20, sifra_jednostrano: 900, sifra_dvostrano: 901 },
+            special: { kolicina: 100, jednostrane: 13000.00, dvostrane: 16000.00, min_kom: 20, sifra_jednostrano: 902, sifra_dvostrano: 903 },
         },
         paper350g: {
-             kolicina: 100, jednostrane: 4800.00, dvostrane: 5800.00
+             kolicina: 100, jednostrane: 4800.00, dvostrane: 5800.00, sifra_jednostrano: 904, sifra_dvostrano: 905
         }
     },
     doplate: {
         plastifikacija: {
             jednostrano: 1.80,
-            dvostrano: 3.60
+            dvostrano: 3.60,
+            sifra: 33
         },
-        coskanje: 3.60,
+        coskanje: {
+            cena: 3.60,
+            sifra: 807
+        },
         uv_doplata: "na upit",
     }
 };
@@ -343,25 +347,25 @@ export const businessCardServices: BusinessCardData = {
 export const flyerServices: FlyerData = {
     digitalA6: {
         oneSided: [
-            {kolicina: 100, cena: 1940.00},
-            {kolicina: 300, cena: 4180.00},
-            {kolicina: 500, cena: 5560.00},
-            {kolicina: 1000, cena: 8250.00}
+            {kolicina: 100, cena: 1940.00, sifra: 720},
+            {kolicina: 300, cena: 4180.00, sifra: 721},
+            {kolicina: 500, cena: 5560.00, sifra: 722},
+            {kolicina: 1000, cena: 8250.00, sifra: 723}
         ],
         twoSided: [
-            {kolicina: 100, cena: 2350.00},
-            {kolicina: 300, cena: 4960.00},
-            {kolicina: 500, cena: 7100.00},
-            {kolicina: 1000, cena: 11400.00}
+            {kolicina: 100, cena: 2350.00, sifra: 725},
+            {kolicina: 300, cena: 4960.00, sifra: 726},
+            {kolicina: 500, cena: 7100.00, sifra: 727},
+            {kolicina: 1000, cena: 11400.00, sifra: 728}
         ]
     },
     offsetA6: {
-        oneSided: { kolicina: 4000, cena: 9800.00 },
-        twoSided: { kolicina: 4000, cena: 10800.00 },
+        oneSided: { kolicina: 4000, cena: 9800.00, sifra: 730 },
+        twoSided: { kolicina: 4000, cena: 10800.00, sifra: 731 },
     },
      offsetA5: {
-        oneSided: { kolicina: 4000, cena: 12500.00 },
-        twoSided: { kolicina: 4000, cena: 13500.00 },
+        oneSided: { kolicina: 4000, cena: 12500.00, sifra: 732 },
+        twoSided: { kolicina: 4000, cena: 13500.00, sifra: 733 },
     }
 }
 
@@ -369,134 +373,134 @@ export const flyerServices: FlyerData = {
 export const largeFormatServices: LargeFormatData = {
     plotting: {
         paper80g: [
-            { rollWidth: "1060 mm", cb: 285.00, lineColor: 299.00, fullColor: 705.00 },
-            { rollWidth: "914 mm", cb: 265.00, lineColor: 280.00, fullColor: 605.00 },
-            { rollWidth: "750 mm", cb: 225.00, lineColor: 250.00, fullColor: 555.00 },
-            { rollWidth: "620 mm", cb: 215.00, lineColor: 230.00, fullColor: 505.00 },
-            { rollWidth: "420 mm", cb: 175.00, lineColor: 199.00, fullColor: 455.00 },
-            { rollWidth: "320 mm", cb: 155.00, lineColor: 180.00, fullColor: 405.00 },
+            { rollWidth: "1060 mm", cb: 285.00, lineColor: 299.00, fullColor: 705.00, sifra: 200 },
+            { rollWidth: "914 mm", cb: 265.00, lineColor: 280.00, fullColor: 605.00, sifra: 201 },
+            { rollWidth: "750 mm", cb: 225.00, lineColor: 250.00, fullColor: 555.00, sifra: 202 },
+            { rollWidth: "620 mm", cb: 215.00, lineColor: 230.00, fullColor: 505.00, sifra: 203 },
+            { rollWidth: "420 mm", cb: 175.00, lineColor: 199.00, fullColor: 455.00, sifra: 204 },
+            { rollWidth: "320 mm", cb: 155.00, lineColor: 180.00, fullColor: 405.00, sifra: 205 },
         ],
         finishing: [
-            { name: "Sečenje po m1 dužnom", price: 30.00 },
-            { name: "Savijanje po m1 na A4", price: 30.00 },
-            { name: "Savijanje po m1 na A3", price: 85.00 },
+            { name: "Sečenje po m1 dužnom", price: 30.00, sifra: 210 },
+            { name: "Savijanje po m1 na A4", price: 30.00, sifra: 211 },
+            { name: "Savijanje po m1 na A3", price: 85.00, sifra: 212 },
         ]
     },
     posters: {
         fixedFormat: {
             '50x70': [
-                { paper: "120gr Foto mat", price: 590.00 },
-                { paper: "180gr Foto mat", price: 735.00 },
-                { paper: "180gr Foto GLOSSY", price: 945.00 },
+                { paper: "120gr Foto mat", price: 590.00, sifra: 220 },
+                { paper: "180gr Foto mat", price: 735.00, sifra: 221 },
+                { paper: "180gr Foto GLOSSY", price: 945.00, sifra: 222 },
             ],
             '70x100': [
-                { paper: "120gr Foto mat", price: 945.00 },
-                { paper: "180gr Foto mat", price: 1253.00 },
-                { paper: "180gr Foto Glossy", price: 1323.00 },
+                { paper: "120gr Foto mat", price: 945.00, sifra: 223 },
+                { paper: "180gr Foto mat", price: 1253.00, sifra: 224 },
+                { paper: "180gr Foto Glossy", price: 1323.00, sifra: 225 },
             ]
         },
         byMeter: [
-            { rollWidth: "610mm", paper: "120gr Foto mat (crno belo/linijski kolor)", priceM2: 630.00 },
-            { rollWidth: "610mm", paper: "120gr Foto mat (do 50% popunjenosti)", priceM2: 840.00 },
-            { rollWidth: "610mm", paper: "120gr Foto mat (preko 50% popunjenosti)", priceM2: 840.00 },
-            { rollWidth: "1060mm", paper: "120gr Foto mat (crno belo/linijski kolor)", priceM2: 890.00 },
-            { rollWidth: "1060mm", paper: "120gr Foto mat (do 50% popunjenosti)", priceM2: 1350.00 },
-            { rollWidth: "1060mm", paper: "120gr Foto mat (preko 50% popunjenosti)", priceM2: 1350.00 },
-            { rollWidth: "610mm", paper: "180gr Foto mat", priceM2: 1050.00 },
-            { rollWidth: "610mm", paper: "180gr Foto glossy /satin", priceM2: 1370.00 },
-            { rollWidth: "1060mm", paper: "180gr Foto mat", priceM2: 1790.00 },
-            { rollWidth: "1060mm", paper: "180gr Foto glossy /satin", priceM2: 1890.00 },
+            { rollWidth: "610mm", paper: "120gr Foto mat (crno belo/linijski kolor)", priceM2: 630.00, sifra: 230 },
+            { rollWidth: "610mm", paper: "120gr Foto mat (do 50% popunjenosti)", priceM2: 840.00, sifra: 231 },
+            { rollWidth: "610mm", paper: "120gr Foto mat (preko 50% popunjenosti)", priceM2: 840.00, sifra: 232 },
+            { rollWidth: "1060mm", paper: "120gr Foto mat (crno belo/linijski kolor)", priceM2: 890.00, sifra: 233 },
+            { rollWidth: "1060mm", paper: "120gr Foto mat (do 50% popunjenosti)", priceM2: 1350.00, sifra: 234 },
+            { rollWidth: "1060mm", paper: "120gr Foto mat (preko 50% popunjenosti)", priceM2: 1350.00, sifra: 235 },
+            { rollWidth: "610mm", paper: "180gr Foto mat", priceM2: 1050.00, sifra: 236 },
+            { rollWidth: "610mm", paper: "180gr Foto glossy /satin", priceM2: 1370.00, sifra: 237 },
+            { rollWidth: "1060mm", paper: "180gr Foto mat", priceM2: 1790.00, sifra: 238 },
+            { rollWidth: "1060mm", paper: "180gr Foto glossy /satin", priceM2: 1890.00, sifra: 239 },
         ]
     },
     banners: {
         services: [
-            { name: "Cirada Baner", tiers: { '1-5': 2150.00, '5-10': 1815.00, '10+': "na upit" } },
+            { name: "Cirada Baner", tiers: { '1-5': 2150.00, '5-10': 1815.00, '10+': "na upit" }, sifra: 250 },
         ],
         addons: [
-            { name: "Ringlice za baner ciradu", price: 55.00, unit: 'kom' },
-            { name: "Porubljivanje baner cirade", price: 220.00, unit: 'm' },
+            { name: "Ringlice za baner ciradu", price: 55.00, unit: 'kom', sifra: 251 },
+            { name: "Porubljivanje baner cirade", price: 220.00, unit: 'm', sifra: 252 },
         ]
     },
     rollups: {
         setups: [
-            { dimensions: "85x200cm", price: 8800.00 },
-            { dimensions: "100x200cm", price: 9990.00 },
+            { dimensions: "85x200cm", price: 8800.00, sifra: 260 },
+            { dimensions: "100x200cm", price: 9990.00, sifra: 261 },
         ],
-        refill: { name: "PP baner za roll up", tiers: { '1-5': 2530.00, '5-10': 2310.00, '10+': "na upit" } },
-        changeService: { name: "Usluga zamena medija za roll up", price: 700.00, unit: "po m2" },
+        refill: { name: "PP baner za roll up", tiers: { '1-5': 2530.00, '5-10': 2310.00, '10+': "na upit" }, sifra: 262 },
+        changeService: { name: "Usluga zamena medija za roll up", price: 700.00, unit: "po m2", sifra: 263 },
     }
 }
 
 export const canvasServices: CanvasServiceData = {
     printByMeter: [
-      { name: "Štampa na kanvasu po dužnom metru", roll: "60cm", price: 1990.00 },
-      { name: "Štampa na kanvasu po dužnom metru", roll: "100cm", price: 3600.00 }
+      { name: "Štampa na kanvasu po dužnom metru", roll: "60cm", price: 1990.00, sifra: 270 },
+      { name: "Štampa na kanvasu po dužnom metru", roll: "100cm", price: 3600.00, sifra: 271 }
     ],
     blindFrameServices: [
-      { name: "blind ram (materijal)", pricePerMeter: 650.00 },
-      { name: "zatezanje platna na blind ramu", pricePerMeter: 700.00 }
+      { name: "blind ram (materijal)", pricePerMeter: 650.00, sifra: 272 },
+      { name: "zatezanje platna na blind ramu", pricePerMeter: 700.00, sifra: 273 }
     ],
     readyFormats: [
-      { id: "30x40", dimension: "30x40 cm", price: 2350.00 },
-      { id: "40x40", dimension: "40x40 cm", price: 2480.00 },
-      { id: "40x50", dimension: "40x50 cm", price: 2660.00 },
-      { id: "40x60", dimension: "40x60 cm", price: 2850.00 },
-      { id: "60x60", dimension: "60x60 cm", price: 3470.00 },
-      { id: "50x85", dimension: "50x85 cm", price: 3920.00 },
-      { id: "30x80", dimension: "30x80 cm", price: 3570.00 },
-      { id: "60x80", dimension: "60x80 cm", price: 3990.00 },
-      { id: "80x80", dimension: "80x80 cm (85x85 cm)", price: 4720.00 },
-      { id: "50x70", dimension: "50x70 cm", price: 3500.00 },
-      { id: "80x100", dimension: "80x100 cm", price: 5500.00 },
-      { id: "100x100", dimension: "100x100 cm", price: 6200.00 },
-      { id: "90x100", dimension: "90x100 cm", price: 5900.00 }
+      { id: "30x40", dimension: "30x40 cm", price: 2350.00, sifra: 280 },
+      { id: "40x40", dimension: "40x40 cm", price: 2480.00, sifra: 281 },
+      { id: "40x50", dimension: "40x50 cm", price: 2660.00, sifra: 282 },
+      { id: "40x60", dimension: "40x60 cm", price: 2850.00, sifra: 283 },
+      { id: "60x60", dimension: "60x60 cm", price: 3470.00, sifra: 284 },
+      { id: "50x85", dimension: "50x85 cm", price: 3920.00, sifra: 285 },
+      { id: "30x80", dimension: "30x80 cm", price: 3570.00, sifra: 286 },
+      { id: "60x80", dimension: "60x80 cm", price: 3990.00, sifra: 287 },
+      { id: "80x80", dimension: "80x80 cm (85x85 cm)", price: 4720.00, sifra: 288 },
+      { id: "50x70", dimension: "50x70 cm", price: 3500.00, sifra: 289 },
+      { id: "80x100", dimension: "80x100 cm", price: 5500.00, sifra: 290 },
+      { id: "100x100", dimension: "100x100 cm", price: 6200.00, sifra: 291 },
+      { id: "90x100", dimension: "90x100 cm", price: 5900.00, sifra: 292 }
     ]
 }
 
 export const giftServices: GiftServiceData = {
   items: [
-    { id: "solja-bela", name: "Foto šolja klasična bela", price: 850.00 },
-    { id: "puzzle-a4", name: "Foto puzzle A4", price: 1200.00 },
-    { id: "puzzle-srce", name: "Foto puzzle srce", price: 1100.00 },
-    { id: "sat", name: "Personalizovani sat (razni oblici)", price: 2900.00 },
-    { id: "foto-kugla", name: "Foto kugla ili srce", price: 1150.00 },
-    { id: "foto-ram", name: "Foto ram ili duplo srce", price: 1350.00 },
+    { id: "solja-bela", name: "Foto šolja klasična bela", price: 850.00, sifra: 300 },
+    { id: "puzzle-a4", name: "Foto puzzle A4", price: 1200.00, sifra: 301 },
+    { id: "puzzle-srce", name: "Foto puzzle srce", price: 1100.00, sifra: 302 },
+    { id: "sat", name: "Personalizovani sat (razni oblici)", price: 2900.00, sifra: 303 },
+    { id: "foto-kugla", name: "Foto kugla ili srce", price: 1150.00, sifra: 304 },
+    { id: "foto-ram", name: "Foto ram ili duplo srce", price: 1350.00, sifra: 305 },
     { id: "maska-telefon", name: "Maska za telefon sa štampom", price: 1500.00, sifra: 335 }
   ]
 }
 
 export const officeSuppliesData: OfficeSuppliesData = {
     memorandums: [
-        { kolicina: 100, cena: 2200.00 },
-        { kolicina: 200, cena: 3300.00 },
-        { kolicina: 500, cena: 7100.00 },
+        { kolicina: 100, cena: 2200.00, sifra: 550 },
+        { kolicina: 200, cena: 3300.00, sifra: 551 },
+        { kolicina: 500, cena: 7100.00, sifra: 552 },
     ],
     envelopes: [
-        { type: 'ameriken', kolicina: 50, cena: 2500.00 },
-        { type: 'ameriken', kolicina: 100, cena: 2600.00 },
-        { type: 'ameriken', kolicina: 200, cena: 4250.00 },
-        { type: 'ameriken', kolicina: 500, cena: 8350.00 },
-        { type: 'c4', kolicina: 50, cena: 1700.00 },
-        { type: 'c4', kolicina: 100, cena: 2900.00 },
-        { type: 'c4', kolicina: 200, cena: 3900.00 },
-        { type: 'c4', kolicina: 500, cena: 7900.00 },
+        { type: 'ameriken', kolicina: 50, cena: 2500.00, sifra: 560 },
+        { type: 'ameriken', kolicina: 100, cena: 2600.00, sifra: 561 },
+        { type: 'ameriken', kolicina: 200, cena: 4250.00, sifra: 562 },
+        { type: 'ameriken', kolicina: 500, cena: 8350.00, sifra: 563 },
+        { type: 'c4', kolicina: 50, cena: 1700.00, sifra: 570 },
+        { type: 'c4', kolicina: 100, cena: 2900.00, sifra: 571 },
+        { type: 'c4', kolicina: 200, cena: 3900.00, sifra: 572 },
+        { type: 'c4', kolicina: 500, cena: 7900.00, sifra: 573 },
     ],
     brochures: [
-        { id: 'buklet-a4', name: 'Brošura - buklet A4 (kolor)', price: 0, pricePerPage: 60.00, unit: 'po strani' },
-        { id: 'katalog-a5', name: 'Katalog - buklet A5 (kolor)', price: 0, pricePerPage: 32.00, unit: 'po strani' },
-        { id: 'liflet-a4-50', name: 'Liflet A4 (2 savijanja, 50 kom)', price: 4150.00, unit: 'paket' },
-        { id: 'liflet-a4-100', name: 'Liflet A4 (2 savijanja, 100 kom)', price: 5950.00, unit: 'paket' },
-        { id: 'liflet-a3-50', name: 'Liflet A3 (1 savijanje, 50 kom)', price: 5750.00, unit: 'paket' },
+        { id: 'buklet-a4', name: 'Brošura - buklet A4 (kolor)', price: 0, pricePerPage: 60.00, unit: 'po strani', sifra: 580 },
+        { id: 'katalog-a5', name: 'Katalog - buklet A5 (kolor)', price: 0, pricePerPage: 32.00, unit: 'po strani', sifra: 581 },
+        { id: 'liflet-a4-50', name: 'Liflet A4 (2 savijanja, 50 kom)', price: 4150.00, unit: 'paket', sifra: 582 },
+        { id: 'liflet-a4-100', name: 'Liflet A4 (2 savijanja, 100 kom)', price: 5950.00, unit: 'paket', sifra: 583 },
+        { id: 'liflet-a3-50', name: 'Liflet A3 (1 savijanje, 50 kom)', price: 5750.00, unit: 'paket', sifra: 584 },
     ]
 }
 
 export const designServices: DesignServiceData = [
-    { id: "kreativni-dizajn", name: "Kreativni dizajn", price: 3600.00, unit: "sat" },
-    { id: "priprema-stampa", name: "Priprema za štampu", price: 2400.00, unit: "sat" },
-    { id: "montaze-korekcije", name: "Montaže i korekcije", price: 60.00, unit: "minut" },
-    { id: "izrada-logoa", name: "Izrada logoa", price: 5000.00, unit: "komad", notes: "Cena od 5000 do 18000" },
-    { id: "obrada-fotografija", name: "Obrada fotografija", price: 2400.00, unit: "sat" },
-    { id: "kucanje-teksta", name: "Kucanje teksta", price: 1200.00, unit: "strana" }
+    { id: "kreativni-dizajn", name: "Kreativni dizajn", price: 3600.00, unit: "sat", sifra: 1001 },
+    { id: "priprema-stampa", name: "Priprema za štampu", price: 2400.00, unit: "sat", sifra: 1002 },
+    { id: "montaze-korekcije", name: "Montaže i korekcije", price: 60.00, unit: "minut", sifra: 1003 },
+    { id: "izrada-logoa", name: "Izrada logoa", price: 5000.00, unit: "komad", notes: "Cena od 5000 do 18000", sifra: 1004 },
+    { id: "obrada-fotografija", name: "Obrada fotografija", price: 2400.00, unit: "sat", sifra: 1005 },
+    { id: "kucanje-teksta", name: "Kucanje teksta", price: 1200.00, unit: "strana", sifra: 1006 }
 ];
 
 
@@ -505,6 +509,7 @@ export const designServices: DesignServiceData = [
 
 
     
+
 
 
 

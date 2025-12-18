@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -26,8 +27,8 @@ export function DesignOptions({ onAddToBasket }: DesignOptionsProps) {
         return designServices.find(s => s.id === selectedServiceId);
     }, [selectedServiceId]);
 
-    const { unitPrice, totalPrice, description, unitLabel } = useMemo(() => {
-        if (!selectedService) return { unitPrice: 0, totalPrice: 0, description: '', unitLabel: '' };
+    const { unitPrice, totalPrice, description, unitLabel, sifra } = useMemo(() => {
+        if (!selectedService) return { unitPrice: 0, totalPrice: 0, description: '', unitLabel: '', sifra: undefined };
 
         const uPrice = (selectedService.id === 'izrada-logoa' && customPrice) ? customPrice : selectedService.price;
         const total = uPrice * quantity;
@@ -37,7 +38,8 @@ export function DesignOptions({ onAddToBasket }: DesignOptionsProps) {
             unitPrice: uPrice, 
             totalPrice: total,
             description: desc,
-            unitLabel: selectedService.unit
+            unitLabel: selectedService.unit,
+            sifra: selectedService.sifra,
         };
     }, [selectedService, quantity, customPrice]);
     
@@ -50,6 +52,7 @@ export function DesignOptions({ onAddToBasket }: DesignOptionsProps) {
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 

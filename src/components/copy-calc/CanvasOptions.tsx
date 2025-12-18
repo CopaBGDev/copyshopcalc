@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -19,13 +20,14 @@ export function CanvasOptions({ onAddToBasket }: CanvasOptionsProps) {
     const [selectedFormatId, setSelectedFormatId] = useState<string>(canvasServices.readyFormats[0].id);
     const [quantity, setQuantity] = useState(1);
 
-    const { unitPrice, description } = useMemo(() => {
+    const { unitPrice, description, sifra } = useMemo(() => {
         const service = canvasServices.readyFormats.find(s => s.id === selectedFormatId);
-        if (!service) return { unitPrice: 0, description: '' };
+        if (!service) return { unitPrice: 0, description: '', sifra: undefined };
         
         return { 
             unitPrice: service.price, 
             description: `Kanvas platno sa blind ramom, ${service.dimension}`,
+            sifra: service.sifra
         };
     }, [selectedFormatId]);
     
@@ -40,6 +42,7 @@ export function CanvasOptions({ onAddToBasket }: CanvasOptionsProps) {
             kolicina: quantity,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 

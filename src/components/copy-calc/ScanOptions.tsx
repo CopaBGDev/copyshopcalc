@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -21,16 +22,16 @@ export function ScanOptions({ onAddToBasket }: ScanOptionsProps) {
   const [isAutomatic, setIsAutomatic] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(1);
   
-  const { unitPrice, totalPrice } = useMemo(() => {
+  const { unitPrice, totalPrice, sifra } = useMemo(() => {
     const serviceType = isAutomatic ? scanServices.auto : scanServices.manual;
     const tier = serviceType.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max);
 
     if (!tier || quantity <= 0) {
-      return { unitPrice: 0, totalPrice: 0 };
+      return { unitPrice: 0, totalPrice: 0, sifra: undefined };
     }
 
     const price = format === 'A4' ? tier.priceA4 : tier.priceA3;
-    return { unitPrice: price, totalPrice: price * quantity };
+    return { unitPrice: price, totalPrice: price * quantity, sifra: tier.sifra };
 
   }, [format, isAutomatic, quantity]);
 
@@ -46,6 +47,7 @@ export function ScanOptions({ onAddToBasket }: ScanOptionsProps) {
       kolicina: quantity,
       cena_jedinice: unitPrice,
       cena_ukupno: totalPrice,
+      sifra: sifra,
     });
   };
 

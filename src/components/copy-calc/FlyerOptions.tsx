@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -22,17 +23,17 @@ const DigitalFlyerCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<
     const [side, setSide] = useState<'oneSided' | 'twoSided'>('oneSided');
     const [quantity, setQuantity] = useState<string>('100');
 
-    const { totalPrice, description, unitPrice } = useMemo(() => {
+    const { totalPrice, description, unitPrice, sifra } = useMemo(() => {
         const quantityNum = parseInt(quantity, 10);
         const priceList = flyerServices.digitalA6[side];
         const tier = priceList.find(p => p.kolicina === quantityNum);
 
-        if (!tier) return { totalPrice: 0, description: '', unitPrice: 0 };
+        if (!tier) return { totalPrice: 0, description: '', unitPrice: 0, sifra: undefined };
 
         const price = tier.cena;
         const desc = `Flajeri A6, digitalna štampa, ${side === 'oneSided' ? 'jednostrano' : 'dvostrano'}, ${quantityNum} kom`;
         
-        return { totalPrice: price, description: desc, unitPrice: price / quantityNum };
+        return { totalPrice: price, description: desc, unitPrice: price / quantityNum, sifra: tier.sifra };
 
     }, [side, quantity]);
 
@@ -47,6 +48,7 @@ const DigitalFlyerCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<
             kolicina: quantityNum,
             cena_jedinice: unitPrice,
             cena_ukupno: totalPrice,
+            sifra: sifra,
         });
     };
 

@@ -127,6 +127,7 @@ export type ScanPriceTier = {
   kolicina: { min: number; max: number };
   priceA4: number;
   priceA3: number;
+  sifra: number;
 };
 
 export type ScanServiceData = {
@@ -184,8 +185,12 @@ export type BusinessCardDoplate = {
     plastifikacija: {
         jednostrano: number;
         dvostrano: number;
+        sifra: number;
     };
-    coskanje: number;
+    coskanje: {
+        cena: number;
+        sifra: number;
+    };
     uv_doplata: string;
 }
 
@@ -194,12 +199,16 @@ export type LuxPVCData = {
     jednostrane: number;
     dvostrane: number;
     min_kom: number;
+    sifra_jednostrano: number;
+    sifra_dvostrano: number;
 }
 
 export type LuxPaperData = {
     kolicina: number;
     jednostrane: number;
     dvostrane: number;
+    sifra_jednostrano: number;
+    sifra_dvostrano: number;
 }
 
 export type BusinessCardData = {
@@ -222,6 +231,7 @@ export type BusinessCardData = {
 export type FlyerPriceTier = {
     kolicina: number;
     cena: number;
+    sifra: number;
 }
 
 export type FlyerData = {
@@ -230,12 +240,12 @@ export type FlyerData = {
         twoSided: FlyerPriceTier[];
     };
     offsetA6: {
-        oneSided: { kolicina: number; cena: number; };
-        twoSided: { kolicina: number; cena: number; };
+        oneSided: { kolicina: number; cena: number; sifra: number; };
+        twoSided: { kolicina: number; cena: number; sifra: number; };
     };
     offsetA5: {
-        oneSided: { kolicina: number; cena: number; };
-        twoSided: { kolicina: number; cena: number; };
+        oneSided: { kolicina: number; cena: number; sifra: number; };
+        twoSided: { kolicina: number; cena: number; sifra: number; };
     };
 }
 // --- END: Flyer Service Specific Types ---
@@ -248,16 +258,18 @@ export type PlottingService = {
   cb: number;
   lineColor: number;
   fullColor: number;
+  sifra: number;
 }
 
 export type PlottingData = {
   paper80g: PlottingService[];
-  finishing: { name: string; price: number; }[];
+  finishing: { name: string; price: number; sifra: number; }[];
 }
 
 export type PosterService = {
   paper: string;
   price: number;
+  sifra: number;
 }
 
 export type PosterData = {
@@ -269,17 +281,20 @@ export type PosterData = {
     rollWidth: string;
     paper: string;
     priceM2: number;
+    sifra: number;
   }[];
 }
 
 export type BannerService = {
   name: string;
-  tiers: { '1-5': number; '5-10': number; '10+': string; }
+  tiers: { '1-5': number; '5-10': number; '10+': string; };
+  sifra: number;
 }
 
 export type RollupService = {
   dimensions: string;
   price: number;
+  sifra: number;
 }
 
 export type LargeFormatData = {
@@ -287,12 +302,12 @@ export type LargeFormatData = {
   posters: PosterData;
   banners: {
     services: BannerService[];
-    addons: { name: string; price: number; unit: 'kom' | 'm' }[]
+    addons: { name: string; price: number; unit: 'kom' | 'm'; sifra: number; }[]
   };
   rollups: {
     setups: RollupService[],
-    refill: { name: string, tiers: { '1-5': number; '5-10': number; '10+': string; } },
-    changeService: { name: string, price: number, unit: string }
+    refill: { name: string, tiers: { '1-5': number; '5-10': number; '10+': string; }, sifra: number; },
+    changeService: { name: string, price: number, unit: string, sifra: number; }
   }
 }
 
@@ -303,11 +318,12 @@ export type CanvasReadyFormat = {
     id: string;
     dimension: string;
     price: number;
+    sifra: number;
 }
 
 export type CanvasServiceData = {
-    printByMeter: { name: string; roll: string; price: number; }[];
-    blindFrameServices: { name: string; pricePerMeter: number; }[];
+    printByMeter: { name: string; roll: string; price: number; sifra: number; }[];
+    blindFrameServices: { name: string; pricePerMeter: number; sifra: number; }[];
     readyFormats: CanvasReadyFormat[];
 }
 // --- END: Canvas Service Specific Types ---
@@ -329,12 +345,14 @@ export type GiftServiceData = {
 export type MemorandumTier = {
     kolicina: number;
     cena: number;
+    sifra: number;
 }
 
 export type EnvelopeTier = {
     type: 'ameriken' | 'c4';
     kolicina: number;
     cena: number;
+    sifra: number;
 }
 
 export type BrochureService = {
@@ -343,6 +361,7 @@ export type BrochureService = {
     price: number;
     pricePerPage?: number;
     unit: 'po strani' | 'paket';
+    sifra: number;
 }
 
 export type OfficeSuppliesData = {
@@ -360,6 +379,7 @@ export type DesignService = {
     price: number;
     unit: 'sat' | 'minut' | 'strana' | 'komad';
     notes?: string;
+    sifra: number;
 }
 
 export type DesignServiceData = DesignService[];
