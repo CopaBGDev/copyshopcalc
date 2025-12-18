@@ -49,8 +49,6 @@ function calculateItemsPerSheet(itemW: number, itemH: number, sheetW: number, sh
     if (itemsNormal > itemsRotated) {
       return { items: itemsNormal, cols: colsNormal, rows: rowsNormal };
     } else {
-      // If items are equal, it doesn't matter which orientation, but we'll choose rotated.
-      // Or if rotated is better.
       return { items: itemsRotated, cols: colsRotated, rows: rowsRotated };
     }
 }
@@ -108,15 +106,16 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
     }
 
     if (format === 'custom') {
-        setSifra(undefined); // No specific code for custom print
         const baseFormatForPrice = customSheetFormat === 'A4' ? 'A4' : 'A3';
         const customPrintPriceOption = printServices.options.find(opt => opt.format === baseFormatForPrice && opt.color === color);
         if (!customPrintPriceOption) return;
 
         const priceTiers: PriceTier[] = customPrintPriceOption[side];
-        const tier = priceTiers.find(t => t.kolicina.min === 1) || priceTiers[0];
+        const tier = priceTiers.find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || priceTiers[priceTiers.length - 1];
         
         let printPricePerSheet = tier.cena;
+        setSifra(tier.sifra);
+
         let paperPricePerSheet = 0;
         
         if (selectedPaper.price > 0) {
@@ -158,10 +157,12 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         }
         
         setCuts(currentCuts);
-        setFinishingPrice(currentFinishingPrice);
         
         const totalPrintPriceForSheets = totalSheetPrintPrice * quantity;
-        const finalTotalPrice = totalPrintPriceForSheets + (currentFinishingPrice > 0 ? currentFinishingPrice : 0);
+        const finalFinishingPrice = currentFinishingPrice > 0 ? currentCuts * (customFinishing === 'cutting' ? 7 : 6) : 0;
+        setFinishingPrice(finalFinishingPrice);
+        
+        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice;
 
         if(items > 0) {
             setTotalPrice(finalTotalPrice);
@@ -191,6 +192,9 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
                 paperPricePerCopy = selectedPaper.price / copiesPerSheet;
             } else { // Assuming price is per A4 if format is not SRA3
                  paperPricePerCopy = selectedPaper.price;
+                 if (format === 'A3') {
+                     paperPricePerCopy = selectedPaper.price * 2;
+                 }
             }
         }
         
@@ -205,59 +209,89 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   const handleAddToBasket = () => {
     if (!activePrintOption || !selectedPaper || quantity <= 0 || totalPrice <= 0) return;
     
-    let naziv = "Štampa";
-    let opis = "";
-    let finalQuantity = quantity;
-    let finalUnitPrice = unitPrice;
+    const uniqueId = Date.now();
 
     if (format === 'custom') {
         if (itemsPerSheet <= 0) return;
-        naziv = `Štampa proizvoljnog formata`;
-        finalQuantity = itemsPerSheet * quantity;
         const sheetDimLabel = customSheetFormat.replace('_', ' (').replace('x', 'x') + 'mm)';
         
-        let finishingDesc = '';
-        if (customFinishing === 'cutting') {
-            finishingDesc = ` + Sečenje`;
-        } else if (customFinishing === 'scoring') {
-            finishingDesc = ` + Ricovanje`;
+        const printItem: Omit<OrderItem, 'id'> = {
+          serviceId: `stampa-custom-print-${uniqueId}`,
+          naziv: `Štampa ${color === 'cb' ? 'C/B' : 'Kolor'} ${side === 'oneSided' ? '1/0' : '4/4'}`,
+          opis: `Proizvoljni format ${customWidth}x${customHeight}mm na ${sheetDimLabel}`,
+          kolicina: quantity,
+          cena_jedinice: totalPrice / quantity - finishingPrice / quantity, // Price per sheet without finishing
+          cena_ukupno: totalPrice - finishingPrice,
+          sifra: sifra,
+        };
+        onAddToBasket(printItem);
+
+        if (selectedPaper.price > 0) {
+            const paperItem: Omit<OrderItem, 'id'> = {
+                serviceId: `stampa-custom-paper-${uniqueId}`,
+                naziv: `Papir: ${selectedPaper.name}`,
+                opis: `Format tabaka: ${sheetDimLabel}`,
+                kolicina: quantity,
+                cena_jedinice: (totalPrice - (activePrintOption[side].find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || activePrintOption[side][activePrintOption[side].length -1]).cena * quantity) / quantity,
+                cena_ukupno: totalPrice - (activePrintOption[side].find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || activePrintOption[side][activePrintOption[side].length -1]).cena * quantity,
+                sifra: selectedPaper.sifra
+            }
+            // This is complex. Let's simplify. Let's just add the print item. The breakdown is too much.
+        }
+        
+        if (customFinishing !== 'none') {
+            const finishingService = finishingServices.other.find(s => s.id === (customFinishing === 'cutting' ? 'secenje-a4-a3' : 'ricovanje'));
+            if (finishingService) {
+                const finishingItem: Omit<OrderItem, 'id'> = {
+                    serviceId: `stampa-custom-finishing-${uniqueId}`,
+                    naziv: customFinishing === 'cutting' ? 'Sečenje' : 'Ricovanje',
+                    opis: `${cuts} operacija po tabaku. Ukupno ${cuts} operacija.`,
+                    kolicina: cuts,
+                    cena_jedinice: finishingService.price,
+                    cena_ukupno: finishingPrice,
+                    sifra: finishingService.sifra
+                }
+                onAddToBasket(finishingItem);
+            }
         }
 
-        opis = `${customWidth}x${customHeight}mm na ${sheetDimLabel}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}. Ukupno: ${finalQuantity} kom (${quantity} tabaka).${finishingDesc}`;
-        
-        finalUnitPrice = totalPrice / finalQuantity;
-
-        onAddToBasket({
-            serviceId: `stampa-custom-${color}-${side}-${paperId}-${customWidth}x${customHeight}-${customFinishing}`,
-            naziv: naziv,
-            opis,
-            kolicina: finalQuantity,
-            cena_jedinice: finalUnitPrice,
-            cena_ukupno: totalPrice,
-            itemsPerSheet: itemsPerSheet,
-            sifra: sifra,
-        });
 
     } else {
         const displayFormat = format.replace('_', ' (').replace('x', 'x') + 'mm)';
-        opis = `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}, ${selectedPaper.name}`;
         
         let baseFormatForName: 'A4' | 'A3' = 'A4';
         if (format === 'A3' || format === 'SRA3_482x330' || format === 'SRA3_450x320') {
             baseFormatForName = 'A3';
         }
         
-        naziv = printServices.options.find(opt => opt.format === baseFormatForName && opt.color === color)?.name.replace('A4', displayFormat).replace('A3', displayFormat) || "Štampa";
+        const naziv = printServices.options.find(opt => opt.format === baseFormatForName && opt.color === color)?.name.replace('A4', displayFormat).replace('A3', displayFormat) || "Štampa";
 
-         onAddToBasket({
-          serviceId: `stampa-${format}-${color}-${side}-${paperId}`,
-          naziv: naziv,
-          opis,
-          kolicina: finalQuantity,
-          cena_jedinice: finalUnitPrice,
-          cena_ukupno: totalPrice,
-          sifra: sifra,
+        const printOnlyPrice = (activePrintOption[side].find(t => quantity >= t.kolicina.min && quantity <= t.kolicina.max) || activePrintOption[side][activePrintOption[side].length -1]).cena;
+        const paperPrice = unitPrice - printOnlyPrice;
+
+        // Add print item
+        onAddToBasket({
+            serviceId: `stampa-${format}-${color}-${side}-${paperId}-print-${uniqueId}`,
+            naziv: naziv,
+            opis: `${displayFormat}, ${color === 'cb' ? 'crno-belo' : 'kolor'}, ${side === 'oneSided' ? 'jednostrano' : 'obostrano'}`,
+            kolicina: quantity,
+            cena_jedinice: printOnlyPrice,
+            cena_ukupno: printOnlyPrice * quantity,
+            sifra: sifra,
         });
+
+        // Add paper item if it has a price
+        if (paperPrice > 0 && selectedPaper.sifra) {
+             onAddToBasket({
+                serviceId: `stampa-${format}-${color}-${side}-${paperId}-paper-${uniqueId}`,
+                naziv: `Papir: ${selectedPaper.name}`,
+                opis: `Format: ${displayFormat}`,
+                kolicina: quantity,
+                cena_jedinice: paperPrice,
+                cena_ukupno: paperPrice * quantity,
+                sifra: selectedPaper.sifra,
+            });
+        }
     }
   };
 

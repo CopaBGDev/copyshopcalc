@@ -48,12 +48,12 @@ export function OrderBasket({ items, onUpdateQuantity, onFinalizeOrder, isFinali
                   </p>
                 </div>
                 <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                   <div className={cn("flex items-center", item.itemsPerSheet && "pointer-events-none")}>
-                        <Button variant="ghost" size="icon" className={cn("h-7 w-7", !item.itemsPerSheet && "pointer-events-auto")} onClick={() => !item.itemsPerSheet && onUpdateQuantity(item.id, item.kolicina - 1)}>
+                   <div className={cn("flex items-center")}>
+                        <Button variant="ghost" size="icon" className={cn("h-7 w-7")} onClick={() => onUpdateQuantity(item.id, item.kolicina - 1)}>
                             <Minus className="h-4 w-4" />
                         </Button>
                         <span className="w-8 text-center font-mono">{item.kolicina}</span>
-                         <Button variant="ghost" size="icon" className={cn("h-7 w-7", !item.itemsPerSheet && "pointer-events-auto")} onClick={() => !item.itemsPerSheet && onUpdateQuantity(item.id, item.kolicina + 1)}>
+                         <Button variant="ghost" size="icon" className={cn("h-7 w-7")} onClick={() => onUpdateQuantity(item.id, item.kolicina + 1)}>
                             <Plus className="h-4 w-4" />
                         </Button>
                    </div>

@@ -86,12 +86,12 @@ export const appCategories: AppCategory[] = [
 
 export const printServices: PrintServiceData = {
     papers: [
-      { id: '80gr', name: 'Standardni 80gr papir', price: 0 },
-      { id: '115-300gr-kuns', name: 'Kunzdruk 115-300gr', price: 36.00, format: 'SRA3' },
-      { id: '120-300gr-papir', name: 'Papir 120-300gr', price: 41.00, format: 'SRA3' },
-      { id: 'pvc-bela', name: 'Plastika za laser štampu bela', price: 330.00, format: 'SRA3' },
-      { id: 'muflon', name: 'Muflon samolepljivi', price: 77.00, format: 'SRA3' },
-      { id: 'pvc-folija', name: 'Samolepljiva PVC folija bela/providna', price: 275.00, format: 'SRA3' },
+      { id: '80gr', name: 'Standardni 80gr papir', price: 0, sifra: 101 },
+      { id: '115-300gr-kuns', name: 'Kunzdruk 115-300gr', price: 36.00, format: 'SRA3', sifra: 102 },
+      { id: '120-300gr-papir', name: 'Papir 120-300gr', price: 41.00, format: 'SRA3', sifra: 103 },
+      { id: 'pvc-bela', name: 'Plastika za laser štampu bela', price: 330.00, format: 'SRA3', sifra: 104 },
+      { id: 'muflon', name: 'Muflon samolepljivi', price: 77.00, format: 'SRA3', sifra: 105 },
+      { id: 'pvc-folija', name: 'Samolepljiva PVC folija bela/providna', price: 275.00, format: 'SRA3', sifra: 106 },
     ],
     options: [
         {
@@ -489,5 +489,6 @@ export const designServices: DesignServiceData = [
 
 
     
+
 
 

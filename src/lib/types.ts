@@ -1,4 +1,5 @@
 
+
 export type OrderItem = {
   id: string; // Unique ID for the basket item instance
   serviceId: string;
@@ -40,7 +41,8 @@ export type PaperType = {
   id: string;
   name: string;
   price: number;
-  format?: 'SRA3'
+  format?: 'SRA3';
+  sifra?: number;
 };
 
 export type PrintServiceData = {
@@ -370,4 +372,5 @@ export type OtherService = {
     kategorija: string;
     cena: number;
 }
+
 
