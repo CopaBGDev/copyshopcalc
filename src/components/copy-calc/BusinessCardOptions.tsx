@@ -41,9 +41,9 @@ const DigitalCardCalculator = ({ onAddToBasket }: { onAddToBasket: (item: Omit<O
         
         if (lamination !== 'none') {
             const isTwoSidedLamination = lamination.startsWith('obostrana');
-            const laminationPrice = (isTwoSidedLamination 
+            const laminationPrice = isTwoSidedLamination 
                 ? businessCardServices.doplate.plastifikacija.dvostrano 
-                : businessCardServices.doplate.plastifikacija.jednostrano) * quantityNum;
+                : businessCardServices.doplate.plastifikacija.jednostrano;
             basePrice += laminationPrice;
 
             const laminationType = lamination.endsWith('mat') ? 'mat' : 'sjaj';

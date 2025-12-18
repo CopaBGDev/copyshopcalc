@@ -338,8 +338,8 @@ export const businessCardServices: BusinessCardData = {
     },
     doplate: {
         plastifikacija: {
-            jednostrano: 1.80,
-            dvostrano: 3.60,
+            jednostrano: 60.00,
+            dvostrano: 120.00,
             sifra: 33
         },
         coskanje: {
@@ -515,6 +515,7 @@ export const designServices: DesignServiceData = [
 
 
     
+
 
 
 
