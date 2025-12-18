@@ -167,21 +167,20 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
             laminationPrice = price * quantity;
         }
-
+        
         let roundingPrice = 0;
         if (cornerRounding && items > 0) {
             const roundingService = finishingServices.other.find(s => s.id === 'coskanje');
             if (roundingService) {
-                roundingPrice = roundingService.price * items * quantity;
+                roundingPrice = roundingService.price * items;
             }
         }
 
-        
-        const finalFinishingPrice = currentFinishingPrice > 0 ? currentFinishingPrice : 0;
+        const finalFinishingPrice = (currentFinishingPrice > 0 ? currentFinishingPrice : 0) + roundingPrice;
         setFinishingPrice(finalFinishingPrice);
         
         const totalPrintPriceForSheets = totalSheetPrintPrice * quantity;
-        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice + laminationPrice + roundingPrice;
+        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice + laminationPrice;
 
         if(items > 0) {
             setTotalPrice(finalTotalPrice);
@@ -273,13 +272,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const isCutting = customFinishing === 'cutting';
             const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
             if (finishingService) {
+                const finishingTotalPrice = finishingService.price * cuts;
                 itemsToAdd.push({
                     serviceId: `stampa-custom-finishing-${uniqueId}`,
                     naziv: isCutting ? 'Sečenje' : 'Ricovanje',
-                    opis: `${cuts} operacija po tabaku. Ukupno operacija: ${cuts}. Cena je po operaciji.`,
-                    kolicina: cuts,
-                    cena_jedinice: finishingService.price,
-                    cena_ukupno: finishingPrice, // This should be calculated only once
+                    opis: `Broj operacija: ${cuts}. Obračunato samo jednom.`,
+                    kolicina: 1,
+                    cena_jedinice: finishingTotalPrice,
+                    cena_ukupno: finishingTotalPrice,
                     sifra: finishingService.sifra
                 });
             }
@@ -304,14 +304,14 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
         if (cornerRounding) {
             const roundingService = finishingServices.other.find(s => s.id === 'coskanje');
             if (roundingService) {
-                const totalItems = itemsPerSheet * quantity;
+                const roundingTotalPrice = roundingService.price * itemsPerSheet;
                  itemsToAdd.push({
                     serviceId: `stampa-custom-rounding-${uniqueId}`,
                     naziv: 'Ćoškanje',
-                    opis: `Za ${totalItems} komada`,
-                    kolicina: totalItems,
-                    cena_jedinice: roundingService.price,
-                    cena_ukupno: roundingService.price * totalItems,
+                    opis: `Obračunato za komade sa jednog tabaka: ${itemsPerSheet}`,
+                    kolicina: 1,
+                    cena_jedinice: roundingTotalPrice,
+                    cena_ukupno: roundingTotalPrice,
                     sifra: roundingService.sifra,
                 });
             }
