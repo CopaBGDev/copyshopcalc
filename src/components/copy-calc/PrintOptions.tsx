@@ -96,6 +96,12 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
   }, [paperId]);
 
   useEffect(() => {
+    if (format === 'custom') {
+      setPaperId('115-300gr-kuns');
+    }
+  }, [format]);
+
+  useEffect(() => {
     if (isOneSidedOnlyPaper) {
       setSide('oneSided');
     }
@@ -154,7 +160,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const isCutting = customFinishing === 'cutting';
             const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
             if(finishingService) {
-                currentFinishingPrice += (currentCuts * finishingService.price);
+                currentFinishingPrice = (currentCuts * finishingService.price);
             }
         }
         
@@ -172,7 +178,7 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const laminationService = finishingServices.lamination.roll.find(s => s.id === (isTwoSided ? 'roll-32' : 'roll-33'));
             if (laminationService) {
                 const price = customSheetFormat === 'A4' ? laminationService.priceA4 : laminationService.priceA3;
-                laminationPrice = price * quantity;
+                laminationPrice = price;
             }
         }
         
@@ -184,11 +190,11 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             }
         }
 
-        const finalFinishingPrice = (currentFinishingPrice > 0) ? (currentFinishingPrice * quantity) : 0;
+        const finalFinishingPrice = currentFinishingPrice;
         setFinishingPrice(finalFinishingPrice);
         
-        const totalPrintPriceForSheets = totalSheetPrintPrice * quantity;
-        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice + laminationPrice + roundingPrice + knifeStartPrice;
+        const totalPrintPriceForSheets = (totalSheetPrintPrice + laminationPrice) * quantity;
+        const finalTotalPrice = totalPrintPriceForSheets + finalFinishingPrice + roundingPrice + knifeStartPrice;
 
         if(items > 0) {
             setTotalPrice(finalTotalPrice);
@@ -283,13 +289,13 @@ export function PrintOptions({ onAddToBasket }: PrintOptionsProps) {
             const isCutting = customFinishing === 'cutting';
             const finishingService = finishingServices.other.find(s => s.id === (isCutting ? 'secenje-a4-a3' : 'ricovanje'));
             if (finishingService) {
-                const finishingTotalPrice = finishingService.price * cuts * quantity;
+                const finishingTotalPrice = finishingService.price * cuts;
                 itemsToAdd.push({
                     serviceId: `stampa-custom-finishing-${uniqueId}`,
                     naziv: isCutting ? 'Sečenje' : 'Ricovanje',
-                    opis: `Broj operacija: ${cuts} po tabaku`,
-                    kolicina: quantity,
-                    cena_jedinice: finishingService.price * cuts,
+                    opis: `Broj operacija: ${cuts}`,
+                    kolicina: 1,
+                    cena_jedinice: finishingTotalPrice,
                     cena_ukupno: finishingTotalPrice,
                     sifra: finishingService.sifra
                 });
